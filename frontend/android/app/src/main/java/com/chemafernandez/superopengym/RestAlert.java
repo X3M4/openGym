@@ -1,4 +1,4 @@
-package ch.duartesantos.opengym;
+package com.chemafernandez.superopengym;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -25,13 +25,13 @@ import android.util.Log;
  * the user also allows notifications there.
  */
 public final class RestAlert {
-    static final String ACTION = "ch.duartesantos.opengym.action.REST_OVER";
-    static final String ACTION_PAUSE = "ch.duartesantos.opengym.rest.PAUSE";
-    static final String ACTION_MINUS = "ch.duartesantos.opengym.rest.MINUS";
-    static final String ACTION_PLUS = "ch.duartesantos.opengym.rest.PLUS";
-    static final String ACTION_SKIP = "ch.duartesantos.opengym.rest.SKIP";
-    static final String ACTION_ACCENT = "ch.duartesantos.opengym.rest.ACCENT";
-    static final String ACTION_HOLD = "ch.duartesantos.opengym.rest.HOLD";
+    static final String ACTION = "com.chemafernandez.superopengym.action.REST_OVER";
+    static final String ACTION_PAUSE = "com.chemafernandez.superopengym.rest.PAUSE";
+    static final String ACTION_MINUS = "com.chemafernandez.superopengym.rest.MINUS";
+    static final String ACTION_PLUS = "com.chemafernandez.superopengym.rest.PLUS";
+    static final String ACTION_SKIP = "com.chemafernandez.superopengym.rest.SKIP";
+    static final String ACTION_ACCENT = "com.chemafernandez.superopengym.rest.ACCENT";
+    static final String ACTION_HOLD = "com.chemafernandez.superopengym.rest.HOLD";
     static final String CHANNEL_ID = "rest-over";
     /**
      * Settings → Vibrate off. Android keeps a channel's vibration as it was when the channel was

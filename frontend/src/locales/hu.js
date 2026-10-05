@@ -1375,7 +1375,7 @@ export default {
   'Could not check for updates — are you online?': 'Nem sikerült ellenőrizni — online vagy?',
   'Get the Android app': 'Android-alkalmazás letöltése',
   'Download the APK from opengym.duarte-santos.ch': 'Töltsd le az APK-t az opengym.duarte-santos.ch oldalról',
-  'Releases are checked on gitlab.com. The download is verified against its checksum before the installer opens.': 'A kiadásokat a gitlab.com-on ellenőrizzük. A letöltést a telepítő megnyitása előtt az ellenőrzőösszeggel vetjük össze.',
+  'Releases are checked on github.com. The download is verified against its checksum before the installer opens.': 'A kiadásokat a github.com-on ellenőrizzük. A letöltést a telepítő megnyitása előtt az ellenőrzőösszeggel vetjük össze.',
   'The web app updates together with your server. The Android app installs its own updates from here.': 'A webalkalmazás a szerverrel együtt frissül. Az Android-alkalmazás innen telepíti a frissítéseit.',
   'Starting download…': 'Letöltés indítása…',
   'Downloading update…': 'Frissítés letöltése…',

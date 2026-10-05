@@ -21,3 +21,6 @@ node_modules
 junit.xml
 coverage/
 frontend/bundle-size.json
+
+# Locally built APKs (frontend/scripts/build-apk.sh)
+out-apk/

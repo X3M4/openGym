@@ -1383,7 +1383,7 @@ export default {
   'Could not check for updates — are you online?': 'ตรวจสอบอัปเดตไม่ได้ — คุณออนไลน์อยู่ไหม?',
   'Get the Android app': 'รับแอป Android',
   'Download the APK from opengym.duarte-santos.ch': 'ดาวน์โหลด APK จาก opengym.duarte-santos.ch',
-  'Releases are checked on gitlab.com. The download is verified against its checksum before the installer opens.': 'ตรวจสอบรุ่นจาก gitlab.com ไฟล์ที่ดาวน์โหลดจะถูกตรวจ checksum ก่อนเปิดตัวติดตั้ง',
+  'Releases are checked on github.com. The download is verified against its checksum before the installer opens.': 'ตรวจสอบรุ่นจาก github.com ไฟล์ที่ดาวน์โหลดจะถูกตรวจ checksum ก่อนเปิดตัวติดตั้ง',
   'The web app updates together with your server. The Android app installs its own updates from here.': 'เว็บแอปอัปเดตพร้อมกับเซิร์ฟเวอร์ของคุณ แอป Android ติดตั้งอัปเดตจากที่นี่',
   'Starting download…': 'กำลังเริ่มดาวน์โหลด…',
   'Downloading update…': 'กำลังดาวน์โหลดอัปเดต…',

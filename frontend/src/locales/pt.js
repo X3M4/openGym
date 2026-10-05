@@ -1372,7 +1372,7 @@ export default {
   'Could not check for updates — are you online?': 'Não foi possível verificar — estás online?',
   'Get the Android app': 'Obter a app Android',
   'Download the APK from opengym.duarte-santos.ch': 'Descarrega o APK em opengym.duarte-santos.ch',
-  'Releases are checked on gitlab.com. The download is verified against its checksum before the installer opens.': 'As versões são verificadas em gitlab.com. A transferência é confirmada pela soma de verificação antes de abrir o instalador.',
+  'Releases are checked on github.com. The download is verified against its checksum before the installer opens.': 'As versões são verificadas em github.com. A transferência é confirmada pela soma de verificação antes de abrir o instalador.',
   'The web app updates together with your server. The Android app installs its own updates from here.': 'A app web atualiza-se com o teu servidor. A app Android instala as suas atualizações a partir daqui.',
   'Starting download…': 'A iniciar transferência…',
   'Downloading update…': 'A transferir atualização…',
