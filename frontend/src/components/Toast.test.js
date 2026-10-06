@@ -14,13 +14,10 @@ const px = v => {
 }
 
 describe('the toast', () => {
-  it('rounds its corners like a pill on one line, not like a circle on four', () => {
+  // SuperOpenGym draws every box with the system's small corner: a wrapped toast stays a box.
+  it('keeps the system\'s small corner, so four lines never read as a circle', () => {
     const radius = px(rule.match(/border-radius:([^;]+);/)[1].trim())
-    const pad = parseFloat(rule.match(/padding:(\d+)px/)[1])
-    const size = parseFloat(rule.match(/font-size:(\d+)px/)[1])
-    const oneLine = 2 * pad + size * 1.29   // body line-height
-    expect(radius).toBeGreaterThanOrEqual(oneLine / 2)   // one line: fully rounded ends
-    expect(radius).toBeLessThanOrEqual(oneLine / 2 + 4)  // four lines: a box with round corners
+    expect(radius).toBeLessThanOrEqual(8)
   })
 
   // left:50% leaves a box without a width half the screen to wrap in: the same message stood as

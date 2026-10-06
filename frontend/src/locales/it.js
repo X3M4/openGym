@@ -1663,4 +1663,7 @@ export default {
   'Teal': 'Turchese',
   'Yellow': 'Giallo',
   'Enter how long it took — at least 1 minute.': 'Inserisci quanto è durato — almeno 1 minuto.',
+  'In progress': 'In progress',
+  'Usual time': 'Usual time',
+  'Log weight': 'Log weight',
 }

@@ -271,3 +271,14 @@ async function pruneAutoBackups({ Filesystem, Directory }, written) {
     try { await Filesystem.deleteFile({ path: `${AUTO_BACKUP_DIR}/${n}`, directory: Directory.Documents }) } catch (e) { /* one stuck file does not stop the rest */ }
   }
 }
+// Status and navigation bar icons in the app's own theme (android SystemBarsPlugin): the
+// activity follows the phone's day/night setting, so a phone in dark mode drew light icons over
+// the app's light theme. Android only; elsewhere (and on iOS, which has no such plugin) a no-op.
+export async function setSystemBars(dark) {
+  if (!MOBILE) return
+  try {
+    const { Capacitor, registerPlugin } = await import('@capacitor/core')
+    if (Capacitor.getPlatform() !== 'android') return
+    await registerPlugin('SystemBars').setStyle({ dark: !!dark })
+  } catch { /* an older shell without the plugin keeps the system's choice */ }
+}

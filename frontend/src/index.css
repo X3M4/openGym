@@ -1,61 +1,81 @@
 /* ============================================================================
-   openGym — design system
+   SuperOpenGym — design system
    ----------------------------------------------------------------------------
-   Rebuilt around four rules, each aimed at a specific "generated" tell in the
-   previous sheet:
+   A sports identity programme in the Munich '72 tradition (Otl Aicher): every
+   domain of a cut owns a flat colour field and a pictogram, so you know where you
+   are by colour before you read a word.
 
-   1. ONE TYPE SCALE, MOSTLY REGULAR WEIGHT. The old sheet set font-weight 700/800
-      on nearly every element, which flattens hierarchy — when everything shouts,
-      position is the only cue left. Here weight carries meaning: 600 for a title,
-      400 for its content, and size does the rest.
-   2. A NEUTRAL SURFACE RAMP. Cards are near-neutral greys a few points apart, not
-      saturated blue-greys. Colour is spent only on the accent and on status.
-   3. HAIRLINES, NOT BORDERS. Separators are sub-pixel and inset past the icon
-      rail, so a list reads as one object instead of a stack of outlined boxes.
-   4. MOTION THAT ACKNOWLEDGES, NOT ANIMATES. Presses scale ~2%, transitions run
-      140–220ms on an ease-out curve. Nothing bounces or slides for decoration.
+   1. COLOUR AS FIELDS, NOT SPRINKLES. Five fixed domain colours (training, body,
+      nutrition, activity, strength) fill whole regions; everything else is white,
+      silver and navy ink. Never pure black.
+   2. ONE SYSTEMATIC FAMILY. Archivo's weight and width axes are the type grid:
+      wide for headings, condensed for the big numerals, regular for reading.
+   3. RULES AND FIELDS, NO SHADOWS. Small 4px corners, flat fills, hairline rules.
+      No gradients, no glass, no floating cards.
+   4. STRAIGHT MOTION. Fields move on straight paths, 200-260ms, ease-out. Numerals
+      never bounce.
+
+   Light is the default theme (bright gyms, daylight); dark is the same system on
+   a navy ground. Token names are the ones the whole sheet already uses, so every
+   rule below inherits the world without being rewritten.
    ========================================================================== */
 
 /* ---------------------------------------------------------------- tokens -- */
 :root {
-  /* surfaces — dark is the default */
-  --bg:        #000000;
-  --bg-el:     #0e0e10;   /* elevated backdrop (sheets, bars) */
-  --surface:   #1c1c1e;   /* card / grouped-list fill */
-  --surface-2: #2c2c2e;   /* pressed + nested fill */
-  --surface-3: #3a3a3c;   /* controls (segmented track, switch off) */
+  /* surfaces — light is the default */
+  --bg:        #ffffff;
+  --bg-el:     #ffffff;   /* elevated backdrop (sheets, bars) */
+  --surface:   #eef2f6;   /* silver field: groups, lists */
+  --surface-2: #e2e8ef;   /* pressed + nested fill */
+  --surface-3: #d3dbe4;   /* controls (segmented track, switch off) */
 
-  /* text */
-  --label:     #ffffff;
-  --label-2:   rgba(235,235,245,.60);
-  --label-3:   rgba(235,235,245,.32);
-  --label-4:   rgba(235,235,245,.18);
+  /* ink: deep navy, never black */
+  --ink:       #13233f;
+  --label:     #13233f;
+  --label-2:   rgba(19,35,63,.70);
+  --label-3:   rgba(19,35,63,.52);
+  --label-4:   rgba(19,35,63,.20);
 
   /* lines */
-  --sep:       rgba(84,84,88,.60);
-  --sep-op:    rgba(84,84,88,.34);   /* for edges sitting over blur */
-  --hair:      .5px;
+  --sep:       rgba(19,35,63,.16);
+  --sep-op:    rgba(19,35,63,.12);
+  --hair:      1px;
 
-  /* system palette (iOS dark values) */
-  --blue:#0a84ff; --green:#30d158; --red:#ff453a; --orange:#ff9f0a;
-  --yellow:#ffd60a; --teal:#40c8e0; --indigo:#5e5ce6; --pink:#ff375f;
-  --purple:#bf5af2; --mint:#63e6e2; --brown:#ac8e68; --grey:#8e8e93;
+  /* domain fields — the identity. Ink on them is --on-field (navy) in both themes. */
+  --d-train:    #3a9fe4;   /* training: sky blue */
+  --d-body:     #34b06a;   /* body weight & composition: green */
+  --d-food:     #f39a33;   /* nutrition: orange */
+  --d-move:     #f5c932;   /* activity, steps, cardio: yellow */
+  --d-strength: #8f80dc;   /* strength kept: violet */
+  --d-rest:     #c4ccd5;   /* rest & neutral: silver */
+  --on-field:   #13233f;
 
-  /* accent (per-account, synced) */
-  --acc:  var(--green);
-  --acc-2:#248a3d;
-  --on-acc:#000000;
-  --acc-soft: color-mix(in srgb, var(--acc) 16%, transparent);
-  --acc-line: color-mix(in srgb, var(--acc) 38%, transparent);
+  /* text-safe tones of the same hues, for words and thin strokes on the ground */
+  --blue:#1468ad; --green:#17834a; --red:#c03a17; --orange:#b85f05;
+  --yellow:#8a6a00; --teal:#0f7389; --indigo:#4b47b8; --pink:#b8285a;
+  --purple:#6a55c4; --mint:#0d7f78; --brown:#87613a; --grey:#66727f;
+
+  /* accent = the training field; primary actions are navy bars */
+  --acc:  var(--d-train);
+  --acc-2:#2a87c9;
+  --on-acc:var(--on-field);
+  --acc-text:#1468ad;
+  --acc-soft: color-mix(in srgb, var(--acc) 18%, transparent);
+  --acc-line: color-mix(in srgb, var(--acc) 45%, transparent);
 
   /* geometry */
-  --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:22px; --r-card:14px;
+  --r-sm:3px; --r:4px; --r-lg:4px; --r-xl:4px; --r-card:4px;   /* one corner: 4px (3px on small marks) */
   --pad:16px;
-  --icon-stroke:1.7;
+  --icon-stroke:1.8;
+
+  /* type: one family, its axes are the grid */
+  --font:'Archivo Variable','Archivo',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --w-wide:112%;     /* headings */
+  --w-cond:78%;      /* big numerals */
 
   /* motion */
-  --ease:cubic-bezier(.32,.72,0,1);
-  --fast:140ms; --med:220ms;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --fast:140ms; --med:230ms;
 
   /* The system bars the page is drawn under. env() is all a browser and the iOS app give; the
      Android WebView reports only the camera cutout there, and on Android 15, which draws the app
@@ -69,49 +89,49 @@
   --conn:0px;
 }
 
-:root[data-theme="light"] {
-  --bg:        #f2f2f7;
-  --bg-el:     #f7f7fa;
-  --surface:   #ffffff;
-  --surface-2: #ececef;
-  --surface-3: #e3e3e8;
+:root[data-theme="dark"] {
+  --bg:        #0d1626;
+  --bg-el:     #111c30;
+  --surface:   #17233a;
+  --surface-2: #1f2e49;
+  --surface-3: #2b3c5b;
 
-  --label:     #000000;
-  --label-2:   rgba(60,60,67,.60);
-  --label-3:   rgba(60,60,67,.30);
-  --label-4:   rgba(60,60,67,.16);
+  --ink:       #eef2f7;
+  --label:     #eef2f7;
+  --label-2:   rgba(238,242,247,.74);
+  --label-3:   rgba(238,242,247,.54);
+  --label-4:   rgba(238,242,247,.22);
 
-  --sep:       rgba(60,60,67,.29);
-  --sep-op:    rgba(60,60,67,.20);
+  --sep:       rgba(238,242,247,.14);
+  --sep-op:    rgba(238,242,247,.10);
 
-  --blue:#007aff; --green:#34c759; --red:#ff3b30; --orange:#ff9500;
-  --yellow:#ffcc00; --teal:#30b0c7; --indigo:#5856d6; --pink:#ff2d55;
-  --purple:#af52de; --mint:#00c7be; --brown:#a2845e; --grey:#8e8e93;
-  --acc-2:#248a3d;
-  --on-acc:#ffffff;
+  --d-train:    #4eaaee;
+  --d-body:     #47c07e;
+  --d-food:     #f6a64b;
+  --d-move:     #f7d04c;
+  --d-strength: #a397ea;
+  --d-rest:     #8a96a6;
+  --on-field:   #0d1626;
+
+  --blue:#6cb8f2; --green:#5fd093; --red:#ff7a59; --orange:#f8ae5c;
+  --yellow:#f7d04c; --teal:#5cc7da; --indigo:#9b98f5; --pink:#f27aa3;
+  --purple:#b3a8f0; --mint:#5fd6cd; --brown:#cfa77c; --grey:#9aa6b4;
+
+  --acc-2:#3d96d8;
+  --acc-text:#6cb8f2;
 }
 
-/* accents — Apple's system colours, so a recolour never looks off-system */
-:root[data-accent="lime"]  { --acc:var(--green);  --acc-2:#248a3d; --on-acc:#000 }
-:root[data-accent="sky"]   { --acc:var(--blue);   --acc-2:#0060df; --on-acc:#fff }
-:root[data-accent="orange"]{ --acc:var(--orange); --acc-2:#c76b00; --on-acc:#000 }
-:root[data-accent="violet"]{ --acc:var(--purple); --acc-2:#8944ab; --on-acc:#fff }
-:root[data-accent="pink"]  { --acc:var(--pink);   --acc-2:#d70036; --on-acc:#fff }
-:root[data-accent="red"]   { --acc:var(--red);    --acc-2:#d70015; --on-acc:#fff }
-:root[data-accent="teal"]  { --acc:var(--teal);   --acc-2:#0071a4; --on-acc:#000 }
-:root[data-accent="gold"]  { --acc:var(--yellow); --acc-2:#b25000; --on-acc:#000 }
-/* Label colour on a filled accent button is picked per accent by measured contrast,
-   not by taste. Button text is 17px/600, so the AA bar is 3:1 (large text). White on
-   the light-theme green is 2.22:1 and on teal 2.57:1 — both fail, and green is the
-   DEFAULT accent, so every primary button in light mode was failing. Black scores
-   9.46 / 8.16 there. Blue, purple, pink and red keep white (3.5–4.1:1), which both
-   passes and matches the platform convention. */
-:root[data-theme="light"][data-accent="lime"],
-:root[data-theme="light"][data-accent="teal"]  { --on-acc:#000 }
-:root[data-theme="light"][data-accent="sky"],
-:root[data-theme="light"][data-accent="violet"],
-:root[data-theme="light"][data-accent="pink"],
-:root[data-theme="light"][data-accent="red"]   { --on-acc:#fff }
+/* Accent choices from openGym stay selectable; each maps onto one of the system's fields so a
+   recolour never leaves the world. "sky" is the default. Ink on a field is always navy. */
+:root[data-accent="sky"]   { --acc:var(--d-train);    --acc-2:#2a87c9; --acc-text:var(--blue) }
+:root[data-accent="lime"]  { --acc:var(--d-body);     --acc-2:#259a58; --acc-text:var(--green) }
+:root[data-accent="orange"]{ --acc:var(--d-food);     --acc-2:#de8420; --acc-text:var(--orange) }
+:root[data-accent="violet"]{ --acc:var(--d-strength); --acc-2:#7a6ad0; --acc-text:var(--purple) }
+:root[data-accent="gold"]  { --acc:var(--d-move);     --acc-2:#e0b51f; --acc-text:var(--yellow) }
+:root[data-accent="teal"]  { --acc:#34b4c4;           --acc-2:#2399a8; --acc-text:var(--teal) }
+:root[data-accent="pink"]  { --acc:#ec7aa3;           --acc-2:#d8618d; --acc-text:var(--pink) }
+:root[data-accent="red"]   { --acc:#ef7a5a;           --acc-2:#da6141; --acc-text:var(--red) }
+:root[data-accent] { --on-acc:var(--on-field) }
 
 /* ---------------------------------------------------------------- reset -- */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -121,8 +141,8 @@ html{
 }
 body{
   background:var(--bg);color:var(--label);
-  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Segoe UI',Roboto,system-ui,sans-serif;
-  font-size:17px;line-height:1.29;letter-spacing:-.01em;
+  font-family:var(--font);
+  font-size:17px;line-height:1.32;letter-spacing:0;
   min-height:100vh;min-height:100dvh;overscroll-behavior-y:none;overflow-x:clip;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   touch-action:manipulation;
@@ -131,9 +151,14 @@ body{
 button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;letter-spacing:inherit}
 input,select,textarea{font:inherit;color:var(--label);letter-spacing:inherit}
 img{max-width:100%}
-a{color:var(--acc);text-decoration:none}
+a{color:var(--acc-text);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+::selection{background:color-mix(in srgb,var(--d-train) 40%,transparent);color:var(--label)}
+html{caret-color:var(--acc-text);accent-color:var(--acc)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:0;border:3px solid var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
 :focus{outline:none}
-:focus-visible{outline:2.5px solid var(--acc);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:2.5px solid var(--acc-text);outline-offset:2px;border-radius:var(--r-sm)}
 button,.chip,.tile,.item,.wday,.cal-d,.swatch,.hm-c,.lrow,.seg button,.stp button,.sld
 {-webkit-user-select:none;user-select:none}
 
@@ -141,25 +166,29 @@ button,.chip,.tile,.item,.wday,.cal-d,.swatch,.hm-c,.lrow,.seg button,.stp butto
 .icn{
   width:1em;height:1em;flex:none;display:block;
   fill:none;stroke:currentColor;stroke-width:var(--icon-stroke);
-  stroke-linecap:round;stroke-linejoin:round;
+  stroke-linecap:square;stroke-linejoin:miter;
 }
 
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 
 /* ------------------------------------------------------------ type scale -- */
-.t-large  {font-size:34px;line-height:1.06;font-weight:700;letter-spacing:-.028em}
-.t-title  {font-size:28px;line-height:1.12;font-weight:700;letter-spacing:-.024em}
-.t-title2 {font-size:22px;line-height:1.18;font-weight:700;letter-spacing:-.021em}
-.t-head   {font-size:17px;line-height:1.29;font-weight:600;letter-spacing:-.012em}
-.t-body   {font-size:17px;line-height:1.29;font-weight:400;letter-spacing:-.012em}
-.t-callout{font-size:16px;line-height:1.31;font-weight:400;letter-spacing:-.009em}
-.t-sub    {font-size:15px;line-height:1.33;font-weight:400;letter-spacing:-.006em}
-.t-foot   {font-size:13px;line-height:1.38;font-weight:400;letter-spacing:-.001em}
-.t-cap    {font-size:12px;line-height:1.33;font-weight:400;letter-spacing:0}
+.t-large  {font-size:34px;line-height:1.04;font-weight:700;font-stretch:var(--w-wide);letter-spacing:-.022em}
+.t-title  {font-size:28px;line-height:1.1;font-weight:700;font-stretch:var(--w-wide);letter-spacing:-.018em}
+.t-title2 {font-size:22px;line-height:1.16;font-weight:650;font-stretch:var(--w-wide);letter-spacing:-.012em}
+.t-head   {font-size:17px;line-height:1.29;font-weight:600;letter-spacing:-.005em}
+.t-body   {font-size:17px;line-height:1.32;font-weight:400;letter-spacing:0}
+.t-callout{font-size:16px;line-height:1.34;font-weight:400;letter-spacing:0}
+.t-sub    {font-size:15px;line-height:1.36;font-weight:400;letter-spacing:0}
+.t-foot   {font-size:13px;line-height:1.38;font-weight:400;letter-spacing:.005em}
+.t-cap    {font-size:12px;line-height:1.33;font-weight:500;letter-spacing:.02em}
+/* the big numerals: condensed, tabular, never bouncing */
+.num-xl{font-size:64px;line-height:.9;font-weight:700;font-stretch:var(--w-cond);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.num-l {font-size:40px;line-height:.95;font-weight:700;font-stretch:var(--w-cond);letter-spacing:-.015em;font-variant-numeric:tabular-nums}
+.num-m {font-size:26px;line-height:1;font-weight:650;font-stretch:var(--w-cond);font-variant-numeric:tabular-nums}
 
 .muted{color:var(--label-2)} .dim{color:var(--label-3)}
 .small{font-size:13px;line-height:1.38}
-.accent{color:var(--acc)}
+.accent{color:var(--acc-text)}
 .capitalize{text-transform:capitalize}
 /* exercise names and body-part/equipment terms arrive lowercase from the dataset,
    so tags and chips capitalise by default. Anything that is a unit or a sentence opts
@@ -203,7 +232,7 @@ body.resting #app{padding-bottom:calc(206px + var(--sab))}
 }
 .conn .icn{flex:none;font-size:16px;color:var(--label-2)}
 .conn-t{flex:1;min-width:0;overflow-wrap:break-word}
-.conn-a{flex:none;padding:4px 10px;border-radius:99px;background:var(--surface-3);font-weight:600;white-space:nowrap}
+.conn-a{flex:none;padding:4px 10px;border-radius:var(--r-sm);background:var(--surface-3);font-weight:600;white-space:nowrap}
 button.conn:active{filter:brightness(1.12)}
 .conn-bar.off .conn{background:color-mix(in srgb,var(--label-3) 18%,var(--surface))}
 .conn-bar.bad .conn{background:color-mix(in srgb,var(--red) 16%,var(--surface))}
@@ -212,7 +241,7 @@ button.conn:active{filter:brightness(1.12)}
 .conn-bar.quiet .conn-row{padding:2px 0 4px}
 .conn-bar.quiet .conn{min-height:26px;padding-block:2px;padding-inline:4px 2px;background:none;color:var(--label-2);font-size:12px;gap:6px}
 .conn-bar.quiet .conn .icn{font-size:13px;color:var(--label-3)}
-.conn-bar.quiet .conn-a{padding:2px 9px;font-size:12px;color:var(--acc);background:var(--acc-soft)}
+.conn-bar.quiet .conn-a{padding:2px 9px;font-size:12px;color:var(--acc-text);background:var(--acc-soft)}
 :root[data-theme="light"] .conn-bar:not(.quiet) .conn-a{background:var(--surface)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .conn-bar{background:var(--bg)}
@@ -232,17 +261,18 @@ button.conn:active{filter:brightness(1.12)}
    a box this tight, and that is what turned "Упражнения" into "Упра / жнен / ия". */
 .hdr>div{min-width:0}
 .hdr>.btn{flex:none}
-.hdr h1{font-size:34px;line-height:1.06;font-weight:700;letter-spacing:-.028em;overflow-wrap:break-word}
-@media (max-width:420px){.hdr h1{font-size:30px}}
-.hdr .sub{color:var(--label-2);font-size:15px;letter-spacing:-.006em;margin-top:4px}
+.hdr h1{font-size:32px;line-height:1.04;font-weight:700;font-stretch:var(--w-wide);letter-spacing:-.02em;overflow-wrap:break-word}
+@media (max-width:420px){.hdr h1{font-size:28px}}
+.hdr .sub{color:var(--label-2);font-size:15px;margin-top:5px}
 
 .iconbtn{
-  width:36px;height:36px;border-radius:50%;flex:none;
+  width:38px;height:38px;border-radius:var(--r);flex:none;
   background:var(--surface);color:var(--label);
   display:flex;align-items:center;justify-content:center;font-size:18px;
   transition:background var(--fast),transform var(--fast);
 }
-.iconbtn:active{background:var(--surface-2);transform:scale(.92)}
+.iconbtn:active{background:var(--surface-2);transform:scale(.94)}
+@media (hover:hover){.iconbtn:hover{background:var(--surface-2)}}
 /* invisible hit-area extension: these look right at their size but fall short of a
    finger-sized target, so the pseudo element widens what the tap lands on without
    changing the painted box. Segmented buttons sit flush against each other, so they
@@ -250,7 +280,7 @@ button.conn:active{filter:brightness(1.12)}
 .iconbtn,.chip,.seg button,.helpbtn{position:relative}
 .iconbtn::before,.chip::before,.seg button::before,.helpbtn::before{content:'';position:absolute;inset:-6px}
 .seg button::before{inset:-6px 0}
-.iconbtn.on-ss{background:var(--acc-soft);color:var(--acc)}
+.iconbtn.on-ss{background:var(--acc-soft);color:var(--acc-text)}
 .iconbtn:disabled{opacity:.32}
 
 h4.sec{
@@ -258,10 +288,10 @@ h4.sec{
   text-transform:none;margin:22px 0 8px;padding:0 4px;
 }
 .card h2{
-  font-size:13px;font-weight:400;letter-spacing:-.004em;color:var(--label-2);
+  font-size:17px;font-weight:650;font-stretch:var(--w-wide);color:var(--label);
   text-transform:none;margin:0 0 12px;
 }
-.divider{height:var(--hair);background:var(--sep);margin:14px 0;border:0}
+.divider{height:var(--hair);background:var(--sep);margin:16px 0;border:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row{display:flex;align-items:center;gap:12px}
 .row.between{justify-content:space-between}
@@ -274,15 +304,15 @@ h4.sec{
 /* ----------------------------------------------------------------- card -- */
 .card{
   background:var(--surface);border-radius:var(--r-card);
-  padding:16px;margin-bottom:12px;
+  padding:16px;margin-bottom:10px;
 }
-.card .big{font-size:30px;font-weight:600;letter-spacing:-.026em;line-height:1.1}
+.card .big{font-size:36px;font-weight:700;font-stretch:var(--w-cond);letter-spacing:-.015em;line-height:1}
 
 /* ------------------------------------------------------ inset group list -- */
 .sect{margin-bottom:22px}
 .sect-t{
-  font-size:13px;font-weight:400;color:var(--label-2);
-  letter-spacing:-.004em;padding:0 4px 7px;display:block;
+  font-size:13px;font-weight:600;color:var(--label-2);
+  letter-spacing:.01em;padding:0 2px 7px;display:block;
 }
 .sect-b{background:var(--surface);border-radius:var(--r-card);overflow:hidden}
 .sect-f{font-size:13px;color:var(--label-2);padding:7px 4px 0;line-height:1.38}
@@ -299,9 +329,10 @@ h4.sec{
 .lrow:has(.lrow-i)+.lrow:has(.lrow-i)::before{inset-inline-start:55px}
 .lrow.tap:active{background:var(--surface-2)}
 .lrow-i{
-  width:29px;height:29px;border-radius:7px;flex:none;font-size:18px;
+  width:30px;height:30px;border-radius:var(--r-sm);flex:none;font-size:18px;
   display:flex;align-items:center;justify-content:center;
-  background:var(--tint,var(--acc));color:#fff;
+  /* the tint is a text-safe tone: drawn as the glyph on a wash of itself, so it reads in both themes */
+  background:color-mix(in srgb,var(--tint,var(--acc-text)) 15%,var(--bg));color:var(--tint,var(--acc-text));
 }
 /* The title column never shrinks below its own longest word. With a basis of 0 and min-width:0 it
    only got what a capped value left over, and on a 320px phone "Progression" (96px) was painted over
@@ -328,7 +359,7 @@ h4.sec{
 .lrow-v{color:var(--label-2);font-size:17px;letter-spacing:-.012em;flex:0 1 auto;max-width:55%;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align: end}
 .lrow-c{color:var(--label);font-size:15px;flex:none;--icon-stroke:2.4}
-.lrow-k{color:var(--acc);font-size:17px;flex:none;--icon-stroke:2.4}
+.lrow-k{color:var(--acc-text);font-size:17px;flex:none;--icon-stroke:2.4}
 .lrow.danger,.lrow.danger .lrow-t{color:var(--red)}
 /* The Stats exercise name gets its own line so long names cannot run into the title.
    Two columns only — label/value on the left, chevron on the right — so this is for rows
@@ -355,20 +386,25 @@ h4.sec{
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;
   padding:14px 18px;border-radius:var(--r);font-size:17px;font-weight:600;
-  letter-spacing:-.012em;background:var(--surface-2);color:var(--label);
+  letter-spacing:0;background:var(--surface-2);color:var(--label);
   transition:transform var(--fast) var(--ease),background var(--fast),opacity var(--fast);
 }
 .btn .icn{font-size:19px}
-.btn:active{transform:scale(.975)}
-.btn.primary{background:var(--acc);color:var(--on-acc)}
-.btn.primary:active{background:var(--acc-2)}
-.btn.tinted{background:var(--acc-soft);color:var(--acc)}
+.btn:active{transform:scale(.98)}
+@media (hover:hover){.btn:hover{background:var(--surface-3)}}
+/* primary: the ink bar. A field (.btn.field) is the domain-coloured alternative. */
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.primary:active,.btn.primary:hover{background:color-mix(in srgb,var(--ink) 86%,var(--d-train))}
+.btn.field{background:var(--acc);color:var(--on-acc)}
+.btn.field:active,.btn.field:hover{background:var(--acc-2)}
+.btn.tinted{background:var(--acc-soft);color:var(--acc-text)}
 .btn.danger{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
-.btn.ghost,.btn.plain{background:none;color:var(--acc);font-weight:400}
+.btn.ghost,.btn.plain{background:none;color:var(--acc-text);font-weight:400}
 .btn.ghost:active,.btn.plain:active{background:var(--surface-2)}
 .btn.sm{padding:8px 14px;width:auto;font-size:15px;border-radius:var(--r-sm);gap:5px}
 .btn.sm .icn{font-size:16px}
-.btn.xs{padding:5px 10px;width:auto;font-size:13px;border-radius:7px;gap:4px}
+.btn.xs{padding:5px 10px;width:auto;font-size:13px;border-radius:var(--r-sm);gap:4px}
+@media (hover:hover){.btn.ghost:hover,.btn.plain:hover{background:var(--surface)}}
 .btn:disabled{opacity:.32;pointer-events:none}
 
 /* ----------------------------------------------------------- tab bar ----- */
@@ -382,46 +418,45 @@ h4.sec{
   position:fixed;inset-inline-start:0;inset-inline-end:0;bottom:0;z-index:50;
   display:flex;justify-content:space-around;align-items:flex-end;
   padding:7px 6px calc(6px + var(--sab));
-  background:color-mix(in srgb,var(--bg-el) 94%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(10px);backdrop-filter:saturate(180%) blur(10px);
-  border-top:var(--hair) solid var(--sep-op);
+  background:var(--bg-el);
+  border-top:var(--hair) solid var(--sep);
 }
-:root[data-theme="light"] #tabbar{background:rgba(249,249,251,.94)}
 #tabbar button{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  color:var(--label-3);font-size:10px;font-weight:500;letter-spacing:.005em;padding-top:3px;
-  transition:color var(--fast);
+  color:var(--label-2);font-size:11px;font-weight:500;letter-spacing:.01em;padding-top:5px;
+  transition:color var(--fast);position:relative;
 }
 /* The inactive tint is semi-transparent, so wherever two strokes cross inside an
    icon (the calendar's hangers over its frame, the divider's caps on its sides)
    the alpha doubled up and the icon read as a stack of loose layers. Carrying the
    fade on the <svg> instead of in the stroke colour flattens the icon first and
    fades it as one shape — and it does that for every icon, not just this one. */
-#tabbar button .icn{font-size:25px;--icon-stroke:1.65;color:var(--label)}
-#tabbar button.on{color:var(--acc)}
-#tabbar button.on .icn{--icon-stroke:2;color:inherit;opacity:1}
+#tabbar button .icn{font-size:24px;--icon-stroke:1.7;color:inherit}
+/* the active tab: ink, heavier, with a short field bar on top — the system's marker, not a glow */
+#tabbar button.on{color:var(--label);font-weight:650}
+#tabbar button.on .icn{--icon-stroke:2.1}
+#tabbar button.on:not(.start)::before{content:'';position:absolute;top:-7px;width:28px;height:3px;background:var(--acc)}
 #tabbar button.start{margin-top:-24px}
 #tabbar button.start .cir{
-  width:52px;height:52px;border-radius:50%;background:var(--acc);color:var(--on-acc);
+  width:54px;height:54px;border-radius:var(--r);background:var(--d-train);color:var(--on-field);
   display:flex;align-items:center;justify-content:center;position:relative;
-  box-shadow:0 6px 18px -4px color-mix(in srgb,var(--acc) 55%,transparent);
   transition:transform var(--fast) var(--ease);
 }
 #tabbar button.start:active .cir{transform:scale(.93)}
 #tabbar button.start .cir .icn{font-size:26px;--icon-stroke:2;color:inherit;opacity:1}
-#tabbar button.start span{color:var(--acc);font-weight:600}
+#tabbar button.start span{color:var(--label);font-weight:650}
 /* `.cir` is itself a <span>, so the label rules above and below reach it too and
    outrank the `.cir` block — which is how the running state ended up painting an
    orange play glyph onto an orange disc. Both states restate their own colour.
    The disc is orange in either theme, so its glyph is black, not `--on-acc`. */
-#tabbar button.start .cir{color:var(--on-acc)}
-#tabbar button.start.rec .cir{background:var(--orange);color:#000;box-shadow:0 6px 18px -4px color-mix(in srgb,var(--orange) 55%,transparent)}
+#tabbar button.start .cir{color:var(--on-field)}
+#tabbar button.start.rec .cir{background:var(--d-food);color:var(--on-field)}
 #tabbar button.start.rec span{color:var(--orange)}
 #tabbar button.start.rec .cir::after{
-  content:'';position:absolute;inset:0;border-radius:50%;
-  border:2px solid var(--orange);animation:ping 1.9s var(--ease) infinite;
+  content:'';position:absolute;inset:0;border-radius:var(--r);
+  border:2px solid var(--d-food);animation:ping 1.9s var(--ease) infinite;
 }
-@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}
+@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.3);opacity:0}}
 
 /* NOTE on every backdrop-filter pair in this file: the -webkit- line comes first and the
    standard property last, which is the order a prefixed/standard pair wants — whichever is
@@ -433,27 +468,108 @@ h4.sec{
    fully opaque instead. Keep this in sync with the rules above. */
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   #tabbar{background:var(--bg-el)}
-  :root[data-theme="light"] #tabbar{background:#f9f9fb}
+  :root[data-theme="light"] #tabbar{background:var(--bg-el)}
   #timer{background:var(--surface)}
-  #toast{background:var(--surface-2)}
+}
+
+/* --------------------------------------------------------- domain field -- */
+/* Home's first block: one full-width field in the colour of what today asks for. Training is
+   sky blue, a session in progress orange, the body green. Ink on it is always --on-field. The
+   go bar is an ink bar across the field's foot — the one action the field exists for. */
+.dfield{
+  --f:var(--d-train);
+  background:var(--f);color:var(--on-field);border-radius:var(--r);
+  display:flex;flex-direction:column;gap:14px;
+  padding:18px 18px 0;margin-bottom:10px;overflow:hidden;
+  min-height:clamp(280px,38vh,380px);
+  container-type:inline-size;
+  view-transition-name:dfield;
+}
+/* the compact field: a domain band under the top field (body weight on a training day) */
+.dfield-band{min-height:0;view-transition-name:none;gap:10px;padding-top:14px}
+.dfield-band .dfield-pict{font-size:30px}
+.dfield-band .dfield-head{padding-inline-end:44px;min-height:0}
+.dfield-body{--f:var(--d-body)}
+.dfield-active{--f:var(--d-food)}
+.dfield-head{position:relative;padding-inline-end:68px}
+.dfield-head+.dfield-note{padding-inline-end:68px;margin-top:-8px}
+/* the corner pictogram sits outside the heading's flow, so the note under the heading stays on it */
+.dfield-head .dfield-pict{position:absolute;top:0;inset-inline-end:0;margin:-4px -4px 0 0}
+/* training and in-progress fields are posters: the pictogram owns the top, the words sit on the bar */
+.dfield-hero{flex:1;display:flex;align-items:flex-start;min-height:0}
+.dfield-hero .icn{font-size:clamp(84px,30cqi,220px);--icon-stroke:1.9;margin:-6px 0 0 -6px}
+.dfield-words{display:flex;flex-direction:column;gap:12px}
+.dfield-pict{font-size:56px;--icon-stroke:2.2;flex:none;margin:-4px -4px 0 0}
+/* the routine name: wide capitals, the lettering of a sports programme */
+.dfield-title{
+  font-size:clamp(30px,10cqi,76px);line-height:.98;font-weight:750;font-stretch:var(--w-wide);
+  text-transform:uppercase;letter-spacing:-.01em;overflow-wrap:break-word;text-wrap:balance;min-width:0;
+}
+.dfield-lead{font-size:clamp(20px,5.6cqi,30px);line-height:1.15;font-weight:700;font-stretch:var(--w-wide);text-wrap:balance;min-width:0}
+.dfield-note{font-size:15px;font-weight:600;margin-top:-4px}
+.dfield-facts{display:flex;gap:clamp(24px,7cqi,56px);margin:4px 0 0}
+.dfield-facts dt{font-size:13px;font-weight:600;opacity:.82}
+.dfield-facts dd{font-size:clamp(40px,12cqi,96px);line-height:1;font-weight:700;font-stretch:var(--w-cond);font-variant-numeric:tabular-nums;margin-top:3px}
+.dfield-facts dd small{font-size:17px;font-weight:600;font-stretch:100%;margin-inline-start:2px}
+.dfield-go,.dfield-ghost{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:18px;font-weight:700;letter-spacing:.01em;min-height:56px;
+}
+.dfield-go{
+  background:var(--ink);color:var(--bg);margin:4px -18px 0;
+  transition:background var(--fast);
+}
+.dfield-go .icn{font-size:20px;--icon-stroke:2.4}
+.dfield-go:active,.dfield-go:hover{background:color-mix(in srgb,var(--ink) 86%,var(--f))}
+.dfield-weight{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:4px}
+.dfield-unit{font-size:20px;font-weight:650}
+.dfield-delta{display:inline-flex;align-items:center;gap:2px;font-size:17px;font-weight:650;margin-inline-start:8px}
+.dfield-delta .icn{font-size:15px;--icon-stroke:2.4}
+.dfield-sub{font-size:15px;font-weight:500;margin-top:-6px}
+.dfield-chart{margin:0 -4px}
+.dfield-chart svg{display:block;width:100%}
+.dfield-actions{display:flex;margin:auto -18px 0}
+.dfield-actions .dfield-go{flex:1;margin:0}
+.dfield-ghost{flex:none;padding:0 16px;color:var(--on-field);background:color-mix(in srgb,var(--on-field) 12%,transparent);border-inline-start:1px solid color-mix(in srgb,var(--on-field) 18%,transparent)}
+.dfield-ghost .icn{font-size:18px;--icon-stroke:2.2}
+.dfield-actions .dfield-go{font-size:16px}
+
+/* a domain band: a silver row led by a square field of its domain's colour and pictogram */
+.dband{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:start;
+  background:var(--surface);border-radius:var(--r);padding:0 16px 0 0;margin-bottom:10px;
+  min-height:64px;overflow:hidden;transition:background var(--fast);
+}
+.dband:active{background:var(--surface-2)}
+@media (hover:hover){.dband:hover{background:var(--surface-2)}}
+.dband-sq{align-self:stretch;width:64px;flex:none;display:grid;place-items:center;font-size:26px;color:var(--on-field);--icon-stroke:2.1}
+.dband-train{background:var(--d-train)} .dband-body{background:var(--d-body)} .dband-food{background:var(--d-food)}
+.dband-move{background:var(--d-move)} .dband-strength{background:var(--d-strength)} .dband-rest{background:var(--d-rest)}
+.dband-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:12px 0}
+.dband-t{font-size:18px;font-weight:700;font-stretch:var(--w-wide)}
+.dband-s{font-size:14px;color:var(--label-2)}
+.dband-c{font-size:20px;color:var(--label-2);flex:none}
+.dfield-ghost:active,.dfield-ghost:hover{background:color-mix(in srgb,var(--on-field) 20%,transparent)}
+@media (prefers-reduced-motion:no-preference){
+  ::view-transition-old(dfield),::view-transition-new(dfield){animation-duration:240ms;animation-timing-function:var(--ease)}
 }
 
 /* ------------------------------------------------------------ week strip -- */
 .week{display:flex;justify-content:space-between;gap:4px}
 .wday{
-  flex:1;text-align:center;padding:8px 2px 9px;border-radius:10px;
+  flex:1;text-align:center;padding:8px 2px 9px;border-radius:var(--r);
   background:none;border:none;transition:background var(--fast);
 }
-.wday .lbl{font-size:11px;color:var(--label-3);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
-.wday .num{font-size:17px;font-weight:400;margin:4px 0;letter-spacing:-.012em}
-.wday .dot{width:5px;height:5px;border-radius:50%;background:transparent;margin:0 auto}
-.wday .dot.plan{background:var(--label-3)}
-.wday .dot.ovr{background:var(--orange)}
-.wday .dot.done{background:var(--acc)}
+.wday .lbl{font-size:11px;color:var(--label-2);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.wday .num{font-size:19px;font-weight:600;font-stretch:var(--w-cond);margin:4px 0}
+.wday .dot{width:6px;height:6px;border-radius:1px;background:transparent;margin:0 auto}
+.wday .dot.plan{background:var(--label-4)}
+.wday .dot.ovr{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.wday .dot.done{background:var(--ink)}
 .wday:active{background:var(--surface-2)}
 .wday.today .num{
-  background:var(--acc);color:var(--on-acc);font-weight:600;
-  width:31px;height:31px;border-radius:50%;display:flex;align-items:center;
+  background:var(--ink);color:var(--bg);font-weight:700;
+  width:32px;height:32px;border-radius:var(--r);display:flex;align-items:center;
   justify-content:center;margin:2px auto;
 }
 
@@ -476,9 +592,9 @@ h4.sec{
 .routine-list.is-reordering{user-select:none;-webkit-user-select:none}
 .routine-list.is-reordering .routine-drag-row{transition:none}
 .routine-drag-row.is-dragging{z-index:2;pointer-events:none}
-.routine-drag-row.is-dragging .item{box-shadow:0 10px 28px rgba(0,0,0,.22);background:var(--surface-2)}
+.routine-drag-row.is-dragging .item{box-shadow:inset 0 0 0 1.5px var(--ink);background:var(--surface-2)}
 .routine-drop-indicator{
-  position:absolute;left:6px;right:6px;height:3px;border-radius:99px;
+  position:absolute;left:6px;right:6px;height:3px;border-radius:var(--r-sm);
   background:var(--acc);transform:translateY(-50%);pointer-events:none;z-index:3;
 }
 /* The drag handle (#277, #114). A long press anywhere on a row reorders it on every device,
@@ -494,7 +610,7 @@ h4.sec{
   .routine-grip:hover{color:var(--label-2)}
 }
 .routine-list.is-reordering,.routine-list.is-reordering *{cursor:grabbing}
-.thumb{width:50px;height:50px;border-radius:9px;object-fit:cover;background:#fff;flex:none}
+.thumb{width:50px;height:50px;border-radius:var(--r-sm);object-fit:cover;background:#fff;flex:none}
 /* exercise pictures are decoration inside tappable rows/cards: no save-image callout on
    a long press and no drag ghost when a scroll starts on the picture */
 .thumb,.exmedia img{-webkit-touch-callout:none;-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
@@ -508,10 +624,10 @@ h4.sec{
 .chev{color:var(--label);flex:none;font-size:15px;--icon-stroke:2.4}
 .tag{
   display:inline-flex;align-items:center;gap:3px;background:var(--surface-2);
-  color:var(--label-2);border-radius:6px;padding:3px 7px;font-size:12px;
+  color:var(--label-2);border-radius:var(--r-sm);padding:3px 7px;font-size:12px;
   font-weight:500;text-transform:capitalize;
 }
-.tag.acc{background:var(--acc-soft);color:var(--acc)}
+.tag.acc{background:var(--acc-soft);color:var(--acc-text)}
 /* favourite marker (issue #6): a small yellow star glued to the exercise name — distinct from
    the accent "chosen" tag at the row's end, which means "already in a routine or the log" */
 .fav-star{color:var(--yellow);font-size:12px;display:inline-block;margin-inline-end:5px;vertical-align:-1px}
@@ -539,13 +655,13 @@ h4.sec{
    whole row up by 4px and left it there. Vertical slop is clipped by the strip anyway. */
 .chips .chip::before{top:0;bottom:0}
 .chip{
-  flex:none;padding:6px 13px;border-radius:99px;background:var(--surface);
+  flex:none;padding:6px 13px;border-radius:var(--r);background:var(--surface);
   font-size:14px;font-weight:400;color:var(--label);text-transform:capitalize;
   letter-spacing:-.006em;transition:background var(--fast),color var(--fast);
 }
 .chip:active{background:var(--surface-2)}
-.chip.on{background:var(--acc);color:var(--on-acc);font-weight:500}
-.chip.on .dim{color:color-mix(in srgb,var(--on-acc) 62%,transparent)}
+.chip.on{background:var(--ink);color:var(--bg);font-weight:600}
+.chip.on .dim{color:color-mix(in srgb,var(--bg) 70%,transparent)}
 /* On a phone these rows scroll by swipe. On a pointer device lib/hchips.js lets you
    click-drag anywhere on the row to pull it along; a grab cursor on rows that actually
    overflow (data-xscroll, set by hchips.js on hover) is the hint. */
@@ -566,7 +682,7 @@ body.chips-dragging *{cursor:inherit}
   transition:box-shadow var(--fast);
 }
 .field::placeholder,.input::placeholder{color:var(--label-3)}
-.field:focus,.input:focus{box-shadow:inset 0 0 0 2px var(--acc)}
+.field:focus,.input:focus{box-shadow:inset 0 0 0 2px var(--acc-text)}
 .field.area,textarea.input{min-height:92px;resize:vertical;line-height:1.42}
 .exnote{
   background:var(--surface);border-radius:var(--r);padding:13px 15px;
@@ -579,17 +695,17 @@ body.chips-dragging *{cursor:inherit}
   position:absolute;inset-inline-start:11px;font-size:16px;color:var(--label-3);
   pointer-events:none;--icon-stroke:2.1;z-index:1;
 }
-.searchf .field{padding-inline-start:35px;padding-inline-end:36px;background:var(--surface-2);border-radius:10px}
-:root[data-theme="light"] .searchf .field{background:rgba(118,118,128,.12)}
+.searchf .field{padding-inline-start:35px;padding-inline-end:36px;background:var(--surface-2);border-radius:var(--r)}
+:root[data-theme="light"] .searchf .field{background:var(--surface)}
 .searchf .clear{
-  position:absolute;inset-inline-end:8px;width:22px;height:22px;border-radius:50%;
+  position:absolute;inset-inline-end:8px;width:22px;height:22px;border-radius:var(--r-sm);
   background:var(--label-3);color:var(--bg);display:flex;align-items:center;
   justify-content:center;font-size:11px;--icon-stroke:3;
 }
 /* legacy .search wrapper */
 .search{position:relative}
-.search .input{padding-inline-start:35px;background:var(--surface-2);border-radius:10px}
-:root[data-theme="light"] .search .input{background:rgba(118,118,128,.12)}
+.search .input{padding-inline-start:35px;background:var(--surface-2);border-radius:var(--r)}
+:root[data-theme="light"] .search .input{background:var(--surface)}
 .search>svg{
   position:absolute;inset-inline-start:11px;top:50%;transform:translateY(-50%);z-index:1;
   width:16px;height:16px;stroke:var(--label-3);fill:none;stroke-width:2.1;stroke-linecap:round;
@@ -601,22 +717,22 @@ body.chips-dragging *{cursor:inherit}
 .search .search-count{
   position:absolute;inset-inline-end:9px;top:50%;transform:translateY(-50%);
   font-size:12px;font-weight:600;line-height:1.4;color:var(--label-2);
-  background:var(--surface-3);padding:2px 8px;border-radius:99px;
+  background:var(--surface-3);padding:2px 8px;border-radius:var(--r-sm);
   font-variant-numeric:tabular-nums;pointer-events:none;user-select:none;
 }
 
 /* --- switch --- */
 .sw{
-  width:51px;height:31px;border-radius:99px;background:var(--surface-3);
+  width:50px;height:30px;border-radius:var(--r);background:var(--surface-3);
   flex:none;padding:2px;display:flex;align-items:center;
   transition:background var(--med) var(--ease);
 }
 .sw .knob{
-  width:27px;height:27px;border-radius:50%;background:#fff;
-  box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);
+  width:26px;height:26px;border-radius:var(--r-sm);background:#fff;
+  box-shadow:inset 0 0 0 1px var(--sep);
   transition:transform var(--med) var(--ease),width var(--fast) var(--ease);
 }
-.sw.on{background:var(--acc)}
+.sw.on{background:var(--d-body)}
 .sw.on .knob{transform:translateX(20px)}
 .sw:active .knob{width:31px}
 .sw.on:active .knob{transform:translateX(16px)}
@@ -629,22 +745,22 @@ body.chips-dragging *{cursor:inherit}
    padding box, which is what the thumb needs. */
 .seg{
   position:relative;display:flex;
-  background:var(--surface-3);border-radius:9px;padding:2px;isolation:isolate;
+  background:var(--surface-3);border-radius:var(--r);padding:2px;isolation:isolate;
 }
 .seg>button{flex:1 1 0;min-width:0}
-:root[data-theme="light"] .seg{background:rgba(118,118,128,.12)}
+:root[data-theme="light"] .seg{background:var(--surface)}
 .seg-sel{
   position:absolute;z-index:0;top:2px;bottom:2px;inset-inline-start:2px;
   width:calc((100% - 4px)/var(--n));
   transform:translateX(calc(100% * var(--i)));
-  background:var(--surface);border-radius:7px;
-  box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.06);
+  background:var(--bg);border-radius:var(--r-sm);
+  box-shadow:inset 0 0 0 1px var(--sep);
   transition:transform var(--med) var(--ease);
 }
-:root[data-theme="light"] .seg-sel{background:#fff}
+
 .seg button{
-  position:relative;z-index:1;padding:6px 8px;font-size:14px;font-weight:500;
-  letter-spacing:-.006em;color:var(--label);display:flex;align-items:center;
+  position:relative;z-index:1;padding:6px 8px;font-size:14px;font-weight:600;
+  letter-spacing:0;color:var(--label);display:flex;align-items:center;
   justify-content:center;gap:5px;min-height:30px;transition:opacity var(--fast);
 }
 .seg button .icn{font-size:16px}
@@ -681,7 +797,7 @@ body.chips-dragging *{cursor:inherit}
 .stp-l{font-size:13px;color:var(--label-2);text-align:center}
 .stp{
   display:flex;align-items:center;background:var(--surface-2);
-  border-radius:10px;overflow:hidden;min-width:0;
+  border-radius:var(--r);overflow:hidden;min-width:0;
 }
 .stp button{
   width:40px;height:44px;flex:none;color:var(--label);font-size:16px;
@@ -708,21 +824,21 @@ body.chips-dragging *{cursor:inherit}
 /* --- slider --- */
 .sld{position:relative;height:32px;display:flex;align-items:center;cursor:pointer;touch-action:none}
 .sld-track{
-  position:absolute;inset-inline-start:0;inset-inline-end:0;height:6px;border-radius:99px;
+  position:absolute;inset-inline-start:0;inset-inline-end:0;height:6px;border-radius:var(--r-sm);
   background:var(--surface-3);overflow:hidden;
 }
-.sld-fill{display:block;height:100%;background:var(--acc);border-radius:99px}
+.sld-fill{display:block;height:100%;background:var(--acc);border-radius:var(--r-sm)}
 .sld-knob{
-  position:absolute;width:26px;height:26px;border-radius:50%;background:#fff;
+  position:absolute;width:26px;height:26px;border-radius:var(--r-sm);background:#fff;
   transform:translateX(-50%);
-  box-shadow:0 4px 10px rgba(0,0,0,.22),0 1px 2px rgba(0,0,0,.16);
+  box-shadow:inset 0 0 0 1.5px var(--ink);
   transition:transform var(--fast) var(--ease);
 }
 .sld.dragging .sld-knob{transform:translateX(-50%) scale(1.14)}
 
 /* --- checkbox --- */
 .chk,.ck{
-  width:30px;height:30px;border-radius:50%;flex:none;position:relative;
+  width:30px;height:30px;border-radius:var(--r-sm);flex:none;position:relative;
   display:flex;align-items:center;justify-content:center;
   background:none;box-shadow:inset 0 0 0 1.8px var(--label-4);color:transparent;
   transition:background var(--fast),box-shadow var(--fast),color var(--fast),transform var(--fast);
@@ -757,13 +873,13 @@ body.chips-dragging *{cursor:inherit}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .whdr.stick{background:var(--bg)}
 }
-.wprog{height:4px;background:var(--surface-2);border-radius:99px;overflow:hidden;margin-bottom:16px}
-.wprog i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width var(--med) var(--ease)}
+.wprog{height:4px;background:var(--surface-2);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px}
+.wprog i{display:block;height:100%;background:var(--acc);border-radius:var(--r-sm);transition:width var(--med) var(--ease)}
 .exmedia{position:relative;border-radius:var(--r-lg);overflow:hidden;background:#fff;margin-bottom:12px}
 .exmedia img{width:100%;height:320px;object-fit:contain;display:block}
 .exmedia .gifhint,.exmedia .giftoggle{
   position:absolute;bottom:9px;display:inline-flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:5px 11px;
+  background:rgba(0,0,0,.45);color:#fff;border-radius:var(--r-sm);padding:5px 11px;
   font-size:12px;font-weight:500;
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
 }
@@ -799,7 +915,7 @@ body.chips-dragging *{cursor:inherit}
 }
 .exlink-card:active{background:var(--surface-2);transform:scale(.98)}
 .exlink-icon{
-  width:34px;height:34px;border-radius:9px;
+  width:34px;height:34px;border-radius:var(--r-sm);
   display:flex;align-items:center;justify-content:center;
   background:var(--surface-2);color:var(--label);font-size:18px;flex:none;
 }
@@ -835,17 +951,17 @@ body.chips-dragging *{cursor:inherit}
 .wmedia-h{margin:0 0 6px}
 .wmedia-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
 .wmedia-item,.wmedia-add{
-  position:relative;aspect-ratio:1;border:0;padding:0;border-radius:10px;overflow:hidden;
+  position:relative;aspect-ratio:1;border:0;padding:0;border-radius:var(--r);overflow:hidden;
   background:var(--surface-2);color:var(--label-2);cursor:pointer;font:inherit;
 }
 .wmedia-item .thumb{width:100%;height:100%;border-radius:0;display:block}
 .wmedia-item .thumb-x{font-size:22px}
 .wmedia-kind{
-  position:absolute;inset-inline-end:5px;bottom:5px;width:22px;height:22px;border-radius:99px;
+  position:absolute;inset-inline-end:5px;bottom:5px;width:22px;height:22px;border-radius:var(--r-sm);
   display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);color:#fff;font-size:12px;
 }
 .wmedia-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  color:var(--acc);font-size:11px;line-height:1.2;text-align:center;padding:6px;
+  color:var(--acc-text);font-size:11px;line-height:1.2;text-align:center;padding:6px;
   border:1.5px dashed var(--sep)}
 .wmedia-add .icn{font-size:20px}
 .wmedia-add:disabled{opacity:.5;cursor:default}
@@ -888,7 +1004,7 @@ body.chips-dragging *{cursor:inherit}
 .setsep{height:1px;background:var(--sep);margin:9px 0}
 /* the per-side wrapper carries its own .n (the set number in front of the L/R rows) */
 .setrow .n,.setrow-side>.n{
-  width:24px;height:24px;border-radius:50%;background:var(--surface-2);color:var(--label-2);
+  width:24px;height:24px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--label-2);
   display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex:none;
   position:relative;padding:0;border:0;font-family:inherit;cursor:pointer;
   transition:background var(--fast),color var(--fast);
@@ -936,7 +1052,7 @@ body.chips-dragging *{cursor:inherit}
    flex hands the difference back to weight and reps, whose own buttons shrink for it. */
 .setrow .effcell,.setrow .effcell-stp,.setrow.eff3 .effcell-stp,.sethead .eff-sp{min-width:64px}
 .effcell{
-  box-sizing:border-box;height:44px;border-radius:10px;
+  box-sizing:border-box;height:44px;border-radius:var(--r);
   background:var(--surface-2);border:1.5px solid transparent;
   color:var(--label);font-size:15px;font-weight:600;letter-spacing:-.01em;
   font-variant-numeric:tabular-nums;white-space:nowrap;line-height:1;
@@ -950,7 +1066,7 @@ body.chips-dragging *{cursor:inherit}
    the +/− buttons step 0.5 on the profile's scale; the value opens the picker. it carries the
    same column flex as the plain .effcell so the row does not jump when a rating is added. */
 .setrow .effcell-stp,.setrow.eff3 .effcell-stp{
-  height:44px;border-radius:10px;border:1.5px solid transparent;
+  height:44px;border-radius:var(--r);border:1.5px solid transparent;
   transition:background var(--fast),border-color var(--fast);
 }
 .effcell-stp button{color:inherit}
@@ -1145,15 +1261,15 @@ body.chips-dragging *{cursor:inherit}
 .menu-list .menu-item.danger .tt,.menu-list .menu-item.danger .lrow-i{color:var(--red)}
 .menu-list .menu-item.disabled{opacity:.4;pointer-events:none}
 .menu-on{color:transparent;font-size:16px;flex:none}
-.menu-on.is-on{color:var(--acc)}
+.menu-on.is-on{color:var(--acc-text)}
 .setextra{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px 32px}
-.setextra .chip.add{display:inline-flex;align-items:center;gap:4px;color:var(--acc)}
+.setextra .chip.add{display:inline-flex;align-items:center;gap:4px;color:var(--acc-text)}
 .setextra .chip.add svg{width:13px;height:13px}
 .setextra .chip.add:disabled{opacity:.35}
 /* why the next target is what it is (issue #17) */
 .progline{
   width:100%;display:flex;align-items:flex-start;gap:7px;margin:6px 0 2px;padding:0;
-  text-align: start;font-size:13px;line-height:1.38;color:var(--acc);
+  text-align: start;font-size:13px;line-height:1.38;color:var(--acc-text);
 }
 .progline.warn{color:var(--yellow)}
 .progline svg{flex:none;margin-top:2px}
@@ -1168,9 +1284,9 @@ body.chips-dragging *{cursor:inherit}
 
 /* start a timed set (issue #16) — sits where you'd otherwise reach for the checkbox */
 .setrow .setgo{
-  width:30px;height:30px;border-radius:50%;flex:none;
+  width:30px;height:30px;border-radius:var(--r-sm);flex:none;
   display:flex;align-items:center;justify-content:center;
-  background:var(--surface-2);color:var(--acc);font-size:14px;
+  background:var(--surface-2);color:var(--acc-text);font-size:14px;
   transition:background var(--fast),opacity var(--fast);
 }
 .setrow .setgo:disabled{opacity:.3;cursor:default}
@@ -1193,18 +1309,15 @@ body.chips-dragging *{cursor:inherit}
 /* --- rest timer --- */
 #timer{
   position:fixed;inset-inline-start:12px;inset-inline-end:12px;bottom:calc(88px + var(--sab));z-index:60;
-  /* nearly opaque: the set rows underneath were reading through the old 82% and made the
-     clock hard to pick out mid-set. The blur stays, so it still sits above the page. */
-  background:color-mix(in srgb,var(--surface) 97%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(10px);backdrop-filter:saturate(180%) blur(10px);
-  border-radius:var(--r-lg);padding:12px 14px;
+  /* solid, with a rule on top: the clock sits above the set rows without glass or a glow */
+  background:var(--surface);border-top:3px solid var(--d-train);
+  border-radius:var(--r);padding:12px 14px;
   display:flex;align-items:center;gap:12px;
-  box-shadow:0 12px 34px -8px rgba(0,0,0,.55);
   animation:slideup var(--med) var(--ease);
 }
 @keyframes slideup{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
 #timer .t{font-size:26px;font-weight:600;letter-spacing:-.026em;font-variant-numeric:tabular-nums;min-width:66px}
-#timer .bar{flex:1;height:4px;background:var(--surface-3);border-radius:99px;overflow:hidden}
+#timer .bar{flex:1;height:4px;background:var(--surface-3);border-radius:var(--r-sm);overflow:hidden}
 #timer .bar i{display:block;height:100%;background:var(--acc);transition:width 1s linear}
 /* rest variant: −15/+15/Skip and the clock won't share one line on a phone, so the clock and
    bar take the top row and the controls take their own. The work timer keeps a single row —
@@ -1219,7 +1332,7 @@ body.chips-dragging *{cursor:inherit}
 /* work timer (issue #16): the same bar doing the opposite job — outlined and tinted so a
    glance tells "you are holding this" apart from "you are recovering". */
 #timer.working{border:var(--hair) solid var(--acc)}
-#timer.working .t{color:var(--acc)}
+#timer.working .t{color:var(--acc-text)}
 #timer.working .grow{flex:1;min-width:0}
 /* The label is the exercise name, handed in already cased (exerciseNameText): a capitalize here
    would title-case German's own casing too. */
@@ -1263,7 +1376,7 @@ body.chips-dragging *{cursor:inherit}
 }
 :root[data-theme="light"] .sheet{background:var(--bg)}
 @keyframes sheetup{from{transform:translateY(100%)}to{transform:none}}
-.sheet .grab{width:36px;height:5px;border-radius:99px;background:var(--label-4);margin:6px auto 14px}
+.sheet .grab{width:36px;height:5px;border-radius:var(--r-sm);background:var(--label-4);margin:6px auto 14px}
 .sheet h3{font-size:20px;font-weight:600;letter-spacing:-.021em;margin-bottom:14px}
 .picker-search{
   position:sticky;top:0;z-index:2;margin-bottom:0;padding-bottom:10px;
@@ -1274,7 +1387,7 @@ body.chips-dragging *{cursor:inherit}
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   width:min(84vw,300px);background:var(--bg-el);border-radius:var(--r-lg);padding:20px;
   max-height:calc(100dvh - 2*var(--sat) - 24px);overflow-y:auto;
-  box-shadow:0 20px 60px -12px rgba(0,0,0,.5);
+  border:var(--hair) solid var(--sep);
   animation:pop .28s var(--ease);
 }
 :root[data-theme="light"] .center{background:#fff}
@@ -1308,7 +1421,7 @@ body.chips-dragging *{cursor:inherit}
 }
 /* the row a working set usually lands on — the anchor the others are read against */
 .efftbl .r.on{background:var(--acc-soft)}
-.efftbl .r.on .n{color:var(--acc)}
+.efftbl .r.on .n{color:var(--acc-text)}
 .efftbl .r.on .f{color:var(--label)}
 
 /* --- glyph picker (replaces the emoji grid) --- */
@@ -1324,7 +1437,7 @@ body.chips-dragging *{cursor:inherit}
 /* --- big weight readout --- */
 .bwstep{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0 6px}
 .bw-pm{
-  width:46px;height:46px;border-radius:50%;background:var(--surface);flex:none;
+  width:46px;height:46px;border-radius:var(--r-sm);background:var(--surface);flex:none;
   color:var(--label);display:flex;align-items:center;justify-content:center;font-size:19px;
   transition:background var(--fast),transform var(--fast);--icon-stroke:2.2;
 }
@@ -1428,7 +1541,7 @@ body.chips-dragging *{cursor:inherit}
    readings at the top of the effort card. */
 .stat-v{font-size:26px;font-weight:600;letter-spacing:-.026em;line-height:1.1}
 .mchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.mchip{font-size:12px;padding:4px 9px;border-radius:99px;background:var(--surface-2);color:var(--label-2)}
+.mchip{font-size:12px;padding:4px 9px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--label-2)}
 .mchip.miss{background:color-mix(in srgb,var(--orange) 16%,transparent);color:var(--orange)}
 
 /* --- stat tiles --- */
@@ -1454,12 +1567,10 @@ body.chips-dragging *{cursor:inherit}
 #toast{
   position:fixed;left:50%;transform:translateX(-50%) translateY(6px);
   bottom:calc(96px + var(--sab));z-index:200;
-  background:color-mix(in srgb,var(--surface-2) 88%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
-  /* 22px, not a pill radius: one line (about 41px high) still reads as a pill, and a toast that
-     wraps to four lines is a rounded box instead of a circle over the page. */
-  border-radius:var(--r-xl);padding:11px 20px;font-size:15px;font-weight:500;
-  box-shadow:0 10px 30px -6px rgba(0,0,0,.5);
+  /* A solid ink bar, the system's corner: never a pill, so a toast that wraps to four lines is
+     a box with small corners, not a circle over the page. */
+  background:var(--ink);color:var(--bg);
+  border-radius:var(--r);padding:11px 18px;font-size:15px;font-weight:500;
   opacity:0;pointer-events:none;transition:opacity var(--med),transform var(--med) var(--ease);
   /* As wide as its text up to 88vw. Without a width, left:50% left it half the screen to wrap
      in, so a long message stood as a narrow column. */
@@ -1480,36 +1591,36 @@ body.chips-dragging *{cursor:inherit}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:10px}
 .cal-h{text-align:center;font-size:11px;color:var(--label-3);font-weight:500;text-transform:uppercase;padding:2px 0}
 .cal-d{
-  aspect-ratio:1;border-radius:10px;background:var(--surface);
+  aspect-ratio:1;border-radius:var(--r);background:var(--surface);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   font-weight:400;font-size:15px;color:var(--label);transition:background var(--fast);
 }
 .cal-d:active{background:var(--surface-2)}
-.cal-d.has{background:var(--acc-soft);color:var(--acc)}
+.cal-d.has{background:var(--acc-soft);color:var(--acc-text)}
 .cal-d.today{box-shadow:inset 0 0 0 1.8px var(--acc)}
-.cal-d i{width:5px;height:5px;border-radius:50%;background:transparent}
+.cal-d i{width:5px;height:5px;border-radius:var(--r-sm);background:transparent}
 .cal-d i.done{background:var(--acc)}
 .cal-d i.plan{background:var(--label-3)}
 .cal-d i.ovr{background:var(--orange)}
 .cal-legend{display:flex;gap:14px;justify-content:center;margin-top:12px;font-size:12px;color:var(--label-3)}
-.cal-legend i{display:inline-block;width:6px;height:6px;border-radius:50%;margin-inline-end:5px}
+.cal-legend i{display:inline-block;width:6px;height:6px;border-radius:var(--r-sm);margin-inline-end:5px}
 
 /* --- accent swatches --- */
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
-.swatch{width:32px;height:32px;border-radius:50%;flex:none;position:relative;transition:transform var(--fast)}
+.swatch{width:32px;height:32px;border-radius:var(--r-sm);flex:none;position:relative;transition:transform var(--fast)}
 .swatch:active{transform:scale(.9)}
-.swatch.on::after{content:'';position:absolute;inset:-4px;border-radius:50%;box-shadow:0 0 0 2px var(--label)}
+.swatch.on::after{content:'';position:absolute;inset:-4px;border-radius:var(--r-sm);box-shadow:0 0 0 2px var(--label)}
 
 /* --- supersets --- */
 .ss-label{
   font-size:12px;font-weight:600;letter-spacing:-.004em;text-transform:none;
-  color:var(--acc);margin-block:8px 5px;margin-inline-start:4px;display:flex;align-items:center;gap:5px;
+  color:var(--acc-text);margin-block:8px 5px;margin-inline-start:4px;display:flex;align-items:center;gap:5px;
 }
 .ss-label .icn{font-size:13px}
 .item.in-ss{box-shadow:inset 3px 0 0 var(--acc)}
 /* A past workout's detail: each exercise opens its history, and a superset's exercises share the
    routine editor's label and bar. */
-.wd-ex{margin-bottom:12px;cursor:pointer;border-radius:10px}
+.wd-ex{margin-bottom:12px;cursor:pointer;border-radius:var(--r)}
 .wd-ex>.grow{flex:1;min-width:0}
 .wd-ex:active{background:var(--surface-2)}
 .wd-ss{box-shadow:inset 3px 0 0 var(--acc);padding-inline-start:11px;margin-bottom:12px}
@@ -1548,11 +1659,11 @@ body.chips-dragging *{cursor:inherit}
   .wl-unit .ss-card{padding-inline:0}
 }
 .ss-hd{
-  font-size:12px;font-weight:600;color:var(--acc);margin-bottom:12px;
+  font-size:12px;font-weight:600;color:var(--acc-text);margin-bottom:12px;
   text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;
 }
 .ss-ex{position:relative}
-.ss-amp{text-align:center;font-size:15px;font-weight:600;color:var(--acc);margin:14px 0 8px}
+.ss-amp{text-align:center;font-size:15px;font-weight:600;color:var(--acc-text);margin:14px 0 8px}
 
 /* --- workout list view: every unit stacked, the current one outlined --- */
 /* minmax(0, …): a grid's default `auto` track is at least as wide as its widest content, so a set
@@ -1615,12 +1726,26 @@ body.chips-dragging *{cursor:inherit}
   .narrow{max-width:640px;margin:0 auto}
   .tiles{grid-template-columns:repeat(4,1fr)}
   .cols .tiles,.center .tiles{grid-template-columns:1fr 1fr}   /* a 300px dialog has no room for four */
+  /* on a computer the tab bar docks as a rail down the left edge: flat, a hairline, no float */
+  body{padding-inline-start:96px}
   #tabbar{
-    left:50%;right:auto;bottom:16px;transform:translateX(-50%);width:520px;
-    border:var(--hair) solid var(--sep-op);border-radius:var(--r-xl);
-    padding:7px 10px 9px;box-shadow:0 12px 40px -10px rgba(0,0,0,.5);
+    top:0;bottom:0;inset-inline-start:0;inset-inline-end:auto;width:96px;
+    flex-direction:column;justify-content:flex-start;align-items:stretch;gap:4px;
+    padding:calc(var(--sat) + 28px) 8px 24px;
+    border-top:0;border-inline-end:var(--hair) solid var(--sep);
   }
-  #tabbar button.start{margin-top:-26px}
+  #tabbar button{flex:none;padding:10px 0;font-size:12px}
+  #tabbar button.on:not(.start)::before{top:50%;inset-inline-start:-8px;width:3px;height:30px;transform:translateY(-50%)}
+  #tabbar button.start{margin:6px 0}
+  .sheet{margin-left:calc(-320px + 48px)}
+  #timer{margin-left:calc(-260px + 48px)}
+  /* Home on a computer: the field holds the left column while the rest of the day reads beside it */
+  .narrow.home{max-width:1080px}
+  /* the field always holds at least the height of the column beside it: on a training day it leads */
+  .home-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px;align-items:stretch}
+  .home-grid>.dfield{margin:0;min-height:380px}
+  .home-grid>.dfield .dfield-hero .icn{font-size:clamp(120px,46cqi,280px)}
+  .home-side>:last-child{margin-bottom:0}
   .sheet{left:50%;right:auto;margin-left:-320px;width:640px;border-radius:var(--r-xl) var(--r-xl) 0 0}
   .center{width:340px}
   #timer{left:50%;right:auto;margin-left:-260px;width:520px;bottom:112px}
@@ -1675,7 +1800,7 @@ body.chips-dragging *{cursor:inherit}
 .ci-add .ci-add-t{font-size:16px;font-weight:500}
 /* dots under the rail — which card you're on. Purely a hint; the rail itself is the control. */
 .ci-dots{display:flex;justify-content:center;gap:7px;margin-top:4px}
-.ci-dot{width:7px;height:7px;border-radius:50%;background:var(--surface-3);transition:background var(--fast),transform var(--fast)}
+.ci-dot{width:7px;height:7px;border-radius:var(--r-sm);background:var(--surface-3);transition:background var(--fast),transform var(--fast)}
 .ci-dot.on{background:var(--acc);transform:scale(1.15)}
 /* browser camera sheet (components/CameraScan.jsx): the video fills a portrait plate, a dashed
    square in the middle says "put the code here" — decoding reads the whole frame regardless. */
@@ -1693,12 +1818,12 @@ body.chips-dragging *{cursor:inherit}
 .coach-cta:active{transform:scale(.985);filter:brightness(1.06)}
 .coach-cta-av{
   width:42px;height:42px;border-radius:13px;flex:none;display:grid;place-items:center;font-size:21px;
-  background:var(--acc);color:var(--on-acc);box-shadow:0 6px 18px -6px color-mix(in srgb,var(--acc) 60%,transparent)
+  background:var(--acc);color:var(--on-acc);
 }
 .coach-cta-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .coach-cta-t b{font-size:17px;font-weight:600;letter-spacing:-.015em;color:var(--label)}
 .coach-cta-t span{font-size:13px;color:var(--label-2);line-height:1.35}
-.coach-cta-chev{color:var(--acc);font-size:15px;flex:none}
+.coach-cta-chev{color:var(--acc-text);font-size:15px;flex:none}
 
 /* ----------------------------------------------------------- RTL (Arabic) -- */
 /* Directional icons flip: back chevrons point right, trailing chevrons point left. */

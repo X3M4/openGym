@@ -1674,4 +1674,7 @@ export default {
   'Teal': 'เขียวน้ำทะเล',
   'Yellow': 'เหลือง',
   'Enter how long it took — at least 1 minute.': 'ใส่ระยะเวลาที่ใช้ — อย่างน้อย 1 นาที',
+  'In progress': 'In progress',
+  'Usual time': 'Usual time',
+  'Log weight': 'Log weight',
 }

@@ -1010,4 +1010,8 @@ export const PT_BR_OVERRIDES = {
   'Enter how long it took — at least 1 minute.': 'Informe quanto tempo levou — pelo menos 1 minuto.',
 }
 
-export default { ...pt, ...PT_BR_OVERRIDES }
+export default { ...pt, ...PT_BR_OVERRIDES,
+  'In progress': 'In progress',
+  'Usual time': 'Usual time',
+  'Log weight': 'Log weight',
+}

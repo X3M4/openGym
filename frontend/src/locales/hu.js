@@ -1666,4 +1666,7 @@ export default {
   'Teal': 'Türkiz',
   'Yellow': 'Sárga',
   'Enter how long it took — at least 1 minute.': 'Add meg, meddig tartott — legalább 1 perc.',
+  'In progress': 'In progress',
+  'Usual time': 'Usual time',
+  'Log weight': 'Log weight',
 }

@@ -1,0 +1,619 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T00:00:00Z",
+  "title": "Design System: SuperOpenGym",
+  "extensions": {
+    "colorMeta": {
+      "training-sky": {
+        "role": "primary",
+        "displayName": "Training Sky",
+        "canonical": "oklch(67.5% 0.137 242.9)",
+        "tonalRamp": [
+          "#000c19",
+          "#01273f",
+          "#01466e",
+          "#0469a1",
+          "#238ed1",
+          "#51b4fa",
+          "#a1d5fe",
+          "#e1f1ff"
+        ],
+        "darkThemeValue": "#4eaaee",
+        "cssVar": "--d-train (also --acc by default)"
+      },
+      "sky-deep": {
+        "role": "primary",
+        "displayName": "Sky Deep",
+        "canonical": "oklch(60.1% 0.131 244.5)",
+        "tonalRamp": [
+          "#000c1a",
+          "#012640",
+          "#024670",
+          "#0468a4",
+          "#318dcf",
+          "#5ab3f8",
+          "#a2d4ff",
+          "#e1f1ff"
+        ],
+        "darkThemeValue": "#3d96d8",
+        "cssVar": "--acc-2"
+      },
+      "body-green": {
+        "role": "secondary",
+        "displayName": "Body Green",
+        "canonical": "oklch(67.3% 0.150 154.0)",
+        "tonalRamp": [
+          "#001005",
+          "#002d14",
+          "#015029",
+          "#027740",
+          "#199f5a",
+          "#4ec67e",
+          "#75eaa0",
+          "#c6ffd6"
+        ],
+        "darkThemeValue": "#47c07e",
+        "cssVar": "--d-body"
+      },
+      "nutrition-orange": {
+        "role": "secondary",
+        "displayName": "Nutrition Orange",
+        "canonical": "oklch(76.1% 0.153 64.7)",
+        "tonalRamp": [
+          "#150800",
+          "#371d01",
+          "#613700",
+          "#8e5303",
+          "#be7101",
+          "#ec932a",
+          "#ffbf81",
+          "#ffead8"
+        ],
+        "darkThemeValue": "#f6a64b",
+        "cssVar": "--d-food"
+      },
+      "activity-yellow": {
+        "role": "secondary",
+        "displayName": "Activity Yellow",
+        "canonical": "oklch(85.1% 0.162 91.3)",
+        "tonalRamp": [
+          "#100a00",
+          "#2e2300",
+          "#524000",
+          "#796002",
+          "#a28205",
+          "#cea60b",
+          "#f5c932",
+          "#ffeebd"
+        ],
+        "darkThemeValue": "#f7d04c",
+        "cssVar": "--d-move"
+      },
+      "strength-violet": {
+        "role": "secondary",
+        "displayName": "Strength Violet",
+        "canonical": "oklch(65.2% 0.135 289.6)",
+        "tonalRamp": [
+          "#0d002b",
+          "#28085f",
+          "#442f83",
+          "#6352aa",
+          "#8576d1",
+          "#a99bfa",
+          "#ccc6ff",
+          "#eeecff"
+        ],
+        "darkThemeValue": "#a397ea",
+        "cssVar": "--d-strength"
+      },
+      "rest-silver": {
+        "role": "secondary",
+        "displayName": "Rest Silver",
+        "canonical": "oklch(84.2% 0.015 251.2)",
+        "tonalRamp": [
+          "#070c11",
+          "#1f252b",
+          "#3d434a",
+          "#5d646c",
+          "#80878f",
+          "#a4acb4",
+          "#c7cfd8",
+          "#e7eff9"
+        ],
+        "darkThemeValue": "#8a96a6",
+        "cssVar": "--d-rest"
+      },
+      "sky-text": {
+        "role": "tertiary",
+        "displayName": "Sky Text",
+        "canonical": "oklch(50.7% 0.132 249.5)",
+        "tonalRamp": [
+          "#000c1c",
+          "#002545",
+          "#004478",
+          "#1066ab",
+          "#3e8ad2",
+          "#64b0fb",
+          "#a8d2fe",
+          "#e3f0ff"
+        ],
+        "darkThemeValue": "#6cb8f2",
+        "cssVar": "--acc-text / --blue"
+      },
+      "green-text": {
+        "role": "tertiary",
+        "displayName": "Green Text",
+        "canonical": "oklch(53.8% 0.128 153.9)",
+        "tonalRamp": [
+          "#001005",
+          "#012d15",
+          "#005129",
+          "#017740",
+          "#399c61",
+          "#62c285",
+          "#86e6a7",
+          "#c6ffd7"
+        ],
+        "darkThemeValue": "#5fd093",
+        "cssVar": "--green"
+      },
+      "orange-text": {
+        "role": "tertiary",
+        "displayName": "Orange Text",
+        "canonical": "oklch(58.0% 0.142 55.1)",
+        "tonalRamp": [
+          "#170600",
+          "#3b1a00",
+          "#673200",
+          "#964d04",
+          "#c56b1d",
+          "#ee904a",
+          "#febe92",
+          "#feeadd"
+        ],
+        "darkThemeValue": "#f8ae5c",
+        "cssVar": "--orange"
+      },
+      "signal-red": {
+        "role": "tertiary",
+        "displayName": "Signal Red",
+        "canonical": "oklch(54.3% 0.176 34.8)",
+        "tonalRamp": [
+          "#1d0200",
+          "#470b00",
+          "#791b01",
+          "#b12b00",
+          "#db5433",
+          "#ff8162",
+          "#ffbbaa",
+          "#fee9e4"
+        ],
+        "darkThemeValue": "#ff7a59",
+        "cssVar": "--red"
+      },
+      "navy-ink": {
+        "role": "neutral",
+        "displayName": "Navy Ink",
+        "canonical": "oklch(25.8% 0.057 260.9)",
+        "tonalRamp": [
+          "#010923",
+          "#13233f",
+          "#314261",
+          "#516484",
+          "#7387a9",
+          "#97acd0",
+          "#b9cff4",
+          "#e6efff"
+        ],
+        "darkThemeValue": "#eef2f7",
+        "cssVar": "--ink / --label / --on-field"
+      },
+      "white-ground": {
+        "role": "neutral",
+        "displayName": "White Ground",
+        "canonical": "oklch(100.0% 0.000 89.9)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#424242",
+          "#636363",
+          "#868686",
+          "#ababab",
+          "#cecece",
+          "#eeeeee"
+        ],
+        "darkThemeValue": "#0d1626",
+        "cssVar": "--bg / --bg-el"
+      },
+      "silver-field": {
+        "role": "neutral",
+        "displayName": "Silver Field",
+        "canonical": "oklch(95.9% 0.007 247.9)",
+        "tonalRamp": [
+          "#090b0e",
+          "#212427",
+          "#404346",
+          "#606467",
+          "#83878a",
+          "#a7abaf",
+          "#caced2",
+          "#ebeff3"
+        ],
+        "darkThemeValue": "#17233a",
+        "cssVar": "--surface"
+      },
+      "silver-pressed": {
+        "role": "neutral",
+        "displayName": "Silver Pressed",
+        "canonical": "oklch(92.8% 0.011 252.1)",
+        "tonalRamp": [
+          "#080c10",
+          "#20242a",
+          "#3e4348",
+          "#5f646a",
+          "#81878d",
+          "#a6abb2",
+          "#c8ced5",
+          "#e9eff6"
+        ],
+        "darkThemeValue": "#1f2e49",
+        "cssVar": "--surface-2"
+      },
+      "silver-control": {
+        "role": "neutral",
+        "displayName": "Silver Control",
+        "canonical": "oklch(88.8% 0.015 251.2)",
+        "tonalRamp": [
+          "#070c11",
+          "#1f252b",
+          "#3d434a",
+          "#5d646c",
+          "#80878f",
+          "#a4acb4",
+          "#c7cfd8",
+          "#e7eff9"
+        ],
+        "darkThemeValue": "#2b3c5b",
+        "cssVar": "--surface-3"
+      },
+      "label-secondary": {
+        "role": "neutral",
+        "displayName": "Secondary Label",
+        "darkThemeValue": "rgba(238,242,247,.74)",
+        "cssVar": "--label-2"
+      },
+      "label-tertiary": {
+        "role": "neutral",
+        "displayName": "Tertiary Label",
+        "darkThemeValue": "rgba(238,242,247,.54)",
+        "cssVar": "--label-3"
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "darkThemeValue": "rgba(238,242,247,.14)",
+        "cssVar": "--sep"
+      },
+      "dark-ground": {
+        "role": "neutral",
+        "displayName": "Dark Ground",
+        "canonical": "oklch(20.0% 0.035 261.4)",
+        "tonalRamp": [
+          "#040b1a",
+          "#1a2435",
+          "#384355",
+          "#586478",
+          "#7b879c",
+          "#9fabc2",
+          "#c1cee5",
+          "#e6efff"
+        ]
+      },
+      "dark-raised": {
+        "role": "neutral",
+        "displayName": "Dark Raised",
+        "canonical": "oklch(22.7% 0.042 261.7)",
+        "tonalRamp": [
+          "#030a1d",
+          "#182438",
+          "#364359",
+          "#56647c",
+          "#7887a0",
+          "#9cacc6",
+          "#bfcfea",
+          "#e6effe"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark Surface",
+        "canonical": "oklch(25.8% 0.047 262.6)",
+        "tonalRamp": [
+          "#030a1f",
+          "#18243b",
+          "#35425c",
+          "#55647e",
+          "#7787a3",
+          "#9babc9",
+          "#beceed",
+          "#e6effe"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "Dark Ink",
+        "canonical": "oklch(96.0% 0.008 253.9)",
+        "tonalRamp": [
+          "#090b0e",
+          "#212428",
+          "#3f4347",
+          "#606468",
+          "#83868b",
+          "#a7abb0",
+          "#caced3",
+          "#ebeff4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Routine or session name in a domain field; wide caps (font-stretch 112%)."
+      },
+      "numeral-xl": {
+        "displayName": "Numeral Xl",
+        "purpose": "Hero weigh-in on the body field."
+      },
+      "numeral-fact": {
+        "displayName": "Numeral Fact",
+        "purpose": "Facts row in the training field (exercises, sets, minutes)."
+      },
+      "numeral-l": {
+        "displayName": "Numeral L",
+        "purpose": "Weigh-in in the compact body band."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page title in the header row; 28px under 420px."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Domain band titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text and list-row titles; tabular figures global."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Default button label."
+      },
+      "footnote": {
+        "displayName": "Footnote",
+        "purpose": "Secondary lines, section footers."
+      },
+      "label-day": {
+        "displayName": "Label Day",
+        "purpose": "Weekday initials in the week strip, uppercase."
+      }
+    },
+    "shadows": [
+      {
+        "name": "hairline-stroke",
+        "value": "inset 0 0 0 1px var(--sep)",
+        "purpose": "Outline of the segmented thumb and switch knob. A stroke, not elevation; the system has no cast shadows."
+      },
+      {
+        "name": "focus-stroke",
+        "value": "inset 0 0 0 2px var(--acc-text)",
+        "purpose": "Focused text field."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.22,1,.36,1)",
+        "purpose": "The single ease-out for every transition."
+      },
+      {
+        "name": "fast",
+        "value": "140ms",
+        "purpose": "Press feedback, colour and background changes."
+      },
+      {
+        "name": "med",
+        "value": "230ms",
+        "purpose": "Switch, segmented thumb, view fade, toast, timer slide-up."
+      },
+      {
+        "name": "field-transition",
+        "value": "240ms",
+        "purpose": "View Transition of the dfield (view-transition-name: dfield); full sweep interaction scheduled for Phase 9."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-title",
+        "value": "max-width: 420px"
+      },
+      {
+        "name": "narrow-phone",
+        "value": "max-width: 479px"
+      },
+      {
+        "name": "desktop-rail",
+        "value": "min-width: 1000px"
+      }
+    ],
+    "fontAxes": {
+      "family": "Archivo Variable (@fontsource-variable/archivo/wdth.css)",
+      "wide": "font-stretch 112% (--w-wide)",
+      "condensed": "font-stretch 78% (--w-cond)"
+    },
+    "coverage": {
+      "redesigned": [
+        "tokens and themes",
+        "type scale",
+        "base components",
+        "tab bar and desktop rail",
+        "Home"
+      ],
+      "tokenInheritedOnly": "all other screens, redesign scheduled for Phase 9"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button (ink bar)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The default primary action: a solid navy ink bar, white words, 4px corner.",
+      "html": "<button class=\"ds-btn-primary\">Start workout</button>",
+      "css": ".ds-btn-primary{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:14px 18px;border:none;border-radius:var(--r,4px);font-size:17px;font-weight:600;background:var(--ink,#13233f);color:var(--bg,#fff);cursor:pointer;transition:transform 140ms cubic-bezier(.22,1,.36,1),background 140ms}.ds-btn-primary:hover,.ds-btn-primary:active{background:color-mix(in srgb,var(--ink,#13233f) 86%,var(--d-train,#3a9fe4))}.ds-btn-primary:active{transform:scale(.98)}.ds-btn-primary:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}"
+    },
+    {
+      "name": "Field Button",
+      "kind": "button",
+      "refersTo": "button-field",
+      "description": "Domain-coloured action (training sky) with navy ink.",
+      "html": "<button class=\"ds-btn-field\">Log set</button>",
+      "css": ".ds-btn-field{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px 18px;border:none;border-radius:var(--r,4px);font-size:17px;font-weight:600;background:var(--acc,#3a9fe4);color:var(--on-field,#13233f);cursor:pointer;transition:transform 140ms cubic-bezier(.22,1,.36,1),background 140ms}.ds-btn-field:hover,.ds-btn-field:active{background:var(--acc-2,#2a87c9)}.ds-btn-field:active{transform:scale(.98)}.ds-btn-field:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}"
+    },
+    {
+      "name": "Default and Ghost Buttons",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Silver default button and text-only ghost button in sky text.",
+      "html": "<div class=\"ds-btnrow\"><button class=\"ds-btn\">Build my own plan</button><button class=\"ds-btn ds-btn-ghost\">Choose a different workout</button></div>",
+      "css": ".ds-btnrow{display:flex;flex-direction:column;gap:8px}.ds-btn{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px 18px;border:none;border-radius:var(--r,4px);font-size:17px;font-weight:600;background:var(--surface-2,#e2e8ef);color:var(--label,#13233f);cursor:pointer;transition:background 140ms}.ds-btn:hover{background:var(--surface-3,#d3dbe4)}.ds-btn:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}.ds-btn-ghost{background:none;color:var(--acc-text,#1468ad);font-weight:400}.ds-btn-ghost:hover{background:var(--surface,#eef2f6)}"
+    },
+    {
+      "name": "Domain Field (training)",
+      "kind": "custom",
+      "refersTo": "domain-field-training",
+      "description": "Signature block: a full-width flat colour field with wide-caps routine name, condensed numerals and a full-bleed ink go bar.",
+      "html": "<section class=\"ds-dfield\"><h2 class=\"ds-dfield-title\">Pull day</h2><dl class=\"ds-dfield-facts\"><div><dt>Exercises</dt><dd>5</dd></div><div><dt>Sets</dt><dd>17</dd></div><div><dt>Usual time</dt><dd>59<small> min</small></dd></div></dl><button class=\"ds-dfield-go\">Start <svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M9 5l7 7-7 7\"/></svg></button></section>",
+      "css": ".ds-dfield{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f);border-radius:var(--r,4px);display:flex;flex-direction:column;gap:14px;padding:18px 18px 0;overflow:hidden;container-type:inline-size;max-width:420px}.ds-dfield-title{margin:0;font-size:clamp(30px,10cqi,76px);line-height:.98;font-weight:750;font-stretch:112%;text-transform:uppercase;letter-spacing:-.01em}.ds-dfield-facts{display:flex;gap:clamp(24px,7cqi,56px);margin:4px 0 0}.ds-dfield-facts dt{font-size:13px;font-weight:600;opacity:.82}.ds-dfield-facts dd{margin:3px 0 0;font-size:clamp(40px,12cqi,96px);line-height:1;font-weight:700;font-stretch:78%;font-variant-numeric:tabular-nums}.ds-dfield-facts dd small{font-size:17px;font-weight:600;font-stretch:100%}.ds-dfield-go{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;align-items:center;justify-content:center;gap:8px;min-height:56px;margin:4px -18px 0;border:none;font-size:18px;font-weight:700;letter-spacing:.01em;background:var(--ink,#13233f);color:var(--bg,#fff);cursor:pointer;transition:background 140ms}.ds-dfield-go:hover,.ds-dfield-go:active{background:color-mix(in srgb,var(--ink,#13233f) 86%,var(--d-train,#3a9fe4))}.ds-dfield-go:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:-4px}"
+    },
+    {
+      "name": "Domain Band",
+      "kind": "custom",
+      "refersTo": "domain-band",
+      "description": "Silver 64px row led by a full-height square of its domain colour and pictogram.",
+      "html": "<button class=\"ds-dband\"><span class=\"ds-dband-sq\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg></span><span class=\"ds-dband-m\"><span class=\"ds-dband-t\">13 week streak</span><span class=\"ds-dband-s\">1 / 3 this week</span></span></button>",
+      "css": ".ds-dband{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;align-items:center;gap:14px;width:100%;text-align:start;background:var(--surface,#eef2f6);color:var(--label,#13233f);border:none;border-radius:var(--r,4px);padding:0 16px 0 0;min-height:64px;overflow:hidden;cursor:pointer;transition:background 140ms}.ds-dband:hover,.ds-dband:active{background:var(--surface-2,#e2e8ef)}.ds-dband:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}.ds-dband-sq{align-self:stretch;width:64px;flex:none;display:grid;place-items:center;background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f)}.ds-dband-m{display:flex;flex-direction:column;gap:2px;padding:12px 0}.ds-dband-t{font-size:18px;font-weight:700;font-stretch:112%}.ds-dband-s{font-size:14px;color:var(--label-2,rgba(19,35,63,.7))}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Borderless silver field; focus is a 2px inset sky-text stroke.",
+      "html": "<input class=\"ds-field\" placeholder=\"Body weight (kg)\">",
+      "css": ".ds-field{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);width:100%;background:var(--surface,#eef2f6);color:var(--label,#13233f);border:none;border-radius:var(--r,4px);padding:13px 15px;font-size:17px;outline:none;transition:box-shadow 140ms}.ds-field::placeholder{color:var(--label-3,rgba(19,35,63,.52))}.ds-field:focus,.ds-field:focus-visible{box-shadow:inset 0 0 0 2px var(--acc-text,#1468ad)}"
+    },
+    {
+      "name": "Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Silver 4px chips; the selected chip is a navy ink fill.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-on\">All</button><button class=\"ds-chip\">Back</button><button class=\"ds-chip\">Legs</button></div>",
+      "css": ".ds-chips{display:flex;gap:7px}.ds-chip{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);padding:6px 13px;border:none;border-radius:var(--r,4px);background:var(--surface,#eef2f6);color:var(--label,#13233f);font-size:14px;cursor:pointer;transition:background 140ms,color 140ms}.ds-chip:hover,.ds-chip:active{background:var(--surface-2,#e2e8ef)}.ds-chip.ds-on{background:var(--ink,#13233f);color:var(--bg,#fff);font-weight:600}.ds-chip:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}"
+    },
+    {
+      "name": "Week Strip",
+      "kind": "custom",
+      "refersTo": "week-day-today",
+      "description": "Seven columns: uppercase weekday, condensed date, square status dot; today is a navy square.",
+      "html": "<div class=\"ds-week\"><div class=\"ds-wday\"><div class=\"ds-lbl\">Mo</div><div class=\"ds-num\">5</div><div class=\"ds-dot ds-done\"></div></div><div class=\"ds-wday ds-today\"><div class=\"ds-lbl\">Tu</div><div class=\"ds-num\">6</div><div class=\"ds-dot ds-ovr\"></div></div><div class=\"ds-wday\"><div class=\"ds-lbl\">We</div><div class=\"ds-num\">7</div><div class=\"ds-dot ds-plan\"></div></div><div class=\"ds-wday\"><div class=\"ds-lbl\">Th</div><div class=\"ds-num\">8</div><div class=\"ds-dot\"></div></div></div>",
+      "css": ".ds-week{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;gap:4px;background:var(--surface,#eef2f6);border-radius:var(--r,4px);padding:12px;color:var(--label,#13233f)}.ds-wday{flex:1;text-align:center;padding:8px 2px 9px;border-radius:var(--r,4px)}.ds-wday:active{background:var(--surface-2,#e2e8ef)}.ds-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--label-2,rgba(19,35,63,.7))}.ds-num{font-size:19px;font-weight:600;font-stretch:78%;margin:4px 0}.ds-today .ds-num{background:var(--ink,#13233f);color:var(--bg,#fff);font-weight:700;width:32px;height:32px;border-radius:var(--r,4px);display:flex;align-items:center;justify-content:center;margin:2px auto}.ds-dot{width:6px;height:6px;border-radius:1px;margin:0 auto}.ds-dot.ds-plan{background:var(--label-4,rgba(19,35,63,.2))}.ds-dot.ds-done{background:var(--ink,#13233f)}.ds-dot.ds-ovr{box-shadow:inset 0 0 0 1.5px var(--ink,#13233f)}"
+    },
+    {
+      "name": "Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-start",
+      "description": "Solid bottom bar with hairline top; active tab gets a 3px sky bar; Start is a raised 54px sky square.",
+      "html": "<nav class=\"ds-tabbar\"><button class=\"ds-tab ds-on\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M3 11l9-7 9 7v10H3z\"/></svg>Home</button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg>Plan</button><button class=\"ds-tab ds-start\"><span class=\"ds-cir\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6\"/></svg></span><span>Start</span></button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M5 20V12M10 20V6M15 20v-9M20 20V9\"/></svg>Progress</button></nav>",
+      "css": ".ds-tabbar{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;justify-content:space-around;align-items:flex-end;padding:7px 6px 6px;background:var(--bg-el,#fff);border-top:1px solid var(--sep,rgba(19,35,63,.16))}.ds-tab{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:5px;position:relative;border:none;background:none;color:var(--label-2,rgba(19,35,63,.7));font-size:11px;font-weight:500;cursor:pointer;transition:color 140ms}.ds-tab:hover{color:var(--label,#13233f)}.ds-tab:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}.ds-tab.ds-on{color:var(--label,#13233f);font-weight:650}.ds-tab.ds-on::before{content:'';position:absolute;top:-7px;width:28px;height:3px;background:var(--acc,#3a9fe4)}.ds-start{margin-top:-24px;color:var(--label,#13233f);font-weight:650}.ds-cir{width:54px;height:54px;border-radius:var(--r,4px);background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f);display:flex;align-items:center;justify-content:center;transition:transform 140ms cubic-bezier(.22,1,.36,1)}.ds-start:active .ds-cir{transform:scale(.93)}"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "Solid navy ink bar with a 4px corner; never a pill.",
+      "html": "<div class=\"ds-toast\">Weight saved</div>",
+      "css": ".ds-toast{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-block;background:var(--ink,#13233f);color:var(--bg,#fff);border-radius:var(--r,4px);padding:11px 18px;font-size:15px;font-weight:500;max-width:88vw}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Games Programme",
+    "overview": "SuperOpenGym is drawn as a sports identity system in the Munich '72 tradition of Otl Aicher. Each domain of a cut (training, body, nutrition, activity, strength) owns one flat colour, and that colour arrives as a whole field, never as a sprinkle. You know where you are from the colour before you read a word. The numerals report the state, and every field has one job, done with one tap on the ink bar at its foot.\n\nThe ground is white in light mode (the default, chosen for bright gyms and daylight) and deep navy in dark mode. Ink is a deep navy, never black. Silver carries rest, structure and every neutral grouping. One grotesque family, Archivo, does all the typographic work through its width axis: wide capitals for headings and routine names, condensed tabular figures for the big numbers, and normal width for reading. Corners are a small 4px everywhere. Surfaces are flat, layout is built from colour fields, silver tone steps and hairline rules, and nothing floats.\n\nDensity is calm rather than sparse. One field leads the first viewport, then stacked full-width bands each carry one key number. Motion is straight and short. Fields travel on straight paths in 200–260ms with an ease-out, and numerals never bounce or count up.",
+    "keyCharacteristics": [
+      "Five fixed domain colours used as whole fields, plus silver for rest.",
+      "Navy ink in both themes. Ink on any coloured field is always navy.",
+      "One family, Archivo Variable, with its width axis as the type grid (wide 112, condensed 78).",
+      "One 4px corner (3px on small marks). No pills, no circles on containers.",
+      "Flat. No cast shadows, gradients or glass on redesigned surfaces.",
+      "The primary action is a full-width ink bar."
+    ],
+    "rules": [
+      {
+        "name": "The Field, Not Sprinkle Rule",
+        "body": "A domain colour appears as a whole field, a full-height band square, or a solid rule (3px marker or timer edge). It never sets body text on the ground. Words on the ground use the matching text-safe tone.",
+        "section": "colors"
+      },
+      {
+        "name": "The Navy Ink Rule",
+        "body": "Ink is navy, never #000. Anything drawn on a domain field, including chart lines, goal lines and axis labels, uses the on-field navy in both themes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reserved Colour Rule",
+        "body": "Activity Yellow and Strength Violet are reserved for their domains. Do not borrow them for decoration while those domains have no surface.",
+        "section": "colors"
+      },
+      {
+        "name": "The Axis Grid Rule",
+        "body": "Use one family and three widths: wide (112%) for headings, condensed (78%) for big numerals, and normal for reading. Do not introduce a second family. The one exception is the monospace account ID.",
+        "section": "typography"
+      },
+      {
+        "name": "The Still Numeral Rule",
+        "body": "Numerals are tabular and never animate, count up or bounce. A changed value simply appears.",
+        "section": "typography"
+      },
+      {
+        "name": "The Full-Width Band Rule",
+        "body": "Domain content is laid out as full-width stacked bands and fields, not a grid of floating cards. On desktop the grid is two columns, never a mosaic.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Field Rule",
+        "body": "Never use a cast shadow, glow, gradient or backdrop blur on a redesigned surface. To lift something, step its tone or give it a rule.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One Corner Rule",
+        "body": "Use 4px, or 3px on small marks. Nothing in the redesigned system is a pill or a circle. The Start action is a square, not a disc.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** fill whole regions with a domain colour (a field, a band square or a 3px rule) and set navy ink on it in both themes.",
+      "**Do** put a field's one action in a full-bleed ink bar at its foot, 56px tall.",
+      "**Do** set headings and routine names wide, big numbers condensed and tabular, and reading text at normal width, all in Archivo.",
+      "**Do** keep every corner at 4px, or 3px on small marks.",
+      "**Do** separate surfaces with silver tone steps and 1px hairlines in the rule colour.",
+      "**Do** use the text-safe tone (sky-text, green-text, orange-text, signal-red) for words and thin strokes on the ground.",
+      "**Do** keep motion straight and ease-out (cubic-bezier(.22,1,.36,1)): 140ms for press feedback, 230–240ms for fields and controls. Honour reduced motion by removing it."
+    ],
+    "donts": [
+      "**Don't** use #000 or any pure black for ink, text or the go bar.",
+      "**Don't** add cast shadows, glows, gradients or backdrop blur to a surface. Lift it by tone or a rule instead.",
+      "**Don't** make containers or actions into pills or circles. Use the square Start action and the square today marker.",
+      "**Don't** set body text in a domain field colour on the white ground.",
+      "**Don't** use Activity Yellow or Strength Violet decoratively before their domains ship.",
+      "**Don't** add a second typeface or fake widths with letter-spacing. Use the `wdth` axis.",
+      "**Don't** animate numerals (no count-ups, no bounces).",
+      "**Don't** add uppercase labels above headings. The only uppercase is a routine's name in a field and the weekday initials in the week strip."
+    ]
+  }
+}

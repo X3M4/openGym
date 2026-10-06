@@ -4,12 +4,13 @@ import { useStore } from '../store/useStore.js'
 import { effectiveRoutines, effectiveRoutineIds, nextTrainingDay, streakWeeks, lastBW, setsDoneActive } from '../lib/history.js'
 import { fmtNum, fmtDate, todayISO, isoOf, weekKey, weekStartOf, weekDayOffset, DAYS, DAYN } from '../lib/format.js'
 import { t, dateLocale } from '../lib/i18n.js'
-import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
+import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, weighInsSheet } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
 import Icon from '../components/Icon.jsx'
 import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
+import { fieldKind, typicalMinutes } from '../lib/home-field.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -24,7 +25,6 @@ export default function Home() {
   const todayRoutines = effectiveRoutines(S, todayISO())
   const routine = todayRoutines[0] || null
   const todayName = todayRoutines.map(r => r.name).join(' + ')
-  const todayOvr = S.dayPlan[todayISO()] !== undefined
   // An open editor on a saved workout (lib/session-edit.js) holds S.active too, but it is not a
   // session in progress: the row takes you back to it as an edit, the way the tab bar does.
   const editingSaved = !!S.active?.editingWorkoutId
@@ -63,11 +63,16 @@ export default function Home() {
   // today's session shown right under the week strip
   const onToday = () => { if (S.active) nav('/workout'); else if (todayRoutines.length) startFlow(effectiveRoutineIds(S, todayISO())); else dayOverrideSheet(todayISO()) }
 
-  return <div className="narrow">
+  return <div className="narrow home">
     <div className="hdr">
-      <div><h1>{user ? t('Hi {0}', user.name) : 'openGym'}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
+      <div><h1>{user ? t('Hi {0}', user.name) : 'SuperOpenGym'}</h1><div className="sub">{today.toLocaleDateString(dateLocale(), { weekday: 'long', day: 'numeric', month: 'long' })}</div></div>
       <button className="iconbtn" onClick={() => nav('/settings')} aria-label={t('Settings')}><Icon name="gear" /></button>
     </div>
+
+    <div className="home-grid">
+    <TodayField S={S} routine={routine} todayRoutines={todayRoutines} todayName={todayName} doneToday={doneToday}
+      editingSaved={editingSaved} next={next} bw={bw} delta={delta} bwPoints={bwPoints} onToday={onToday} />
+    <div className="home-side">
 
     <div className="card">
       <div className="row between" style={{ marginBottom: 8 }}>
@@ -76,30 +81,6 @@ export default function Home() {
         <button className="iconbtn" style={{ width: 30, height: 30, fontSize: 15 }} onClick={() => setWeekOffset(w => w + 1)} aria-label={t('Next week')}><Icon name="chevronRight" /></button>
       </div>
       <div className="week">{strip}</div>
-      {/* Once today's session is logged the row stops asking for it. The week strip already
-          knew (its dot goes 'done'); this row did not, so a finished day kept showing the
-          routine name behind a green Start tag and read as still outstanding (issue #4).
-          An in-progress session still wins — that one is happening right now. Tapping the
-          row keeps working, so a second session in one day is a tap away, just not urged. */}
-      <div className="today-row" {...tappable(onToday)}>
-        <div className="row" style={{ gap: 9, minWidth: 0 }}>
-          <span className="lrow-i" style={{ background: S.active ? 'var(--orange)' : doneToday ? 'var(--surface-3)' : routine ? 'var(--acc)' : 'var(--surface-3)' }}>
-            <Icon name={S.active ? (editingSaved ? 'pencil' : 'timer') : doneToday ? 'checkCircle' : routine ? glyphOf(routine.emoji) : 'moon'}
-              style={doneToday && !S.active ? { color: 'var(--green)' } : undefined} />
-          </span>
-          <div style={{ minWidth: 0 }}>
-            <div className="lbl2">{t('Today')}</div>
-            <div className="ttl">{S.active ? (editingSaved ? S.active.name : t('{0} — in progress', S.active.name))
-              : doneToday ? (doneToday.name ? t('{0} — done', doneToday.name) : t('Workout done'))
-              : routine ? todayName : t('Rest day')}{todayOvr && routine && !doneToday ? ' · ' + t('rescheduled') : ''}</div>
-            {next && !doneToday && <div className="ss">{t('Next session: {0}, {1}', t(DAYN[next.weekday]), next.routine.name)}</div>}
-          </div>
-        </div>
-        {S.active ? <span className="tag" style={{ color: 'var(--orange)', background: 'color-mix(in srgb,var(--orange) 16%,transparent)' }}>{editingSaved ? t('Edit') : t('Resume')}</span>
-          : doneToday ? <span className="tag" style={{ color: 'var(--green)', background: 'color-mix(in srgb,var(--green) 16%,transparent)' }}>{t('Done')}</span>
-          : routine ? <span className="tag acc">{t('Start')}</span>
-          : <Icon name="plus" className="chev" />}
-      </div>
       {/* The row above starts today's plan in one tap, and so does the Start button in the tab
           bar — which is the whole problem when you want something else. Both jump straight into
           the planned session whenever there is one, so the Start screen (a freestyle session,
@@ -116,18 +97,11 @@ export default function Home() {
     {/* Jump to the gym check-in cards (QR membership codes). Shown here as a quick tap on
         arrival at the gym; folds away per user via the "Gym check-in" switch in Settings. */}
     {S.checkIn !== false && (
-      <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => nav('/checkin'))}>
-        <div className="row between">
-          <div className="row" style={{ gap: 9 }}>
-            <span className="lrow-i" style={{ background: 'var(--blue)' }}><Icon name="qr" /></span>
-            <div>
-              <div className="lbl2">{t('At the gym')}</div>
-              <div className="ttl">{t('Check in')}</div>
-            </div>
-          </div>
-          <Icon name="chevronRight" className="chev" />
-        </div>
-      </div>
+      <button className="dband" onClick={() => nav('/checkin')}>
+        <span className="dband-sq dband-rest"><Icon name="qr" /></span>
+        <span className="dband-m"><span className="dband-t">{t('Check in')}</span><span className="dband-s">{t('At the gym')}</span></span>
+        <Icon name="chevronRight" className="dband-c" />
+      </button>
     )}
 
     {!S.routines.length && !S.active && (
@@ -142,53 +116,101 @@ export default function Home() {
       </div>
     )}
 
-    {S.showWeightCard !== false && <div className="card">
-      <div className="row between bw-head" style={{ marginBottom: 6 }}>
-        <h2 style={{ margin: 0 }}>{t('Body weight')}</h2>
-        <div className="row" style={{ gap: 8 }}>
-          <Button size="sm" icon="target" style={S.targetW ? { color: 'var(--yellow)' } : undefined} onClick={goalSheet}>{S.targetW ? fmtNum(S.targetW) : t('Goal')}</Button>
-          <Button size="sm" icon="plus" onClick={() => bwSheet()}>{t('Log')}</Button>
-        </div>
-      </div>
-      {bw ? <>
-        <div className="row" style={{ gap: 8, alignItems: 'baseline' }}>
-          <div className="big">{fmtNum(bw.w)} <span className="muted" style={{ fontSize: '1rem' }}>{S.unit}</span></div>
-          {/* only when it actually moved — an unchanged weight used to read as "− 0" */}
-          {!!delta && (
-            <span className="small row" style={{ gap: 2, fontWeight: 500, color: bwDeltaColor(delta, bw.w) }}>
-              <Icon name={delta > 0 ? 'arrowUp' : 'arrowDown'} style={{ fontSize: 12 }} />
-              {fmtNum(Math.abs(delta))}
-            </span>
-          )}
-          <span className="dim small" style={{ marginInlineStart: 'auto' }}>{fmtDate(bw.d, true)}</span>
-        </div>
-        {S.targetW && (
-          <div className="small row" style={{ color: 'var(--yellow)', marginTop: 4, gap: 5 }}>
-            <Icon name="target" style={{ fontSize: 13 }} />
-            <span>{t('Goal')} {fmtNum(S.targetW)} {S.unit} · {Math.abs(S.targetW - bw.w) < 0.05 ? t('reached!') : t(S.targetW > bw.w ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(S.targetW - bw.w)) + ' ' + S.unit)}</span>
-          </div>
-        )}
-        <div className="chart" style={{ marginTop: 8 }}><LineChart points={bwPoints} h={130} unit={S.unit} goal={S.targetW} /></div>
-        {/* every weigh-in, week by week with its average (Discord 'Weight') */}
-        <div className="row" style={{ justifyContent: 'flex-end', marginTop: 4 }}>
-          <Button size="sm" variant="ghost" trailingIcon="chevronRight" onClick={weighInsSheet}>{t('All weigh-ins')}</Button>
-        </div>
-      </> : <div className="muted small">{S.weighIn === false
-        ? t('No entries yet — log your weight to start the curve.')
-        : t("No entries yet — log your weight to start the curve. It's also asked before every workout.")}</div>}
-    </div>}
+    {S.showWeightCard !== false && fieldKind(S, todayRoutines, doneToday) !== 'body' &&
+      <BodyBand S={S} bw={bw} delta={delta} bwPoints={bwPoints} />}
 
-    <div className="card tappable" style={{ cursor: 'pointer' }} {...tappable(() => calendarSheet())}>
-      <div className="row between">
-        <div>
-          <div className="row" style={{ gap: 7, fontSize: 22, fontWeight: 600, letterSpacing: '-.021em' }}>
-            <Icon name="flame" style={{ color: 'var(--orange)' }} />
-            {t('{0} week streak', streakWeeks(S))}
-          </div>
-          <div className="muted small" style={{ marginTop: 2 }}>{wThisWeek}{plannedPerWeek ? ' / ' + plannedPerWeek : ''} {t('this week')} · {t(S.workouts.length === 1 ? '{0} workout total' : '{0} workouts total', S.workouts.length)}</div>
-        </div>
-        <Icon name="calendar" className="chev" style={{ fontSize: 20 }} />
-      </div>
+    <button className="dband" onClick={() => calendarSheet()}>
+      <span className="dband-sq dband-train"><Icon name="flame" /></span>
+      <span className="dband-m">
+        <span className="dband-t">{t('{0} week streak', streakWeeks(S))}</span>
+        <span className="dband-s">{wThisWeek}{plannedPerWeek ? ' / ' + plannedPerWeek : ''} {t('this week')} · {t(S.workouts.length === 1 ? '{0} workout total' : '{0} workouts total', S.workouts.length)}</span>
+      </span>
+      <Icon name="calendar" className="dband-c" />
+    </button>
+    </div>
     </div>
   </div>
+}
+
+function TodayField({ S, routine, todayRoutines, todayName, doneToday, editingSaved, next, bw, delta, bwPoints, onToday }) {
+  const nav = useNavigate()
+  const kind = fieldKind(S, todayRoutines, doneToday)
+
+  if (kind === 'active') return <section className="dfield dfield-active" aria-label={t('Today')}>
+    <div className="dfield-hero" aria-hidden="true"><Icon name={editingSaved ? 'pencil' : 'timer'} /></div>
+    <div className="dfield-words">
+      <h2 className="dfield-title">{S.active.name}</h2>
+      <div className="dfield-note">{editingSaved ? t('Edit workout') : t('In progress')}</div>
+    </div>
+    <button className="dfield-go" onClick={() => nav('/workout')}>{editingSaved ? t('Edit') : t('Resume')}<Icon name="chevronRight" /></button>
+  </section>
+
+  if (kind === 'train') {
+    const exCount = todayRoutines.reduce((n, r) => n + r.ex.length, 0)
+    const setCount = todayRoutines.reduce((n, r) => n + r.ex.reduce((m, e) => m + (Number(e.sets) || 0), 0), 0)
+    const mins = typicalMinutes(S.workouts, todayRoutines.map(r => r.id))
+    return <section className="dfield dfield-train" aria-label={t('Today')}>
+      <div className="dfield-hero" aria-hidden="true"><Icon name={glyphOf(routine.emoji)} /></div>
+      <div className="dfield-words">
+      <h2 className="dfield-title">{todayName}</h2>
+      {S.dayPlan[todayISO()] !== undefined && <div className="dfield-note">{t('rescheduled')}</div>}
+      <dl className="dfield-facts">
+        <div><dt>{t('Exercises')}</dt><dd>{exCount}</dd></div>
+        {setCount > 0 && <div><dt>{t('Sets')}</dt><dd>{setCount}</dd></div>}
+        {mins != null && <div><dt>{t('Usual time')}</dt><dd>{mins}<small> min</small></dd></div>}
+      </dl>
+      </div>
+      <button className="dfield-go" onClick={onToday}>{t('Start')}<Icon name="chevronRight" /></button>
+    </section>
+  }
+
+  // body: the weight curve against the goal, the latest weigh-in at the end of the line
+  return <section className="dfield dfield-body" aria-label={t('Body weight')}>
+    <div className="dfield-head">
+      <h2 className="dfield-lead">{t('Body weight')}</h2>
+      <Icon name="scale" className="dfield-pict" />
+    </div>
+    <div className="dfield-note">{doneToday ? (doneToday.name ? t('{0} — done', doneToday.name) : t('Workout done'))
+      : next ? t('Next session: {0}, {1}', t(DAYN[next.weekday]), next.routine.name) : t('Rest day')}</div>
+    {S.showWeightCard === false ? <div className="dfield-title">{doneToday ? t('Done') : t('Rest day')}</div>
+    : bw ? <>
+      <div className="dfield-weight">
+        <span className="num-xl">{fmtNum(bw.w)}</span><span className="dfield-unit">{S.unit}</span>
+        {!!delta && <span className="dfield-delta"><Icon name={delta > 0 ? 'arrowUp' : 'arrowDown'} />{fmtNum(Math.abs(delta))}</span>}
+      </div>
+      <div className="dfield-sub">{fmtDate(bw.d, true)}{S.targetW ? ' · ' + t('Goal') + ' ' + fmtNum(S.targetW) + ' ' + S.unit + ' · ' + (Math.abs(S.targetW - bw.w) < 0.05 ? t('reached!') : t(S.targetW > bw.w ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(S.targetW - bw.w)) + ' ' + S.unit)) : ''}</div>
+      {bwPoints.length > 1 && <div className="dfield-chart"><LineChart points={bwPoints} h={110} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
+    </> : <div className="dfield-sub">{t('No entries yet — log your weight to start the curve.')}</div>}
+    {S.showWeightCard !== false && <div className="dfield-actions">
+      <button className="dfield-go" onClick={() => bwSheet()}><Icon name="plus" />{t('Log weight')}</button>
+      <button className="dfield-ghost" onClick={goalSheet}><Icon name="target" />{S.targetW ? fmtNum(S.targetW) : t('Goal')}</button>
+      {bw && <button className="dfield-ghost" onClick={weighInsSheet} aria-label={t('All weigh-ins')}><Icon name="list" /></button>}
+    </div>}
+  </section>
+}
+
+// The body band: the same green field as the rest-day field, compact, for days when training
+// owns the top of Home. Ink is navy throughout, the chart included.
+function BodyBand({ S, bw, delta, bwPoints }) {
+  return <section className="dfield dfield-body dfield-band" aria-label={t('Body weight')}>
+    <div className="dfield-head">
+      <h2 className="dfield-lead">{t('Body weight')}</h2>
+      <Icon name="scale" className="dfield-pict" />
+    </div>
+    {bw ? <>
+      <div className="dfield-weight">
+        <span className="num-l">{fmtNum(bw.w)}</span><span className="dfield-unit">{S.unit}</span>
+        {!!delta && <span className="dfield-delta"><Icon name={delta > 0 ? 'arrowUp' : 'arrowDown'} />{fmtNum(Math.abs(delta))}</span>}
+      </div>
+      <div className="dfield-sub">{fmtDate(bw.d, true)}{S.targetW ? ' · ' + t('Goal') + ' ' + fmtNum(S.targetW) + ' ' + S.unit + ' · ' + (Math.abs(S.targetW - bw.w) < 0.05 ? t('reached!') : t(S.targetW > bw.w ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(S.targetW - bw.w)) + ' ' + S.unit)) : ''}</div>
+      {bwPoints.length > 1 && <div className="dfield-chart"><LineChart points={bwPoints} h={96} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
+    </> : <div className="dfield-sub">{S.weighIn === false
+      ? t('No entries yet — log your weight to start the curve.')
+      : t("No entries yet — log your weight to start the curve. It's also asked before every workout.")}</div>}
+    <div className="dfield-actions">
+      <button className="dfield-go" onClick={() => bwSheet()}><Icon name="plus" />{t('Log')}</button>
+      <button className="dfield-ghost" onClick={goalSheet}><Icon name="target" />{S.targetW ? fmtNum(S.targetW) : t('Goal')}</button>
+      {bw && <button className="dfield-ghost" onClick={weighInsSheet} aria-label={t('All weigh-ins')}><Icon name="list" /></button>}
+    </div>
+  </section>
 }

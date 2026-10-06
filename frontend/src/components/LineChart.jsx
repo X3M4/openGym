@@ -12,7 +12,7 @@ const W = 340   // viewBox width; the svg stretches to its container, height com
 // opts: { h, unit, color, axes, goal, invert }
 //   invert flips the y axis, for a scale that counts down as it gets harder (RIR). Without it
 //   a curve of reps-in-reserve reads upside down, with the hardest sets at the floor.
-export default function LineChart({ points, h = 150, unit = '', color = 'var(--acc)', axes = true, goal = null, invert = false }) {
+export default function LineChart({ points, h = 150, unit = '', color = 'var(--acc)', axes = true, goal = null, invert = false, goalColor = 'var(--yellow)', ink = null }) {
   const svgRef = useRef(null)
   const wrapRef = useRef(null)
   const tipRef = useRef(null)
@@ -70,7 +70,7 @@ export default function LineChart({ points, h = 150, unit = '', color = 'var(--a
       const y = Y(v)
       gridlines.push(<g key={'y' + v}>
         <line x1={P.l} y1={y} x2={W - P.r} y2={y} stroke="var(--sep-op)" strokeWidth="1" strokeDasharray="2 4" />
-        <text x={P.l - 5} y={y + 3.5} textAnchor="end" fontSize="9.5" fill="var(--label-2)">{fmtNum(v)}</text>
+        <text x={P.l - 5} y={y + 3.5} textAnchor="end" fontSize="9.5" fill={ink || 'var(--label-2)'}>{fmtNum(v)}</text>
       </g>)
     }
     const d0 = new Date(t0), d1 = new Date(t1)
@@ -89,7 +89,7 @@ export default function LineChart({ points, h = 150, unit = '', color = 'var(--a
       const x = X(tk.t)
       gridlines.push(<g key={'x' + i}>
         <line x1={x} y1={P.t} x2={x} y2={H - P.b} stroke="var(--sep-op)" strokeWidth="1" strokeDasharray="2 4" />
-        <text x={x} y={H - 7} textAnchor={tk.anchor || 'middle'} fontSize="9.5" fill="var(--label-2)">{tk.txt}</text>
+        <text x={x} y={H - 7} textAnchor={tk.anchor || 'middle'} fontSize="9.5" fill={ink || 'var(--label-2)'}>{tk.txt}</text>
       </g>)
     })
   }
@@ -121,13 +121,14 @@ export default function LineChart({ points, h = 150, unit = '', color = 'var(--a
       onTouchStart={onMove} onTouchMove={onMove}>
       <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ aspectRatio: `${W}/${H}` }}>
         <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor={color} stopOpacity=".28" />
-          <stop offset="1" stopColor={color} stopOpacity="0" />
+          {/* a flat wash under the line: the system has no gradients */}
+          <stop offset="0" stopColor={color} stopOpacity=".14" />
+          <stop offset="1" stopColor={color} stopOpacity=".14" />
         </linearGradient></defs>
         {gridlines}
         {goal != null && isFinite(goal) && <>
-          <line x1={P.l} y1={Y(goal)} x2={W - P.r} y2={Y(goal)} stroke="var(--yellow)" strokeWidth="1.6" strokeDasharray="7 4" />
-          <text x={W - P.r - 2} y={Y(goal) - 5} textAnchor="end" fontSize="9.5" fontWeight="700" fill="var(--yellow)">{fmtNum(goal)}</text>
+          <line x1={P.l} y1={Y(goal)} x2={W - P.r} y2={Y(goal)} stroke={goalColor} strokeWidth="1.6" strokeDasharray="7 4" />
+          <text x={W - P.r - 2} y={Y(goal) - 5} textAnchor="end" fontSize="9.5" fontWeight="700" fill={goalColor}>{fmtNum(goal)}</text>
         </>}
         <polygon points={`${P.l},${H - P.b} ${poly} ${X(last.t).toFixed(1)},${H - P.b}`} fill={`url(#${gid})`} />
         <polyline points={poly} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />

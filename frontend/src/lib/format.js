@@ -122,8 +122,9 @@ export const localTZ = () => { try { return Intl.DateTimeFormat().resolvedOption
 export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7)
 // What each accent is called, for a screen reader (Settings' swatches carry no text).
 export const ACCENT_NAMES = { lime: 'Green', sky: 'Blue', orange: 'Orange', violet: 'Purple', pink: 'Pink', red: 'Red', teal: 'Teal', gold: 'Yellow' }
-export const ACCENTS = { lime: '#30d158', sky: '#0a84ff', orange: '#ff9f0a', violet: '#bf5af2', pink: '#ff375f', red: '#ff453a', teal: '#40c8e0', gold: '#ffd60a' }
+export const ACCENTS = { sky: '#3a9fe4', lime: '#34b06a', orange: '#f39a33', violet: '#8f80dc', gold: '#f5c932', teal: '#34b4c4', pink: '#ec7aa3', red: '#ef7a5a' }
 // Text drawn on top of that swatch. Matches the --on-acc values in index.css.
-export const ACCENT_INK = { lime: '#000000', sky: '#ffffff', orange: '#000000', violet: '#ffffff', pink: '#ffffff', red: '#ffffff', teal: '#000000', gold: '#000000' }
+// Ink on every accent field is the system's navy, as in the CSS (--on-field).
+export const ACCENT_INK = { sky: '#13233f', lime: '#13233f', orange: '#13233f', violet: '#13233f', gold: '#13233f', teal: '#13233f', pink: '#13233f', red: '#13233f' }
 // Android color int, opaque. JS bitwise ops are signed, so the high bit is cleared back to unsigned.
 export const argb = hex => (0xff000000 | parseInt(hex.slice(1), 16)) >>> 0
