@@ -68,7 +68,19 @@ export default defineConfig({
     // server needs to be told the workspace is wider than frontend/.
     fs: { allow: ['..'] },
     proxy: {
-      '/api': { target: backend, changeOrigin: true, headers: { Origin: apiOrigin } },
+      // Only the dev server's own pages (or a request with no Origin) present ORIGIN. A paired
+      // phone calls in from its WebView origin (https://localhost) and must keep it: the API
+      // reflects the Origin it sees into Access-Control-Allow-Origin, and a rewritten one makes
+      // the WebView drop the answer — the pairing went through on the server, the token never
+      // reached the phone.
+      '/api': {
+        target: backend, changeOrigin: true,
+        configure: proxy => proxy.on('proxyReq', (proxyReq, req) => {
+          const origin = req.headers.origin
+          const own = req.headers.host && (origin === `http://${req.headers.host}` || origin === `https://${req.headers.host}`)
+          if (!origin || own) proxyReq.setHeader('Origin', apiOrigin)
+        })
+      },
       '/img': { target: media, changeOrigin: true },
       '/gif': { target: media, changeOrigin: true }
     }

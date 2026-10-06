@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug build only (SuperOpenGymTest). Same trust anchors as src/main, plus cleartext to the
+     phone's own loopback: `./dev.sh phone` forwards the dev stack there over USB (adb reverse),
+     and it serves plain http. The release build keeps cleartext off everywhere. -->
+<network-security-config>
+    <base-config>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">127.0.0.1</domain>
+        <domain includeSubdomains="false">localhost</domain>
+    </domain-config>
+</network-security-config>

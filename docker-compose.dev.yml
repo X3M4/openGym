@@ -1,0 +1,87 @@
+# SuperOpenGym — local development stack, driven by ./dev.sh (do not run it by hand unless you
+# pass the same project name: docker compose -p superopengym-dev -f docker-compose.dev.yml …).
+#
+#   web    Vite dev server with hot reload, frontend/ mounted from the host
+#   api    the API from api/, restarted by `node --watch` on every change
+#   media  one-time download of the exercise images and GIFs into ./media (shared with prod)
+#   mediasrv  serves ./media to Vite's /img and /gif proxy
+#
+# Data lives in ./data-dev, apart from anything a production stack writes to ./data.
+name: superopengym-dev
+
+services:
+  media:
+    image: alpine/git
+    volumes:
+      - ./media/img:/out/img
+      - ./media/gif:/out/gif
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ -z "$$(ls -A /out/img 2>/dev/null)" ]; then
+          echo "↓ Downloading exercise media (~140 MB, one time)…"
+          git clone --depth 1 https://github.com/hasaneyldrm/exercises-dataset /tmp/ds
+          cp /tmp/ds/images/*.jpg /out/img/ && cp /tmp/ds/videos/*.gif /out/gif/
+          echo "✓ Exercise media ready ($$(ls /out/img | wc -l) images)."
+        else
+          echo "✓ Exercise media already present — skipping download."
+        fi
+    restart: "no"
+
+  mediasrv:
+    image: nginx:alpine
+    volumes:
+      - ./media:/usr/share/nginx/html:ro
+    depends_on:
+      media:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./api
+      target: default
+    env_file: .env.dev
+    environment:
+      - PORT=3000
+      - DATA_DIR=/data
+      - NODE_ENV=development
+    command: ["node", "--watch", "server.js"]
+    volumes:
+      - ./api:/app
+      # The image's node_modules, not the host's: kept by an anonymous volume over the mount.
+      - /app/node_modules
+      - ./data-dev:/data
+    restart: unless-stopped
+
+  web:
+    image: node:22-alpine
+    # The frontend imports ../../../api/coach/core, so both keep their places under /app.
+    working_dir: /app/frontend
+    environment:
+      - API_TARGET=http://api:3000
+      - API_ORIGIN=${DEV_ORIGIN:-http://localhost:8095}
+      - MEDIA_TARGET=http://mediasrv:80
+    # Dependencies are installed into a volume, and again only when package-lock.json changes.
+    command:
+      - sh
+      - -c
+      - |
+        h=$$(sha256sum package-lock.json | cut -d' ' -f1)
+        if [ "$$(cat node_modules/.lockhash 2>/dev/null)" != "$$h" ]; then
+          npm ci --ignore-scripts && echo "$$h" > node_modules/.lockhash
+        fi
+        exec npx vite --host 0.0.0.0 --port 5173 --strictPort
+    ports:
+      - "${DEV_PORT:-8095}:5173"
+    volumes:
+      - ./frontend:/app/frontend
+      - ./api/coach/core:/app/api/coach/core:ro
+      - web_node_modules:/app/frontend/node_modules
+    depends_on:
+      - api
+      - mediasrv
+    restart: unless-stopped
+
+volumes:
+  web_node_modules:

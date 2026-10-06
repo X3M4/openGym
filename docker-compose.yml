@@ -1,4 +1,7 @@
-name: opengym
+# SuperOpenGym — production stack. ./deploy.sh copies this file to the VPS and runs it there
+# with the images it pushed to GHCR (IMAGE_TAG = the commit deployed). Locally, ./dev.sh uses
+# docker-compose.dev.yml instead.
+name: superopengym
 
 services:
   # One-time: download the exercise images + GIFs into ./media (skipped if already there).
@@ -35,7 +38,7 @@ services:
   # Passkey auth + per-user data (Node, no framework).
   # image: prebuilt (docker compose pull). build: from source (docker compose up --build).
   api:
-    image: ghcr.io/duartesantos8/opengym-api:latest
+    image: ${IMAGE_PREFIX:-ghcr.io/x3m4/superopengym}-api:${IMAGE_TAG:-latest}
     # Default target: no AI runtime, no AI dependency — the image every instance has always had.
     # To opt into the AI Coach, build the other target instead:
     #     API_TARGET=coach docker compose up --build api
@@ -66,7 +69,7 @@ services:
   # Builds the React frontend (multi-stage) and serves it, proxying /api → api
   # and the exercise media from the shared volume. Single origin for passkeys.
   web:
-    image: ghcr.io/duartesantos8/opengym-web:latest
+    image: ${IMAGE_PREFIX:-ghcr.io/x3m4/superopengym}-web:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: web/Dockerfile
@@ -76,8 +79,10 @@ services:
         condition: service_completed_successfully
       api:
         condition: service_started
+    # Loopback only by default: on the VPS the host's Nginx is the one door in (HTTPS).
+    # WEB_BIND=0.0.0.0 publishes it on every interface instead.
     ports:
-      - "${WEB_PORT:-8080}:${NGINX_PORT:-80}"
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8080}:${NGINX_PORT:-80}"
     # nginx renders its config at start-up from these (web/nginx.conf.template),
     # so the API service does not have to be called `api`. Defaults are the old
     # hardcoded values, so an existing .env and an existing stack are unaffected.
