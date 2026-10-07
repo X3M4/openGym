@@ -12,6 +12,7 @@ import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { fieldKind, typicalMinutes } from '../lib/home-field.js'
 import { trendSeries, weeklyRate, rateBand, isCutting } from '../lib/body-comp.js'
+import { targets, dayTotals } from '../lib/nutrition.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -119,6 +120,8 @@ export default function Home() {
 
     {S.showWeightCard !== false && fieldKind(S, todayRoutines, doneToday) !== 'body' &&
       <BodyBand S={S} bw={bw} delta={delta} bwPoints={bwPoints} />}
+
+    <NutritionBand S={S} />
 
     <button className="dband" onClick={() => calendarSheet()}>
       <span className="dband-sq dband-train"><Icon name="flame" /></span>
@@ -229,4 +232,20 @@ function WeightSummary({ S, big = false }) {
     {points.length > 1 && <div className="dfield-chart"><LineChart points={points} h={big ? 110 : 96} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
     <button className="dfield-open" onClick={() => nav('/body')}>{t('Body: trend, measurements and body fat')}<Icon name="chevronRight" /></button>
   </>
+}
+
+// The nutrition band: today's calories against the target and the protein, into Nutrition.
+function NutritionBand({ S }) {
+  const nav = useNavigate()
+  const today = todayISO()
+  const T = targets(S, today)
+  const day = dayTotals(S.foodLog, today)
+  return <button className="dband" onClick={() => nav('/nutrition')}>
+    <span className="dband-sq dband-food"><Icon name="food" /></span>
+    <span className="dband-m">
+      <span className="dband-t">{fmtNum(day.kcal)}{T.kcal != null ? ' / ' + fmtNum(T.kcal) : ''} kcal</span>
+      <span className="dband-s">{t('Protein')} {fmtNum(day.p)}{T.protein != null ? ' / ' + fmtNum(T.protein) : ''} g{!day.items.length ? ' · ' + t('nothing logged today') : ''}</span>
+    </span>
+    <Icon name="chevronRight" className="dband-c" />
+  </button>
 }

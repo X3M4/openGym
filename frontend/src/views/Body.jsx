@@ -7,7 +7,7 @@ import { fmtNum, fmtDate, todayISO, uid } from '../lib/format.js'
 import { bwSheet, goalSheet, weighInsSheet, confirmSheet } from '../sheets.jsx'
 import { trendSeries, weeklyRate, rateBand, isCutting, bodyFatSeries, liveMeasures, measureChanges, navyBodyFat, MEASURE_FIELDS, RATE_BAND } from '../lib/body-comp.js'
 import Icon from '../components/Icon.jsx'
-import { Button, Row, NumberField, Segmented } from '../components/ui.jsx'
+import { Button, Row, NumberField, CommitNumberField, Segmented } from '../components/ui.jsx'
 
 // Body (SuperOpenGym Phase 5): the weight trend and the weekly rate against the 0.5–1% band,
 // body measurements, body fat (logged and the Navy estimate) with lean mass, and the profile the
@@ -183,7 +183,7 @@ function ProfileRows() {
         options={[{ value: 'male', label: t('Male') }, { value: 'female', label: t('Female') }]} />
     </Row>
     <Row icon="arrowUp" title={t('Height (cm)')}>
-      <NumberField className="body-num" value={p.heightCm ?? null} nullable decimal={false} onChange={v => set({ heightCm: v > 0 ? v : null })} />
+      <CommitNumberField className="body-num" value={p.heightCm ?? null} decimal={false} onCommit={v => set({ heightCm: v >= 100 && v <= 250 ? Math.round(v) : (v == null ? null : p.heightCm ?? null) })} />
     </Row>
     <div className="small muted" style={{ marginTop: 6 }}>{t('Used for the Navy body-fat estimate, and later for your calorie and protein targets.')}</div>
   </>
@@ -222,7 +222,7 @@ function MeasureSheet({ close }) {
     <div className="muted small" style={{ marginBottom: 10 }}>{t('In centimetres, relaxed, same time of day and same side each time. Leave empty what you do not measure.')}</div>
     <Row icon="calendar" title={t('Date')}><input type="date" className="timef" value={d} max={todayISO()} onChange={e => setD(e.target.value)} /></Row>
     {MEASURE_FIELDS.map(f => <Row key={f} title={t(MEASURE_LABEL[f])} subtitle={prev[f] ? t('Last: {0} cm', fmtNum(prev[f])) : undefined}>
-      <NumberField value={vals[f]} nullable fit onChange={v => setF(f, v)} />
+      <NumberField className="body-num" placeholder="cm" value={vals[f]} nullable onChange={v => setF(f, v)} />
     </Row>)}
     {navy != null && <div className="small" style={{ margin: '10px 0' }}>{t('Navy estimate with these measurements: {0} % body fat.', fmtNum(navy))}</div>}
     <div style={{ height: 12 }} />
@@ -244,7 +244,7 @@ function BodyFatSheet({ close }) {
   return <>
     <h3>{t('Log body fat')}</h3>
     <Row icon="calendar" title={t('Date')}><input type="date" className="timef" value={d} max={todayISO()} onChange={e => setD(e.target.value)} /></Row>
-    <Row title={t('Body fat (%)')}><NumberField value={pct} nullable fit onChange={v => setPct(v)} /></Row>
+    <Row title={t('Body fat (%)')}><NumberField className="body-num" placeholder="%" value={pct} nullable onChange={v => setPct(v)} /></Row>
     <div className="sect-t" style={{ marginTop: 12 }}>{t('Method')}</div>
     <div className="chips" style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
       {['scale', 'calipers', 'dexa', 'other'].map(m => <button key={m} className={'chip nocap' + (method === m ? ' on' : '')} onClick={() => setMethod(m)}>{t(METHOD_LABEL[m])}</button>)}

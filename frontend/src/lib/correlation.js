@@ -69,11 +69,15 @@ export function splitAtMedian(xs, ys) {
  */
 export function weeklyRelations(weeks, keys) {
   const paired = weeks.filter(w => w.change != null && isFinite(w.change))
-  if (paired.length < MIN_WEEKS) return { enough: false, weeks: paired.length, findings: [], weak: [] }
-  const findings = [], weak = []
+  if (paired.length < MIN_WEEKS) return { enough: false, weeks: paired.length, findings: [], weak: [], short: [] }
+  const findings = [], weak = [], short = []
   for (const key of keys) {
-    const xs = paired.map(w => Number(w.vars[key]) || 0)
-    const ys = paired.map(w => w.change)
+    // A week without this variable (null — e.g. food not logged enough that week) is left out
+    // of this relation only; the variable needs the minimum of weeks on its own.
+    const rows = paired.filter(w => w.vars[key] != null && isFinite(Number(w.vars[key])))
+    if (rows.length < MIN_WEEKS) { short.push(key); continue }
+    const xs = rows.map(w => Number(w.vars[key]))
+    const ys = rows.map(w => w.change)
     const r = pearson(xs, ys)
     if (r == null) continue
     const strength = strengthOf(r)
@@ -85,5 +89,5 @@ export function weeklyRelations(weeks, keys) {
     } else weak.push(key)
   }
   findings.sort((a, b) => Math.abs(b.r) - Math.abs(a.r))
-  return { enough: true, weeks: paired.length, findings, weak }
+  return { enough: true, weeks: paired.length, findings, weak, short }
 }

@@ -12,6 +12,9 @@ import { isoOf, weekKey } from './format.js'
 import { weeklyRelations } from './correlation.js'
 import { trendSeries, weeklyRate, bodyFatSeries, liveMeasures, measureChanges } from './body-comp.js'
 
+// A week's food enters the relations only with at least this many days logged (SuperOpenGym's rule).
+export const FOOD_MIN_DAYS = 4
+
 const DAY = 86400000
 const dateOf = iso => new Date(iso + 'T12:00:00')
 const addDays = (iso, n) => isoOf(new Date(dateOf(iso).getTime() + n * DAY))
@@ -113,8 +116,17 @@ export function weeklySeries(S, facts, from, to, ws) {
     if (!fatByWeek.has(key)) fatByWeek.set(key, [])
     fatByWeek.get(key).push(x.pct)
   }
+  // food per day, then per week: mean kcal and protein over the logged days of the week
+  const foodDays = new Map()
+  for (const e of S.foodLog || []) {
+    if (!e || e.deleted || !e.d) continue
+    const x = foodDays.get(e.d) || { kcal: 0, p: 0 }
+    x.kcal += Number(e.kcal) || 0; x.p += Number(e.p) || 0
+    foodDays.set(e.d, x)
+  }
   return weeks.map(key => {
     const inWeek = facts.filter(f => weekKey(f.d, ws) === key)
+    const logged = [...foodDays].filter(([d]) => weekKey(d, ws) === key).map(([, x]) => x)
     const vars = {
       sessions: inWeek.length,
       sets: inWeek.reduce((n, f) => n + f.sets, 0),
@@ -125,6 +137,8 @@ export function weeklySeries(S, facts, from, to, ws) {
       mixedSessions: inWeek.filter(f => f.kind === 'mixed').length,
     }
     for (const id of routineIds) vars['routine:' + id] = inWeek.filter(f => f.routineIds.includes(id)).length
+    vars.kcal = logged.length >= FOOD_MIN_DAYS ? mean(logged.map(x => x.kcal)) : null
+    vars.protein = logged.length >= FOOD_MIN_DAYS ? mean(logged.map(x => x.p)) : null
     const avg = mean(bwByWeek.get(key) || [])
     const nextAvg = mean(bwByWeek.get(addDays(key, 7)) || [])
     const fat = mean(fatByWeek.get(key) || []), nextFat = mean(fatByWeek.get(addDays(key, 7)) || [])
@@ -174,7 +188,7 @@ export function topLiftSeries(S, facts, n = 4) {
 
 /** The relation keys the report tests, in reading order. */
 export function relationKeys(weeks) {
-  const base = ['sessions', 'sets', 'volume', 'cardioMin', 'strengthSessions', 'cardioSessions', 'mixedSessions']
+  const base = ['sessions', 'sets', 'volume', 'cardioMin', 'strengthSessions', 'cardioSessions', 'mixedSessions', 'kcal', 'protein']
   const routines = Object.keys(weeks[0]?.vars || {}).filter(k => k.startsWith('routine:'))
   return [...base, ...routines]
 }
@@ -217,6 +231,7 @@ export function buildPeriodReport(S, { from, to, today = isoOf(new Date()), week
     relations: weeklyRelations(weeks, relationKeys(weeks)),
     fatRelations: { ...weeklyRelations(weeks.map(w => ({ vars: w.vars, change: w.fatChange })), relationKeys(weeks)), method: mainFatMethod(S, from, addDays(to, 7)) },
     body: bodySection(S, from, to),
+    food: foodSection(S, from, to),
   }
 }
 
@@ -252,4 +267,18 @@ export function bodySection(S, from, to) {
     measures: measureChanges(measures),
     fat,
   }
+}
+
+/** What was eaten over [from, to]: the days logged and the mean per logged day. */
+export function foodSection(S, from, to) {
+  const days = new Map()
+  for (const e of S.foodLog || []) {
+    if (!e || e.deleted || !e.d || e.d < from || e.d > to) continue
+    const x = days.get(e.d) || { kcal: 0, p: 0, c: 0, f: 0 }
+    for (const k of ['kcal', 'p', 'c', 'f']) x[k] += Number(e[k]) || 0
+    days.set(e.d, x)
+  }
+  const xs = [...days.values()]
+  const avg = k => (xs.length ? Math.round(xs.reduce((n, x) => n + x[k], 0) / xs.length) : null)
+  return { days: xs.length, totalDays: daysBetween(from, to).length, kcal: avg('kcal'), p: avg('p'), c: avg('c'), f: avg('f') }
 }

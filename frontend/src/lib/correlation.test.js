@@ -56,7 +56,7 @@ describe('weeklyRelations', () => {
   const wk = (sessions, cardio, change) => ({ vars: { sessions, cardio }, change })
   it('concludes nothing below the minimum of paired weeks', () => {
     const weeks = Array.from({ length: MIN_WEEKS - 1 }, (_, i) => wk(i, 0, -i / 10))
-    expect(weeklyRelations(weeks, ['sessions'])).toEqual({ enough: false, weeks: MIN_WEEKS - 1, findings: [], weak: [] })
+    expect(weeklyRelations(weeks, ['sessions'])).toEqual({ enough: false, weeks: MIN_WEEKS - 1, findings: [], weak: [], short: [] })
   })
   it('weeks without a weight change do not count towards the minimum', () => {
     const weeks = [...Array.from({ length: MIN_WEEKS - 1 }, (_, i) => wk(i, 0, -i / 10)), wk(3, 0, null)]
@@ -73,5 +73,14 @@ describe('weeklyRelations', () => {
     expect(r.findings[0].strength).toBe('large')
     expect(r.findings[0].direction).toBe('more-loss')
     expect(r.findings[0].split.more.change).toBeLessThan(r.findings[0].split.less.change)
+  })
+})
+
+describe('weeklyRelations — a variable missing in some weeks', () => {
+  it('uses only the weeks that have it, and lists it as short when they are too few', () => {
+    const weeks = Array.from({ length: 10 }, (_, i) => ({ vars: { sessions: i % 4, kcal: i < 5 ? 2000 + i * 50 : null }, change: -0.1 * (i % 4) }))
+    const r = weeklyRelations(weeks, ['sessions', 'kcal'])
+    expect(r.short).toEqual(['kcal'])
+    expect([...r.findings.map(f => f.key), ...r.weak]).toContain('sessions')
   })
 })

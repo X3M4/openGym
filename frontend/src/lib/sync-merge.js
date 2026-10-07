@@ -22,7 +22,7 @@
  *   - routines: union by id in the newer copy's order; of an id that both have, the version
  *     edited last by its own `_ts` (stampRoutines), the newer copy's on a tie
  *   - bodyweight: union by day, the later-edited (`t`) entry of a day that both have
- *   - measures, bodyfat (SuperOpenGym): union by id, the later-edited (`t`) version of an id both
+ *   - measures, bodyfat, foods, meals, foodLog (SuperOpenGym): union by id, the later-edited (`t`) version of an id both
  *     have. A deletion is a tombstone ({ id, deleted: true, t }) so it outlives the other copy's
  *     older version instead of being brought back by the union (mergeLatestById)
  *   - favEx: ordered set union, the newer copy first
@@ -230,8 +230,10 @@ const bodyweightKey = e => `${e?.d}|${e?.t ?? ''}`
 const RESET_LISTS = {
   workouts: workoutKey, routines: x => x?.id, customEx: x => x?.id, bodyweight: bodyweightKey,
   gymCards: x => x?.id, equipProfiles: x => x?.id, favEx: x => x,
-  measures: x => x?.id, bodyfat: x => x?.id,
+  measures: x => x?.id, bodyfat: x => x?.id, foods: x => x?.id, meals: x => x?.id, foodLog: x => x?.id,
 }
+/** The SuperOpenGym lists merged entry by entry (mergeLatestById), deletions as tombstones. */
+export const LATEST_BY_ID = ['measures', 'bodyfat', 'foods', 'meals', 'foodLog']
 const RESET_MAPS = ['exNotes', 'barWeights', 'balanceOverrides', 'loadKind', 'plates']
 /** An entry's name in resetIds: a workout's id (or day and start), a weigh-in's day and time, … */
 export const entryKey = (field, x) => String(RESET_LISTS[field](x))
@@ -285,8 +287,7 @@ export function sinceReset(S, at, ids) {
     out.routines = list(S.routines).filter(r => r && after(r._ts))
     out.customEx = list(S.customEx).filter(c => c && after(c._ts))
     out.bodyweight = list(S.bodyweight).filter(e => e && after(e.t))
-    out.measures = list(S.measures).filter(e => e && after(e.t))
-    out.bodyfat = list(S.bodyfat).filter(e => e && after(e.t))
+    for (const f of LATEST_BY_ID) out[f] = list(S[f]).filter(e => e && after(e.t))
     // No time of their own: taken for what they were before the reset, which cleared them.
     out.equipProfiles = []
     out.gymCards = []
@@ -403,7 +404,7 @@ export function mergeStates(a0, b0, { prefer } = {}) {
     })
   }
   out.bodyweight = mergeBodyweight(n.bodyweight, o.bodyweight).map(clone)
-  for (const f of ['measures', 'bodyfat']) {
+  for (const f of LATEST_BY_ID) {
     if (list(n[f]).length || list(o[f]).length) out[f] = mergeLatestById(n[f], o[f]).map(clone)
   }
   if (list(n.favEx).length || list(o.favEx).length) out.favEx = [...new Set([...list(n.favEx), ...list(o.favEx)])]
@@ -502,7 +503,7 @@ export function localExtras(local, server) {
     bodyweight: list(local?.bodyweight).filter(e => e && e.d != null && (!days.has(e.d) || differs(e, days.get(e.d)))).length,
     customEx: list(local?.customEx).filter(e => e && !ex.has(e.id)).length,
     // Named only when there are some, so the counts read as they always did for everyone else.
-    ...Object.fromEntries(['measures', 'bodyfat'].map(f => {
+    ...Object.fromEntries(LATEST_BY_ID.map(f => {
       const ids = new Set(list(server?.[f]).map(e => e?.id))
       return [f, list(local?.[f]).filter(e => e && !e.deleted && !ids.has(e.id)).length]
     }).filter(([, n]) => n > 0)),

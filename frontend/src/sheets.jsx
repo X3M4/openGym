@@ -87,7 +87,8 @@ export function askAddDeviceData(extras) {
   return new Promise(resolve => confirmSheet({
     title: t('Add this device\'s workouts to your profile?'),
     message: addDeviceDataMessage(extras.workouts, extras.bodyweight)
-      + (extras.measures || extras.bodyfat ? ' ' + t('Also {0} body measurements and {1} body-fat entries.', extras.measures || 0, extras.bodyfat || 0) : ''),
+      + (extras.measures || extras.bodyfat ? ' ' + t('Also {0} body measurements and {1} body-fat entries.', extras.measures || 0, extras.bodyfat || 0) : '')
+      + (extras.foodLog ? ' ' + t('Also {0} logged foods.', extras.foodLog) : ''),
     confirmText: t('Add them'), cancelText: t('Keep profile as is'),
     onConfirm: () => resolve(true), onCancel: () => resolve(false), locked: true
   }))

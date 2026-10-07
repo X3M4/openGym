@@ -569,11 +569,34 @@ h4.sec{
 .br-m{color:var(--label-2);min-width:0}
 .br-v{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
 .br-v small{font-size:12px;color:var(--label-2)}
-.body-num{width:88px;text-align:end}
+/* a number typed into a row (Body, Nutrition): a silver field wide enough for "1986" or "102.5" */
+input.body-num{
+  width:104px;flex:none;padding:10px 12px;border:0;border-radius:var(--r);
+  background:var(--surface);color:var(--label);font-size:17px;font-weight:600;
+  text-align:end;font-variant-numeric:tabular-nums;outline:none;
+}
+.sheet input.body-num,.card input.body-num{background:var(--surface-2)}
+input.body-num:focus{box-shadow:inset 0 0 0 2px var(--acc-text)}
+input.body-num::placeholder{color:var(--label-3);font-weight:400}
 .linkbtn{color:var(--label-3);padding:6px;font-size:16px;line-height:0;justify-self:end}
 .linkbtn:hover,.linkbtn:active{color:var(--red)}
 .dfield-rate{font-size:15px;font-weight:650}
 .dfield-open{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:650;text-decoration:underline;text-underline-offset:3px;color:var(--on-field)}
+
+/* -------------------------------------------------------- nutrition view -- */
+.dfield-food{--f:var(--d-food)}
+.nday{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px -6px 0}
+.nday .iconbtn{background:color-mix(in srgb,var(--on-field) 12%,transparent);color:var(--on-field)}
+.nday-l{font-size:16px;font-weight:700;font-stretch:var(--w-wide);text-transform:capitalize}
+.nmeters{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.nmeter-h{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+.nmeter-b{height:8px;background:color-mix(in srgb,var(--on-field) 16%,transparent);margin-top:3px}
+.nmeter-b i{display:block;height:100%;background:var(--on-field)}
+.ntargets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.ntargets>div{display:flex;flex-direction:column;padding:10px;background:var(--bg);border-radius:var(--r-sm)}
+.ntargets .num-m small{font-size:13px;font-weight:600;font-stretch:100%}
+@media (max-width:420px){.ntargets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.callout-s{background:color-mix(in srgb,var(--d-food) 18%,var(--bg));border-radius:var(--r-sm);padding:10px 12px;font-size:14px;margin-bottom:10px}
 
 /* ------------------------------------------------------------ week strip -- */
 .week{display:flex;justify-content:space-between;gap:4px}
@@ -1373,11 +1396,11 @@ body.chips-dragging *{cursor:inherit}
 .sheet{
   position:absolute;inset-inline-start:0;inset-inline-end:0;bottom:0;background:var(--bg-el);
   border-radius:var(--r-xl) var(--r-xl) 0 0;
-  padding:8px 18px calc(20px + var(--sab));
+  padding:8px 18px calc(32px + var(--sab));
   /* A tall sheet stops short of the status bar / Dynamic Island: every cap carries the top
      safe-area inset, which the layout viewport does not (viewport-fit=cover). */
   max-height:90vh;max-height:min(90vh,calc(100dvh - var(--sat) - 8px - var(--native-kb,0px)));
-  overflow-y:auto;scroll-padding-bottom:calc(20px + var(--sab));
+  overflow-y:auto;scroll-padding-bottom:calc(32px + var(--sab));
   animation:sheetup .34s var(--ease);
   overscroll-behavior:contain;touch-action:pan-y;will-change:transform;
 }

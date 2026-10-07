@@ -12,6 +12,7 @@ import { fmtSec } from './history.js'
 import { fmtSpeed, speedUnitOf } from './speed.js'
 import { isWarmupRow, dropsOf, clustersOf, isSideSet, setType } from './workout-model.js'
 import { MIN_WEEKS } from './correlation.js'
+import { FOOD_MIN_DAYS } from './period-report.js'
 
 const INK = '#13233f', TRAIN = '#3a9fe4', BODY = '#34b06a', FOOD = '#f39a33', MOVE = '#f5c932', STRENGTH = '#8f80dc', SILVER = '#eef2f6', RULE = '#d3dbe4'
 
@@ -127,6 +128,8 @@ const VAR_NOUN = {
   strengthSessions: () => t('strength-only sessions'),
   cardioSessions: () => t('cardio-only sessions'),
   mixedSessions: () => t('mixed sessions'),
+  kcal: () => t('calories eaten'),
+  protein: () => t('protein eaten'),
 }
 const routineName = (key, routines) => routines.find(x => x.id === key.slice(8))?.name || t('a routine')
 function varNoun(key, routines) {
@@ -144,6 +147,8 @@ function thresholdText(key, v, unit, routines) {
     strengthSessions: () => t('{0} or more strength-only sessions', n),
     cardioSessions: () => t('{0} or more cardio-only sessions', n),
     mixedSessions: () => t('{0} or more mixed sessions', n),
+    kcal: () => t('{0} kcal a day or more', n),
+    protein: () => t('{0} g of protein a day or more', n),
   }[key] || (() => n))()
 }
 
@@ -169,7 +174,9 @@ function relationBlock(R, routines, kind, unit) {
     ? t('No clear relation in these {0} weeks between how you trained and how your body fat changed.', R.weeks)
     : t('No clear relation in these {0} weeks between how you trained and how your weight changed.', R.weeks))}</div>` : ''
   const weak = R.weak.length ? `<p class="note">${esc(t('No clear relation with: {0}.', R.weak.map(k => varNoun(k, routines)).join(', ')))}</p>` : ''
-  return findings + none + weak
+  const food = (R.short || []).filter(k => k === 'kcal' || k === 'protein')
+  const short = food.length ? `<p class="note">${esc(t('Not enough food logged to compare: {0}. Each needs {1} weeks with food logged on at least {2} days.', food.map(k => varNoun(k, routines)).join(', '), MIN_WEEKS, FOOD_MIN_DAYS))}</p>` : ''
+  return findings + none + weak + short
 }
 
 function relationsHTML(rep, routines) {
@@ -187,6 +194,18 @@ function relationsHTML(rep, routines) {
 
 const METHOD_LABEL = { scale: 'Smart scale (bioimpedance)', calipers: 'Skinfold calipers', dexa: 'DEXA scan', navy: 'US Navy estimate', other: 'Other' }
 const MEASURE_LABEL = { waist: 'Waist', neck: 'Neck', hip: 'Hip', chest: 'Chest', shoulders: 'Shoulders', arm: 'Arm', thigh: 'Thigh', calf: 'Calf' }
+
+function foodHTML(rep) {
+  const F = rep.food
+  if (!F.days) return `<p class="empty">${esc(t('No food logged in this period.'))}</p>`
+  const cell = (color, label, value, sub = '') => `<div class="stat" style="--f:${color}"><span class="stat-l">${esc(label)}</span><span class="stat-v">${value}</span>${sub ? `<span class="stat-s">${sub}</span>` : ''}</div>`
+  return `<div class="stats">
+    ${cell(FOOD, t('Calories'), `${esc(fmtNum(F.kcal))}<small> kcal</small>`, esc(t('a day, mean of {0} of {1} days logged', F.days, F.totalDays)))}
+    ${cell(FOOD, t('Protein'), `${esc(fmtNum(F.p))}<small> g</small>`, esc(t('a day')))}
+    ${cell(FOOD, t('Carbohydrates'), `${esc(fmtNum(F.c))}<small> g</small>`, esc(t('a day')))}
+    ${cell(FOOD, t('Fat'), `${esc(fmtNum(F.f))}<small> g</small>`, esc(t('a day')))}
+  </div>`
+}
 
 function bodyHTML(rep) {
   const B = rep.body, u = rep.unit
@@ -331,6 +350,9 @@ export function periodReportHTML(rep, S, owner) {
 
   <h2>${esc(t('Body composition'))}</h2>
   ${bodyHTML(rep)}
+
+  <h2>${esc(t('Nutrition'))}</h2>
+  ${foodHTML(rep)}
 
   <h2>${esc(t('Plan and sessions, day by day'))}</h2>
   <div class="legend"><span><i style="background:${TRAIN}"></i>${esc(t('Trained'))}</span><span><i style="border:1.5px solid ${INK}"></i>${esc(t('Planned, not done'))}</span><span><i style="background:${SILVER}"></i>${esc(t('Planned, still to come'))}</span></div>

@@ -13,4 +13,11 @@ ext {
     androidxJunitVersion = '1.2.1'
     androidxEspressoCoreVersion = '3.6.1'
     cordovaAndroidVersion = '10.1.1'
+    // CameraX for the barcode scanner (@capacitor-mlkit/barcode-scanning reads these). Its default,
+    // 1.1.0, ships libimage_processing_util_jni.so with 4 KB LOAD segments, which Android 15+ flags
+    // on 16 KB page-size devices; 1.4.2 is built 16 KB-aligned (checked with readelf -l).
+    androidxCameraCamera2Version = '1.4.2'
+    androidxCameraCoreVersion = '1.4.2'
+    androidxCameraLifecycleVersion = '1.4.2'
+    androidxCameraViewVersion = '1.4.2'
 }

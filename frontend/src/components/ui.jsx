@@ -32,7 +32,7 @@ export const numWidthCh = s => Math.max(1, [...s].reduce((n, c) => n + (c === '.
 // logged 0 is a set taken to failure). Those clear back to null instead of snapping to 0.
 // `fit` sizes the field to the digits on screen instead of filling its cell — for the big
 // weight read-out, where the unit sits right beside the number.
-export function NumberField({ value, onChange, decimal = true, nullable = false, fit = false, className = '', ...rest }) {
+export function NumberField({ value, onChange, decimal = true, nullable = false, fit = false, className = '', onBlur, ...rest }) {
   const [draft, setDraft] = useState(null)
   const committed = useRef(null)
   // null and undefined are the same "empty" here — a nullable field's key is dropped once cleared.
@@ -58,10 +58,32 @@ export function NumberField({ value, onChange, decimal = true, nullable = false,
       style={fit ? { width: numWidthCh(String(shown)) + 'ch' } : undefined}
       onFocus={e => e.target.select()}
       onChange={e => commit(e.target.value)}
-      onBlur={() => { setDraft(null); committed.current = null }}
+      onBlur={e => { setDraft(null); committed.current = null; onBlur && onBlur(e) }}
       {...rest}
     />
   )
+}
+
+/**
+ * A NumberField whose value is checked once, when the field is left (or Enter is pressed), not on
+ * every key: "1", "19", "198" on the way to 1986 are not a year, and validating them as they were
+ * typed cleared the field before the year could be finished. `onCommit(n)` gets the typed number
+ * (null when empty) and decides what to keep; the field then shows what was kept.
+ */
+export function CommitNumberField({ value, onCommit, ...props }) {
+  const [local, setLocal] = useState(value ?? null)
+  const [settled, setSettled] = useState(0)
+  const editing = useRef(false)
+  const latest = useRef(value)
+  latest.current = value
+  // After a commit the field shows what was kept — also when that is the value it already had
+  // (a refused entry leaves `value` unchanged, so it alone would not bring the field back).
+  useEffect(() => { if (!editing.current) setLocal(latest.current ?? null) }, [value, settled])
+  const done = () => { editing.current = false; onCommit(local); setSettled(n => n + 1) }
+  return <NumberField {...props} nullable value={local}
+    onChange={n => { editing.current = true; setLocal(n) }}
+    onBlur={done}
+    onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }} />
 }
 
 // forwardRef so callers can focus it or read its value imperatively

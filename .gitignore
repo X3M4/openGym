@@ -33,3 +33,7 @@ deploy.env
 # impeccable working material (screenshots of design reviews)
 .impeccable/review/
 .impeccable/mocks/
+
+# Local Vite build settings (VITE_OFF_CONTACT…)
+frontend/.env.local
+frontend/.env.*.local
