@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EXDB } from './exercises.js'
-import { buildPeriodReport, workoutFacts, calendarDays, weeklySeries, daysBetween, presetRange } from './period-report.js'
+import { buildPeriodReport, workoutFacts, calendarDays, weeklySeries, daysBetween, presetRange, mainFatMethod, bodySection } from './period-report.js'
 
 const chest = EXDB.find(e => e.bp === 'chest').id
 const legs = EXDB.find(e => e.bp === 'upper legs').id
@@ -93,5 +93,33 @@ describe('presetRange', () => {
     expect(presetRange('lastMonth', '2026-10-06')).toEqual({ from: '2026-09-01', to: '2026-09-30' })
     expect(presetRange('lastMonth', '2026-01-15')).toEqual({ from: '2025-12-01', to: '2025-12-31' })
     expect(presetRange('last3m', '2026-10-06')).toEqual({ from: '2026-07-08', to: '2026-10-06' })
+  })
+})
+
+describe('body composition in the report', () => {
+  const S = () => ({
+    unit: 'kg', profile: { sex: 'male', heightCm: 180 },
+    bodyweight: Array.from({ length: 21 }, (_, i) => ({ d: '2026-09-' + String(i + 1).padStart(2, '0'), w: 82 - i * 0.1 })),
+    bodyfat: [{ id: 'a', d: '2026-09-02', t: 1, pct: 21, method: 'scale' }, { id: 'b', d: '2026-09-10', t: 2, pct: 20.5, method: 'scale' },
+      { id: 'c', d: '2026-09-11', t: 3, pct: 17, method: 'calipers' }],
+    measures: [{ id: 'm1', d: '2026-09-01', t: 1, waist: 92, neck: 40 }, { id: 'm2', d: '2026-09-20', t: 2, waist: 90, neck: 40 }],
+  })
+  it('compares body fat by its most used method only', () => {
+    // two Navy estimates (from the measurements) tie with two scale readings: either is one method
+    expect(['scale', 'navy']).toContain(mainFatMethod(S(), '2026-09-01', '2026-09-30'))
+    expect(mainFatMethod({ ...S(), measures: [] }, '2026-09-01', '2026-09-30')).toBe('scale')
+  })
+  it('a week\'s body-fat change uses readings of that method in it and the next', () => {
+    const weeks = weeklySeries({ ...S(), measures: [] }, [], '2026-08-31', '2026-09-20', 1)
+    expect(weeks[0].fatChange).toBeCloseTo(-0.5)             // 21 (week of 31 Aug) → 20.5 (week of 7 Sep)
+    expect(weeks[1].fatChange).toBe(null)                     // no scale reading the week after
+  })
+  it('the body section has the trend at both ends, the measurement changes and the readings', () => {
+    const b = bodySection(S(), '2026-09-01', '2026-09-21')
+    expect(b.trendFirst.y).toBe(82)
+    expect(b.trendLast.y).toBeLessThan(82)
+    expect(b.measures.waist.change).toBe(-2)
+    expect(b.fat.map(x => x.method)).toEqual(['navy', 'scale', 'scale', 'calipers', 'navy'])
+    expect(b.rate).toBeLessThan(0)
   })
 })

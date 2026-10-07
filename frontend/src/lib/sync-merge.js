@@ -22,6 +22,9 @@
  *   - routines: union by id in the newer copy's order; of an id that both have, the version
  *     edited last by its own `_ts` (stampRoutines), the newer copy's on a tie
  *   - bodyweight: union by day, the later-edited (`t`) entry of a day that both have
+ *   - measures, bodyfat (SuperOpenGym): union by id, the later-edited (`t`) version of an id both
+ *     have. A deletion is a tombstone ({ id, deleted: true, t }) so it outlives the other copy's
+ *     older version instead of being brought back by the union (mergeLatestById)
  *   - favEx: ordered set union, the newer copy first
  *   - exWeights: union by exercise, the better `w` for that exercise — larger for an ordinary
  *     lift, smaller on an assistance machine (a PR logged on the other device must not be
@@ -135,6 +138,17 @@ export function mergeBodyweight(a = [], b = []) {
   return [...byDay.values()].sort((x, y) => (x.d < y.d ? -1 : 1))
 }
 
+/** Union by id; of an id both lists hold, the entry with the later `t` (a tombstone included). */
+export function mergeLatestById(a = [], b = []) {
+  const byId = new Map()
+  for (const e of [...list(a), ...list(b)]) {
+    if (!e || e.id == null) continue
+    const cur = byId.get(e.id)
+    if (!cur || (Number(e.t) || 0) > (Number(cur.t) || 0)) byId.set(e.id, e)
+  }
+  return [...byId.values()].sort((x, y) => (x.d < y.d ? -1 : x.d > y.d ? 1 : (Number(x.t) || 0) - (Number(y.t) || 0)))
+}
+
 // The kept load per exercise. "The larger one wins" held while the app only ever raised it —
 // but an assistance machine progresses downwards, so there the smaller number is the newer,
 // harder setting and taking the larger would hand back the help the other device just dropped
@@ -216,6 +230,7 @@ const bodyweightKey = e => `${e?.d}|${e?.t ?? ''}`
 const RESET_LISTS = {
   workouts: workoutKey, routines: x => x?.id, customEx: x => x?.id, bodyweight: bodyweightKey,
   gymCards: x => x?.id, equipProfiles: x => x?.id, favEx: x => x,
+  measures: x => x?.id, bodyfat: x => x?.id,
 }
 const RESET_MAPS = ['exNotes', 'barWeights', 'balanceOverrides', 'loadKind', 'plates']
 /** An entry's name in resetIds: a workout's id (or day and start), a weigh-in's day and time, … */
@@ -270,6 +285,8 @@ export function sinceReset(S, at, ids) {
     out.routines = list(S.routines).filter(r => r && after(r._ts))
     out.customEx = list(S.customEx).filter(c => c && after(c._ts))
     out.bodyweight = list(S.bodyweight).filter(e => e && after(e.t))
+    out.measures = list(S.measures).filter(e => e && after(e.t))
+    out.bodyfat = list(S.bodyfat).filter(e => e && after(e.t))
     // No time of their own: taken for what they were before the reset, which cleared them.
     out.equipProfiles = []
     out.gymCards = []
@@ -386,6 +403,9 @@ export function mergeStates(a0, b0, { prefer } = {}) {
     })
   }
   out.bodyweight = mergeBodyweight(n.bodyweight, o.bodyweight).map(clone)
+  for (const f of ['measures', 'bodyfat']) {
+    if (list(n[f]).length || list(o[f]).length) out[f] = mergeLatestById(n[f], o[f]).map(clone)
+  }
   if (list(n.favEx).length || list(o.favEx).length) out.favEx = [...new Set([...list(n.favEx), ...list(o.favEx)])]
   out.exWeights = clone(mergeExWeights(n.exWeights, o.exWeights))
   for (const [id, sources] of editedBy) {
@@ -480,6 +500,11 @@ export function localExtras(local, server) {
   return {
     workouts: list(local?.workouts).filter(w => !have.has(workoutKey(w))).length,
     bodyweight: list(local?.bodyweight).filter(e => e && e.d != null && (!days.has(e.d) || differs(e, days.get(e.d)))).length,
-    customEx: list(local?.customEx).filter(e => e && !ex.has(e.id)).length
+    customEx: list(local?.customEx).filter(e => e && !ex.has(e.id)).length,
+    // Named only when there are some, so the counts read as they always did for everyone else.
+    ...Object.fromEntries(['measures', 'bodyfat'].map(f => {
+      const ids = new Set(list(server?.[f]).map(e => e?.id))
+      return [f, list(local?.[f]).filter(e => e && !e.deleted && !ids.has(e.id)).length]
+    }).filter(([, n]) => n > 0)),
   }
 }

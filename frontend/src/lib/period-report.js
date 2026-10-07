@@ -10,6 +10,7 @@ import { hasCompletedWork, isWarmupRow, completedVolumeOf } from './workout-mode
 import { bestSetOf } from './onerm.js'
 import { isoOf, weekKey } from './format.js'
 import { weeklyRelations } from './correlation.js'
+import { trendSeries, weeklyRate, bodyFatSeries, liveMeasures, measureChanges } from './body-comp.js'
 
 const DAY = 86400000
 const dateOf = iso => new Date(iso + 'T12:00:00')
@@ -84,6 +85,13 @@ const mean = xs => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null
  * in average weight from that week to the next (null where either has no weigh-in). The week
  * after the range is read for the last week's change when it has weigh-ins.
  */
+/** The method with the most body-fat readings in [from, to] — readings of one method compare. */
+export function mainFatMethod(S, from, to) {
+  const count = new Map()
+  for (const x of bodyFatSeries(S)) if (x.d >= from && x.d <= to) count.set(x.method, (count.get(x.method) || 0) + 1)
+  return [...count].sort((a, b) => b[1] - a[1])[0]?.[0] || null
+}
+
 export function weeklySeries(S, facts, from, to, ws) {
   const weeks = []
   let k = weekKey(from, ws)
@@ -97,6 +105,14 @@ export function weeklySeries(S, facts, from, to, ws) {
     bwByWeek.get(key).push(Number(b.w))
   }
   const routineIds = [...new Set(facts.flatMap(f => f.routineIds))]
+  const method = mainFatMethod(S, from, addDays(to, 7))
+  const fatByWeek = new Map()
+  for (const x of bodyFatSeries(S)) {
+    if (x.method !== method) continue
+    const key = weekKey(x.d, ws)
+    if (!fatByWeek.has(key)) fatByWeek.set(key, [])
+    fatByWeek.get(key).push(x.pct)
+  }
   return weeks.map(key => {
     const inWeek = facts.filter(f => weekKey(f.d, ws) === key)
     const vars = {
@@ -111,7 +127,9 @@ export function weeklySeries(S, facts, from, to, ws) {
     for (const id of routineIds) vars['routine:' + id] = inWeek.filter(f => f.routineIds.includes(id)).length
     const avg = mean(bwByWeek.get(key) || [])
     const nextAvg = mean(bwByWeek.get(addDays(key, 7)) || [])
-    return { week: key, vars, avgWeight: avg, change: avg != null && nextAvg != null ? nextAvg - avg : null }
+    const fat = mean(fatByWeek.get(key) || []), nextFat = mean(fatByWeek.get(addDays(key, 7)) || [])
+    return { week: key, vars, avgWeight: avg, change: avg != null && nextAvg != null ? nextAvg - avg : null,
+      fatChange: fat != null && nextFat != null ? nextFat - fat : null }
   })
 }
 
@@ -197,6 +215,8 @@ export function buildPeriodReport(S, { from, to, today = isoOf(new Date()), week
     lifts: topLiftSeries(S, facts),
     bodyweight,
     relations: weeklyRelations(weeks, relationKeys(weeks)),
+    fatRelations: { ...weeklyRelations(weeks.map(w => ({ vars: w.vars, change: w.fatChange })), relationKeys(weeks)), method: mainFatMethod(S, from, addDays(to, 7)) },
+    body: bodySection(S, from, to),
   }
 }
 
@@ -213,4 +233,23 @@ export function presetRange(key, today) {
   }
   if (key === 'last3m') return { from: addDays(today, -90), to: today }
   return { from: addDays(today, -27), to: today }
+}
+
+/** Body composition over [from, to]: the trend at both ends, the rate at the end, measurement
+ *  changes inside the range and the body-fat readings in it (lib/body-comp.js). */
+export function bodySection(S, from, to) {
+  const series = trendSeries(S.bodyweight).filter(x => x.d >= from && x.d <= to)
+  const inRange = series.filter(x => x.w != null)
+  const upTo = (S.bodyweight || []).filter(b => b && b.d <= to)
+  const rate = weeklyRate(upTo, to)
+  const measures = liveMeasures(S).filter(m => m.d >= from && m.d <= to)
+  const fat = bodyFatSeries(S).filter(x => x.d >= from && x.d <= to)
+  return {
+    trendFirst: inRange.length ? { d: series[0].d, y: series[0].trend } : null,
+    trendLast: inRange.length ? { d: series.at(-1).d, y: series.at(-1).trend } : null,
+    trend: series.map(x => ({ d: x.d, t: dateOf(x.d).getTime(), y: Math.round(x.trend * 10) / 10 })),
+    rate: rate.rate, kgPerWeek: rate.kgPerWeek ?? null,
+    measures: measureChanges(measures),
+    fat,
+  }
 }

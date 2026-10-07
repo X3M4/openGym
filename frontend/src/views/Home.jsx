@@ -11,6 +11,7 @@ import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { fieldKind, typicalMinutes } from '../lib/home-field.js'
+import { trendSeries, weeklyRate, rateBand, isCutting } from '../lib/body-comp.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -174,12 +175,7 @@ function TodayField({ S, routine, todayRoutines, todayName, doneToday, editingSa
       : next ? t('Next session: {0}, {1}', t(DAYN[next.weekday]), next.routine.name) : t('Rest day')}</div>
     {S.showWeightCard === false ? <div className="dfield-title">{doneToday ? t('Done') : t('Rest day')}</div>
     : bw ? <>
-      <div className="dfield-weight">
-        <span className="num-xl">{fmtNum(bw.w)}</span><span className="dfield-unit">{S.unit}</span>
-        {!!delta && <span className="dfield-delta"><Icon name={delta > 0 ? 'arrowUp' : 'arrowDown'} />{fmtNum(Math.abs(delta))}</span>}
-      </div>
-      <div className="dfield-sub">{fmtDate(bw.d, true)}{S.targetW ? ' · ' + t('Goal') + ' ' + fmtNum(S.targetW) + ' ' + S.unit + ' · ' + (Math.abs(S.targetW - bw.w) < 0.05 ? t('reached!') : t(S.targetW > bw.w ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(S.targetW - bw.w)) + ' ' + S.unit)) : ''}</div>
-      {bwPoints.length > 1 && <div className="dfield-chart"><LineChart points={bwPoints} h={110} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
+      <WeightSummary S={S} big />
     </> : <div className="dfield-sub">{t('No entries yet — log your weight to start the curve.')}</div>}
     {S.showWeightCard !== false && <div className="dfield-actions">
       <button className="dfield-go" onClick={() => bwSheet()}><Icon name="plus" />{t('Log weight')}</button>
@@ -198,12 +194,7 @@ function BodyBand({ S, bw, delta, bwPoints }) {
       <Icon name="scale" className="dfield-pict" />
     </div>
     {bw ? <>
-      <div className="dfield-weight">
-        <span className="num-l">{fmtNum(bw.w)}</span><span className="dfield-unit">{S.unit}</span>
-        {!!delta && <span className="dfield-delta"><Icon name={delta > 0 ? 'arrowUp' : 'arrowDown'} />{fmtNum(Math.abs(delta))}</span>}
-      </div>
-      <div className="dfield-sub">{fmtDate(bw.d, true)}{S.targetW ? ' · ' + t('Goal') + ' ' + fmtNum(S.targetW) + ' ' + S.unit + ' · ' + (Math.abs(S.targetW - bw.w) < 0.05 ? t('reached!') : t(S.targetW > bw.w ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(S.targetW - bw.w)) + ' ' + S.unit)) : ''}</div>
-      {bwPoints.length > 1 && <div className="dfield-chart"><LineChart points={bwPoints} h={96} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
+      <WeightSummary S={S} />
     </> : <div className="dfield-sub">{S.weighIn === false
       ? t('No entries yet — log your weight to start the curve.')
       : t("No entries yet — log your weight to start the curve. It's also asked before every workout.")}</div>}
@@ -213,4 +204,29 @@ function BodyBand({ S, bw, delta, bwPoints }) {
       {bw && <button className="dfield-ghost" onClick={weighInsSheet} aria-label={t('All weigh-ins')}><Icon name="list" /></button>}
     </div>
   </section>
+}
+
+const BAND_SHORT = { fast: 'faster than 1% a week', 'in-range': 'in the 0.5–1% range', slow: 'under 0.5% a week', 'not-losing': 'not going down' }
+// The body field's content: the weight trend (not the day's weigh-in, which water and salt move),
+// the weekly rate against the 0.5–1% band when cutting, and the way into the Body screen.
+function WeightSummary({ S, big = false }) {
+  const nav = useNavigate()
+  const series = trendSeries(S.bodyweight)
+  const last = series.at(-1)
+  const lastIn = [...series].reverse().find(x => x.w != null)
+  const rate = weeklyRate(S.bodyweight, todayISO())
+  const trend = Math.round(last.trend * 10) / 10
+  const band = isCutting(S.targetW, last.trend) ? rateBand(rate.rate) : null
+  const toGoal = S.targetW != null ? S.targetW - trend : null
+  const points = series.slice(-60).map(x => ({ t: new Date(x.d + 'T12:00:00').getTime(), y: Math.round(x.trend * 10) / 10, d: x.d }))
+  return <>
+    <div className="dfield-weight">
+      <span className={big ? 'num-xl' : 'num-l'}>{fmtNum(trend)}</span><span className="dfield-unit">{S.unit} · {t('trend')}</span>
+    </div>
+    <div className="dfield-sub">{t('Last weigh-in {0} {1} · {2}', fmtNum(lastIn.w), S.unit, fmtDate(lastIn.d, true))}
+      {toGoal != null ? ' · ' + (Math.abs(toGoal) < 0.05 ? t('Goal reached!') : t(toGoal > 0 ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(Math.round(toGoal * 10) / 10)) + ' ' + S.unit)) : ''}</div>
+    {rate.rate != null && <div className="dfield-rate">{(rate.rate > 0 ? '+' : rate.rate < 0 ? '−' : '±') + fmtNum(Math.abs(Math.round(rate.rate * 100) / 100))} % {t('per week')}{band ? ' · ' + t(BAND_SHORT[band]) : ''}</div>}
+    {points.length > 1 && <div className="dfield-chart"><LineChart points={points} h={big ? 110 : 96} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
+    <button className="dfield-open" onClick={() => nav('/body')}>{t('Body: trend, measurements and body fat')}<Icon name="chevronRight" /></button>
+  </>
 }

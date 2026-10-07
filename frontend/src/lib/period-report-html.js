@@ -147,24 +147,68 @@ function thresholdText(key, v, unit, routines) {
   }[key] || (() => n))()
 }
 
-function relationsHTML(rep, routines) {
-  const R = rep.relations, u = rep.unit
-  const intro = `<p>${esc(t('Each week of the period is compared with how your average weight changed into the following week. It measures weight, not body fat: once body fat is logged it will be compared too.'))}</p>`
-  if (!R.enough) return intro + `<div class="callout">${esc(t('Not enough data yet: a relation needs at least {0} weeks with weigh-ins in that week and the next. This period has {1}.', MIN_WEEKS, R.weeks))}</div>`
+// One relation block. `kind` is 'weight' (kg/lb, the weekly average weigh-in) or 'fat' (points of
+// body-fat %, readings of one method).
+function relationBlock(R, routines, kind, unit) {
+  const fmtChange = v => kind === 'fat' ? signed(Math.round(v * 10) / 10, t('pts')) : signed(Math.round(v * 10) / 10, unit)
   const findings = R.findings.map(f => {
     const strong = f.strength === 'large'
     const what = varNoun(f.key, routines)
-    const head = f.direction === 'more-loss'
-      ? t('Weeks with more {0} were followed by a bigger drop in weight.', what)
-      : t('Weeks with more {0} were followed by a smaller drop in weight, or a rise.', what)
+    const head = kind === 'fat'
+      ? (f.direction === 'more-loss'
+        ? t('Weeks with more {0} were followed by a bigger drop in body fat.', what)
+        : t('Weeks with more {0} were followed by a smaller drop in body fat, or a rise.', what))
+      : (f.direction === 'more-loss'
+        ? t('Weeks with more {0} were followed by a bigger drop in weight.', what)
+        : t('Weeks with more {0} were followed by a smaller drop in weight, or a rise.', what))
     const split = f.split ? `<p>${esc(t('Weeks with {0}: {1} on average ({2} weeks). Weeks with fewer: {3} ({4} weeks).',
-      thresholdText(f.key, f.split.threshold, u, routines), signed(f.split.more.change, u), f.split.more.weeks, signed(f.split.less.change, u), f.split.less.weeks))}</p>` : ''   // both sides hold MIN_GROUP (3) weeks or more, so "weeks" is always plural
-    return `<div class="finding ${strong ? 'strong' : ''}"><span class="badge">${esc(strong ? t('Strong relation') : t('Moderate relation'))}</span><p class="f-h">${esc(head)}</p>${split}</div>`
+      thresholdText(f.key, f.split.threshold, unit, routines), fmtChange(f.split.more.change), f.split.more.weeks, fmtChange(f.split.less.change), f.split.less.weeks))}</p>` : ''   // both sides hold MIN_GROUP (3) weeks or more, so "weeks" is always plural
+    return `<div class="finding"><span class="badge">${esc(strong ? t('Strong relation') : t('Moderate relation'))}</span><p class="f-h">${esc(head)}</p>${split}</div>`
   }).join('')
-  const none = !R.findings.length ? `<div class="callout">${esc(t('No clear relation in these {0} weeks between how you trained and how your weight changed.', R.weeks))}</div>` : ''
+  const none = !R.findings.length ? `<div class="callout">${esc(kind === 'fat'
+    ? t('No clear relation in these {0} weeks between how you trained and how your body fat changed.', R.weeks)
+    : t('No clear relation in these {0} weeks between how you trained and how your weight changed.', R.weeks))}</div>` : ''
   const weak = R.weak.length ? `<p class="note">${esc(t('No clear relation with: {0}.', R.weak.map(k => varNoun(k, routines)).join(', ')))}</p>` : ''
-  return intro + findings + none + weak +
-    `<p class="note">${esc(t('Based on {0} weeks. These are coincidences in time, not proof of cause: sleep, food, water and stress move the scale too.', R.weeks))}</p>`
+  return findings + none + weak
+}
+
+function relationsHTML(rep, routines) {
+  const R = rep.relations, F = rep.fatRelations, u = rep.unit
+  let out = `<p>${esc(t('Each week of the period is compared with how your average weight, and your body fat when you log it, changed into the following week.'))}</p>`
+  out += `<h4>${esc(t('Weight'))}</h4>`
+  out += R.enough ? relationBlock(R, routines, 'weight', u)
+    : `<div class="callout">${esc(t('Not enough data yet: a relation needs at least {0} weeks with weigh-ins in that week and the next. This period has {1}.', MIN_WEEKS, R.weeks))}</div>`
+  out += `<h4 style="margin-top:14px">${esc(t('Body fat'))}${F.method ? ' · ' + esc(t(METHOD_LABEL[F.method] || 'Other')) : ''}</h4>`
+  out += F.enough ? relationBlock(F, routines, 'fat', u)
+    : `<div class="callout">${esc(t('Not enough body-fat readings yet: a relation needs at least {0} weeks with a reading in that week and the next, all by the same method. This period has {1}.', MIN_WEEKS, F.weeks))}</div>`
+  const weeks = Math.max(R.weeks, F.weeks)
+  return out + `<p class="note">${esc(t('Based on {0} weeks. These are coincidences in time, not proof of cause: sleep, food, water and stress move the scale too.', weeks))}</p>`
+}
+
+const METHOD_LABEL = { scale: 'Smart scale (bioimpedance)', calipers: 'Skinfold calipers', dexa: 'DEXA scan', navy: 'US Navy estimate', other: 'Other' }
+const MEASURE_LABEL = { waist: 'Waist', neck: 'Neck', hip: 'Hip', chest: 'Chest', shoulders: 'Shoulders', arm: 'Arm', thigh: 'Thigh', calf: 'Calf' }
+
+function bodyHTML(rep) {
+  const B = rep.body, u = rep.unit
+  const cell = (color, label, value, sub = '') => `<div class="stat" style="--f:${color}"><span class="stat-l">${esc(label)}</span><span class="stat-v">${value}</span>${sub ? `<span class="stat-s">${sub}</span>` : ''}</div>`
+  const r1 = x => Math.round(x * 10) / 10
+  const trend = B.trendFirst && B.trendLast
+    ? cell(BODY, t('Weight trend'), `${esc(fmtNum(r1(B.trendLast.y)))}<small> ${esc(u)}</small>`, esc(signed(r1(B.trendLast.y - B.trendFirst.y), u) + ' · ' + t('since {0}', shortDate(B.trendFirst.d))))
+    : cell(BODY, t('Weight trend'), '—', esc(t('No weigh-ins in this period')))
+  const rate = cell(BODY, t('Rate at the end'), B.rate == null ? '—' : `${esc(signed(Math.round(B.rate * 100) / 100, ''))}<small> % ${esc(t('per week'))}</small>`,
+    B.rate == null ? '' : esc(signed(Math.round(B.kgPerWeek * 100) / 100, u) + ' ' + t('per week')))
+  const fatFirst = B.fat[0], fatLast = B.fat.at(-1)
+  const fat = fatLast
+    ? cell(BODY, t('Body fat'), `${esc(fmtNum(fatLast.pct))}<small> %</small>`, esc((fatFirst !== fatLast ? signed(r1(fatLast.pct - fatFirst.pct), t('pts')) + ' · ' : '') + t(METHOD_LABEL[fatLast.method] || 'Other')))
+    : cell(BODY, t('Body fat'), '—', esc(t('No readings in this period')))
+  const lean = fatLast?.lean != null
+    ? cell(STRENGTH, t('Lean mass'), `${esc(fmtNum(fatLast.lean))}<small> ${esc(u)}</small>`, fatFirst?.lean != null && fatFirst !== fatLast ? esc(signed(r1(fatLast.lean - fatFirst.lean), u)) : '')
+    : cell(STRENGTH, t('Lean mass'), '—', '')
+  const rows = Object.entries(B.measures).map(([f, m]) => `<div class="hb"><span class="hb-l">${esc(t(MEASURE_LABEL[f] || f))}</span>
+    <span>${esc(fmtNum(m.first.v))} → <b>${esc(fmtNum(m.last.v))} cm</b></span><span class="hb-v">${m.first.d !== m.last.d ? esc(signed(r1(m.change), 'cm')) : ''}</span></div>`).join('')
+  return `<div class="stats">${trend}${rate}${fat}${lean}</div>
+    ${rows ? `<h4 style="margin-top:14px">${esc(t('Measurements'))}</h4><div class="hbars">${rows}</div>` : ''}
+    <p class="note" style="margin-top:10px">${esc(t('Trend: exponentially smoothed average, 10% per weigh-in (J. Walker, The Hacker\'s Diet). Recommended rate when cutting: 0.5–1% of body weight per week (Helms, Aragon & Fitschen, 2014). Navy estimate: Hodgdon & Beckett, 1984.'))}</p>`
 }
 
 function setText(entryId, s, unit, speedUnit) {
@@ -285,6 +329,9 @@ export function periodReportHTML(rep, S, owner) {
   <h2>${esc(t('Summary'))}</h2>
   ${summaryHTML(rep)}
 
+  <h2>${esc(t('Body composition'))}</h2>
+  ${bodyHTML(rep)}
+
   <h2>${esc(t('Plan and sessions, day by day'))}</h2>
   <div class="legend"><span><i style="background:${TRAIN}"></i>${esc(t('Trained'))}</span><span><i style="border:1.5px solid ${INK}"></i>${esc(t('Planned, not done'))}</span><span><i style="background:${SILVER}"></i>${esc(t('Planned, still to come'))}</span></div>
   ${calendarHTML(rep, ws)}
@@ -296,8 +343,8 @@ export function periodReportHTML(rep, S, owner) {
   ${barChart(rep.weeks.map(w => ({ label: weekLabel(w.week), v: w.vars.sessions })), TRAIN, v => fmtNum(v))}
   <h4>${esc(t('Work sets per muscle group'))}</h4>
   ${hbars(rep.bodyParts, STRENGTH)}
-  <h4 style="margin-top:14px">${esc(t('Body weight'))} (${esc(rep.unit)})</h4>
-  ${lineChart(rep.bodyweight, BODY, rep.unit, { goal: S.targetW ?? null })}
+  <h4 style="margin-top:14px">${esc(t('Weight trend'))} (${esc(rep.unit)})</h4>
+  ${lineChart(rep.body.trend, BODY, rep.unit, { goal: S.targetW ?? null })}
   ${rep.lifts.length ? `<h4 style="margin-top:6px">${esc(t('Estimated 1RM of your most trained exercises'))} (${esc(rep.unit)})</h4><div class="lifts">${lifts}</div>` : ''}
 
   <h2>${esc(t('Training and weight change'))}</h2>
