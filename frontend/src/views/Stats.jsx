@@ -10,6 +10,7 @@ import { bwSheet, goalSheet, calendarSheet, workoutDetailSheet, exerciseHistoryS
 import LineChart from '../components/LineChart.jsx'
 import Heatmap from '../components/Heatmap.jsx'
 import Icon from '../components/Icon.jsx'
+import { reportSheet } from '../components/ReportSheet.jsx'
 import BodyMap, { BodyMapLegend } from '../components/BodyMap.jsx'
 import { loadOfWorkouts, muscleBalanceWindow, rankOf, MUSCLE_NAME, musclesOf } from '../lib/muscles.js'
 import { fatigueOf, strengthOf, STRENGTH_FLOOR, LB_TO_KG } from '../lib/recovery.js'
@@ -451,7 +452,10 @@ export default function Stats() {
 
   return <>
     <div className="hdr"><div><h1>{t('Stats')}</h1><div className="sub">{t('Progress & history')}</div></div>
-      <button className="iconbtn" onClick={() => nav('/history')} aria-label={t('History')}><Icon name="history" /></button></div>
+      <div className="row" style={{ gap: 8 }}>
+        <button className="iconbtn" onClick={reportSheet} aria-label={t('PDF report')}><Icon name="download" /></button>
+        <button className="iconbtn" onClick={() => nav('/history')} aria-label={t('History')}><Icon name="history" /></button>
+      </div></div>
 
     <div className="tiles">
       <div className="tile"><div className="l"><Icon name="dumbbell" />{t('Workouts')}</div><div className="v">{workouts.length}</div></div>
