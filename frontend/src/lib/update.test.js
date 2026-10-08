@@ -101,6 +101,13 @@ describe('checkForUpdate', () => {
     ]
   }
 
+  it('reads the version of a SuperOpenGym release tag (sog-vX.Y.Z)', async () => {
+    mockFetch({ ...REAL_RELEASE, tag_name: 'sog-v9.0.0' })
+    const result = await checkForUpdate()
+    expect(result.latestVersion).toBe('9.0.0')
+    expect(result.hasUpdate).toBe(true)
+  })
+
   it('finds the APK and its checksum in a real github.com release payload', async () => {
     mockFetch(REAL_RELEASE)
     const result = await checkForUpdate()

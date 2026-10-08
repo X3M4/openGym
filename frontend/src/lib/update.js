@@ -56,7 +56,8 @@ async function fetchLatest() {
   if (res.status === 404) return { hasUpdate: false, latestVersion: __APP_VERSION__, apkUrl: null, hashUrl: null }
   if (!res.ok) throw new Error(`GitHub API ${res.status}`)
   const latest = await res.json()
-  const latestVersion = latest.tag_name.replace(/^v/, '')
+  // SuperOpenGym tags its releases sog-vX.Y.Z: the fork inherited upstream's vX.Y.Z tags.
+  const latestVersion = latest.tag_name.replace(/^(sog-)?v/, '')
   const hasUpdate = compareSemver(latestVersion, __APP_VERSION__) > 0
 
   const assets = Array.isArray(latest.assets) ? latest.assets : []
