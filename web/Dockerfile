@@ -24,7 +24,10 @@ COPY frontend/ ./
 # image built between two releases calls itself the same thing, and "which build are you running?"
 # cannot be answered from the phone. Unset, the app reports package.json's version as before.
 ARG APP_BUILD=""
-RUN APP_BUILD="$APP_BUILD" npm run build
+# The Open Food Facts contact for the User-Agent (lib/off.js). Passed at build time, never
+# committed: CI takes it from the OFF_CONTACT secret. Unset, the app names the fork's URL.
+ARG VITE_OFF_CONTACT=""
+RUN APP_BUILD="$APP_BUILD" VITE_OFF_CONTACT="$VITE_OFF_CONTACT" npm run build
 
 FROM nginx:alpine
 # Same reason as in api/Dockerfile: alpine fixes land faster than the nginx image is rebuilt.

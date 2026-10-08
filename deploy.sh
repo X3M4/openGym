@@ -104,7 +104,11 @@ cmd_deploy() {
                 --label "org.opencontainers.image.revision=$tag")
   docker buildx build --platform "$PLATFORM" --target default "${labels[@]}" \
     -t "$IMAGE_PREFIX-api:$tag" -t "$IMAGE_PREFIX-api:latest" --push ./api
-  docker buildx build --platform "$PLATFORM" -f web/Dockerfile --build-arg "APP_BUILD=$tag" "${labels[@]}" \
+  # The Open Food Facts contact lives only in the untracked frontend/.env.local.
+  local off_contact
+  off_contact=$(sed -n 's/^VITE_OFF_CONTACT=//p' frontend/.env.local 2>/dev/null | tail -n 1)
+  docker buildx build --platform "$PLATFORM" -f web/Dockerfile --build-arg "APP_BUILD=$tag" \
+    --build-arg "VITE_OFF_CONTACT=$off_contact" "${labels[@]}" \
     -t "$IMAGE_PREFIX-web:$tag" -t "$IMAGE_PREFIX-web:latest" --push .
 
   echo "· Backing up $VPS_DIR/data on the VPS"

@@ -73,6 +73,9 @@ describe('owed photos and videos', () => {
   it('going ahead anyway keeps the copy in the stash, and its files survive the sign-out', async () => {
     await signedInWithPendingPhoto()
     await media.put('c'.repeat(64), new Blob(['x']), { mime: 'image/png', pending: false })   // nobody's
+    // Put strictly before the sign-out: in the same millisecond it would count as "picked from
+    // here on" (keepPutAfter) and rightly survive.
+    await new Promise(r => setTimeout(r, 5))
     const r = await useStore.getState().signOut({ force: true })
     expect(r).toMatchObject({ owed: true, media: 1, stashed: true })
     expect(useStore.getState().S.customEx).toEqual([])

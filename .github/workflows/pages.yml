@@ -10,12 +10,8 @@
 # upstream dataset on jsDelivr instead, pinned to a commit so the CDN can cache it forever.
 name: Deploy demo to GitHub Pages
 
+# SuperOpenGym fork: disabled — this job serves the upstream project. Only a manual run starts it.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:

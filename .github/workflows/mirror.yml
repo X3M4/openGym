@@ -15,10 +15,8 @@
 # api scope, so a leak could push commits but not read variables, tokens or the registry.
 name: Mirror to GitLab
 
+# SuperOpenGym fork: disabled — this job serves the upstream project. Only a manual run starts it.
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
   workflow_dispatch:
 
 permissions:

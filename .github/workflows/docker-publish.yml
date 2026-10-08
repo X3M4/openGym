@@ -1,5 +1,8 @@
 name: Publish Docker images
 
+# SuperOpenGym fork: images are ghcr.io/x3m4/superopengym-{api,web} (what deploy.sh pulls). The
+# web image takes the Open Food Facts contact from the OFF_CONTACT repository secret.
+
 # Images are published from a *published release*, never from a bare tag push.
 # A tag that is later deleted (the versioning rule consolidates unreleased tags)
 # would otherwise leave its image tags behind in GHCR forever, and dependency
@@ -65,7 +68,7 @@ jobs:
       - uses: docker/metadata-action@v6
         id: meta
         with:
-          images: ghcr.io/${{ steps.repo.outputs.owner }}/opengym-${{ matrix.image }}
+          images: ghcr.io/${{ steps.repo.outputs.owner }}/superopengym-${{ matrix.image }}
           tags: |
             type=raw,value=edge,enable=${{ github.ref == 'refs/heads/main' }}
             type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/') }}
@@ -81,6 +84,7 @@ jobs:
             VERSION=${{ steps.version_meta.outputs.VERSION }}
             VCS_REF=${{ steps.version_meta.outputs.VCS_REF }}
             BUILD_DATE=${{ steps.version_meta.outputs.BUILD_DATE }}
+            VITE_OFF_CONTACT=${{ secrets.OFF_CONTACT }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
