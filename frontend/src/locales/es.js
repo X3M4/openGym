@@ -1971,4 +1971,9 @@ export default {
   '{0} alerts in your training': '{0} alertas en tu entrenamiento',
   '1 alert about your strength or training volume.': '1 alerta sobre tu fuerza o tu volumen de entrenamiento.',
   '{0} alerts about your strength or training volume.': '{0} alertas sobre tu fuerza o tu volumen de entrenamiento.',
+  'Made with SuperOpenGym, based on {0}': 'Hecho con SuperOpenGym, basado en {0}',
+  'Edit meal': 'Editar comida',
+  'Meal updated': 'Comida actualizada',
+  'Grams': 'Gramos',
+  'A meal needs at least one food.': 'Una comida necesita al menos un alimento.',
 }

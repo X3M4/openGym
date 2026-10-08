@@ -49,7 +49,7 @@ function AlertsSheet({ close }) {
         </div>
       </div>)}
     </div>
-    {all.length > 0 && <div className="callout-s" style={{ marginTop: 12 }}>
+    {all.length > 0 && <div className="callout-s callout-quiet" style={{ marginTop: 12 }}>
       {C.band && C.rate != null && <div>{t('You are losing {0}% of your weight a week', pct1(-C.rate))}{C.band === 'fast' ? ' — ' + t('faster than the 1% that best keeps muscle.') : '.'}</div>}
       {C.protein != null && C.proteinTarget != null && <div>{t('Protein, last {0} logged days: {1} g a day against a target of {2} g.', C.proteinDays, C.protein, C.proteinTarget)}</div>}
       {C.band == null && C.protein == null && <div>{t('Log your weight and food to see these alerts against your loss rate and protein.')}</div>}

@@ -50,6 +50,17 @@ export function portion(food, g) {
   return { kcal: r0((p.kcal || 0) * f), p: r1((p.p || 0) * f), c: r1((p.c || 0) * f), f: r1((p.f || 0) * f) }
 }
 
+/**
+ * A saved-meal item at a new weight: its energy and macros scale from what it was saved with.
+ * An item without a weight, or a weight of zero or less, is left as it is.
+ */
+export function rescaleItem(it, g) {
+  const old = Number(it?.g) || 0, n = Number(g) || 0
+  if (old <= 0 || n <= 0) return it
+  const k = n / old
+  return { ...it, g: n, kcal: r0((Number(it.kcal) || 0) * k), p: r1((Number(it.p) || 0) * k), c: r1((Number(it.c) || 0) * k), f: r1((Number(it.f) || 0) * k) }
+}
+
 const live = xs => (xs || []).filter(e => e && !e.deleted)
 
 /** A day's log entries and totals. */

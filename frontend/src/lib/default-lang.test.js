@@ -32,3 +32,10 @@ describe('autoLang', () => {
     expect(autoLang(fresh, { default_lang: 'xx' }, ['fr-FR'])).toBe('fr')
   })
 })
+
+describe('the phone app in local mode (no server config)', () => {
+  it('an empty config means: no instance default, so the system language decides', async () => {
+    const { effectiveLang } = await import('./default-lang.js')
+    expect(effectiveLang({ lang: 'en', langAuto: true }, {}, ['es-ES', 'en-US'])).toBe('es')
+  })
+})

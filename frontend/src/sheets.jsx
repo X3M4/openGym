@@ -639,7 +639,7 @@ export function bwDeltaColor(delta, currentW) {
   if (!delta) return 'var(--label-2)'
   if (!S().targetW) return 'var(--label)'
   const up = S().targetW > currentW
-  return (delta > 0) === up ? 'var(--acc)' : 'var(--red)'
+  return (delta > 0) === up ? 'var(--green)' : 'var(--red)'
 }
 function GoalSheet({ close }) {
   const st = S()
@@ -2156,7 +2156,7 @@ export function WorkoutRow({ w, onClick }) {
   const glyph = glyphOf((st.routines.find(r => r.id === w.routineId) || {}).emoji)
   const mediaN = workoutMediaCount(w)
   return <div className="item" {...tappable(onClick)}>
-    <span className="lrow-i" style={{ width: 34, height: 34, borderRadius: 8, fontSize: 19 }}><Icon name={glyph} /></span>
+    <span className="lrow-i on-train" style={{ width: 36, height: 36, fontSize: 20 }}><Icon name={glyph} /></span>
     <div className="grow"><div className="tt">{w.name}</div>
       <div className="ss">{[fmtDate(w.d, true), ...durPart(w.end - w.start), t('{0} sets', setsDone(w)), fmtVol(w.vol, st.unit)].join(' · ')}</div></div>
     {mediaN > 0 && <span className="wrow-media" title={t(mediaN === 1 ? '{0} photo or video' : '{0} photos or videos', mediaN)} aria-label={t(mediaN === 1 ? '{0} photo or video' : '{0} photos or videos', mediaN)}><Icon name="image" />{mediaN}</span>}

@@ -75,7 +75,8 @@ export default function Plan() {
         {weekOrder(weekStartOf(S)).map(d => {
           const dayRoutines = [].concat(S.week[d] || []).map(id => S.routines.find(x => x.id === id)).filter(Boolean)
           // An empty day stays one tappable row → pick its first routine (today's behaviour).
-          if (!dayRoutines.length) return <div key={d} className="item" {...tappable(() => dayAssignSheet(d))}>
+          if (!dayRoutines.length) return <div key={d} className="item plan-day" {...tappable(() => dayAssignSheet(d))}>
+            <span className="plan-sq" aria-hidden="true">{t(DAYN[d]).slice(0, 2)}</span>
             <div className="grow"><div className="tt">{t(DAYN[d])}</div></div>
             <span className="tag">{t('Rest')}</span>
             <Icon name="chevronRight" className="chev" /></div>
@@ -83,7 +84,9 @@ export default function Plan() {
           // is a small ＋ in the day's header, centred over the ✕ column (#276): a full-width
           // "＋ Add routine" under every planned day made the week read as a list of buttons,
           // when most people train one routine a day. The ＋ keeps the option for those who don't.
-          return <div key={d} className="item" style={{ display: 'block', padding: '10px 14px' }}>
+          return <div key={d} className="item plan-day on">
+            <span className="plan-sq" aria-hidden="true">{t(DAYN[d]).slice(0, 2)}</span>
+            <div className="grow" style={{ padding: '10px 14px 10px 0' }}>
             <div className="row between" style={{ marginBottom: 6 }}>
               <div className="tt">{t(DAYN[d])}</div>
               <div className="row" style={{ gap: 8 }}>
@@ -94,10 +97,11 @@ export default function Plan() {
               </div>
             </div>
             {dayRoutines.map(r => <div key={r.id} className="row" style={{ gap: 8, padding: '4px 0 4px 8px' }}>
-              <span className="lrow-i" style={{ width: 26, height: 26, fontSize: 14 }}><Icon name={glyphOf(r.emoji)} /></span>
+              <span className="lrow-i" style={{ width: 30, height: 30, fontSize: 17 }}><Icon name={glyphOf(r.emoji)} /></span>
               <div className="grow" style={{ minWidth: 0 }}><div className="tt" style={{ fontSize: 14 }}>{r.name}</div><div className="ss">{exCount(r.ex.length)}</div></div>
               <button className="iconbtn sm" aria-label={t('Remove')} onClick={() => removeFromDay(d, r.id)}><Icon name="xmark" /></button>
             </div>)}
+            </div>
           </div>
         })}
       </div>
@@ -106,9 +110,9 @@ export default function Plan() {
         <h4 className="sec" style={{ margin: 0 }}>{t('Routines')}</h4>
         <Button size="sm" variant="tinted" icon="plus" onClick={addRoutine}>{t('New')}</Button>
       </div>
-      {S.routines.length ? <div className="list">{S.routines.map((r, i) => <SwipeToDelete key={r.id} className="item"
+      {S.routines.length ? <div className="list">{S.routines.map((r, i) => <SwipeToDelete key={r.id} className="item plan-routine"
         deleteLabel={t('Delete routine')} onDelete={() => confirmDelete(r)} {...tappable(() => nav('/plan/r/' + r.id))}>
-        <span className="lrow-i"><Icon name={glyphOf(r.emoji)} /></span>
+        <span className="lrow-i on-train"><Icon name={glyphOf(r.emoji)} /></span>
         <div className="grow"><div className="tt">{r.name}</div><div className="ss">{exCount(r.ex.length)}</div></div>
         {/* The order of this list is the order of `S.routines`, and every other screen reads the
             same array — the Start screen, the day-assignment sheets, the routine pickers. So

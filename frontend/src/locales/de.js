@@ -1991,4 +1991,9 @@ export default {
   '{0} alerts in your training': '{0} alerts in your training',
   '1 alert about your strength or training volume.': '1 alert about your strength or training volume.',
   '{0} alerts about your strength or training volume.': '{0} alerts about your strength or training volume.',
+  'Made with SuperOpenGym, based on {0}': 'Made with SuperOpenGym, based on {0}',
+  'Edit meal': 'Edit meal',
+  'Meal updated': 'Meal updated',
+  'Grams': 'Grams',
+  'A meal needs at least one food.': 'A meal needs at least one food.',
 }

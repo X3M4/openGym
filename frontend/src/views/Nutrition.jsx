@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore.js'
 import { useUI } from '../store/useUI.js'
 import { t, dateLocale } from '../lib/i18n.js'
 import { fmtNum, todayISO, uid } from '../lib/format.js'
 import { confirmSheet } from '../sheets.jsx'
 import { MOBILE } from '../lib/mobile.js'
-import { targets, dayTotals, portion, MEALS, PAL, PROTEIN_RANGE, FAT_RANGE, ADAPT_MIN_DAYS, ADAPT_WINDOW } from '../lib/nutrition.js'
+import { targets, dayTotals, portion, rescaleItem, MEALS, PAL, PROTEIN_RANGE, FAT_RANGE, ADAPT_MIN_DAYS, ADAPT_WINDOW } from '../lib/nutrition.js'
 import { searchFoods, productByCode, OffLimitError } from '../lib/off.js'
 import Icon from '../components/Icon.jsx'
 import { Button, Row, NumberField, CommitNumberField, Segmented, TextField } from '../components/ui.jsx'
@@ -35,7 +34,6 @@ function Meter({ label, value, target, unit }) {
 }
 
 export default function Nutrition() {
-  const nav = useNavigate()
   const S = useStore(s => s.S)
   const today = todayISO()
   const [d, setD] = useState(today)
@@ -47,10 +45,9 @@ export default function Nutrition() {
   return <div className="narrow">
     <div className="hdr">
       <div><h1>{t('Nutrition')}</h1><div className="sub">{t('What you eat against your targets')}</div></div>
-      <button className="iconbtn" onClick={() => nav(-1)} aria-label={t('Back')}><Icon name="chevronLeft" /></button>
     </div>
 
-    <section className="dfield dfield-food dfield-band" aria-label={t('Nutrition')}>
+    <section className="dfield dfield-food dfield-band dfield-dest" aria-label={t('Nutrition')}>
       <div className="nday">
         <button className="iconbtn" onClick={() => setD(shift(d, -1))} aria-label={t('Previous day')}><Icon name="chevronLeft" /></button>
         <span className="nday-l">{label}</span>
@@ -79,8 +76,7 @@ function MealBlock({ meal, d, items }) {
     const name = `${t(MEAL_LABEL[meal])} ${dateOf(d).toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' })}`
     const foods = live(S.foods)
     const entries = items.map(e => ({ foodId: e.foodId && foods.some(f => f.id === e.foodId) ? e.foodId : null, name: e.name, g: e.g, kcal: e.kcal, p: e.p, c: e.c, f: e.f }))
-    update(s => { s.meals = [...(s.meals || []), { id: uid(), t: Date.now(), name, items: entries }] })
-    ui().toast(t('Meal saved as "{0}"', name))
+    mealEditSheet({ name, items: entries }, true)
   }
   return <div className="card nmeal">
     <div className="row between">
@@ -295,12 +291,50 @@ function SavedMeals({ meal, d, close }) {
     close(); ui().toast(t('Meal added'))
   }
   if (!meals.length) return <p className="small muted">{t('Log a meal with two or more foods and tap "Save as meal" to reuse it here in one tap.')}</p>
-  return <div className="body-list">{meals.map(m => <div key={m.id} className="body-row" style={{ cursor: 'pointer' }} onClick={() => add(m)}>
+  return <div className="body-list">{meals.map(m => <div key={m.id} className="body-row meal-row" style={{ cursor: 'pointer' }} onClick={() => add(m)}>
     <span className="br-d">{fmtNum(m.items.reduce((n, i) => n + (i.kcal || 0), 0))}<small> kcal</small></span>
     <span className="br-m"><b style={{ color: 'var(--label)' }}>{m.name}</b> · {m.items.map(i => i.name).join(', ')}</span>
-    <span />
+    <button className="linkbtn" aria-label={t('Edit')} title={t('Edit')} onClick={e => { e.stopPropagation(); mealEditSheet(m) }}><Icon name="pencil" /></button>
     <button className="linkbtn" aria-label={t('Delete')} onClick={e => { e.stopPropagation(); update(s => { s.meals = (s.meals || []).map(x => x?.id === m.id ? { id: m.id, deleted: true, t: Date.now() } : x) }) }}><Icon name="trash" /></button>
   </div>)}</div>
 }
+
+/**
+ * A saved meal's name, foods and amounts. `isNew` is the "Save as meal" step: the name comes
+ * prefilled (meal and date) and Save creates it; otherwise Save replaces the meal, stamped with
+ * a new time so the latest edit wins a sync (lib/sync-merge.js).
+ */
+function MealEdit({ meal, isNew, close }) {
+  const [name, setName] = useState(meal.name || '')
+  const [items, setItems] = useState(meal.items || [])
+  const kcal = items.reduce((n, i) => n + (Number(i.kcal) || 0), 0)
+  const ok = name.trim() && items.length > 0
+  const save = () => {
+    const next = { id: isNew ? uid() : meal.id, t: Date.now(), name: name.trim(), items }
+    update(s => {
+      const list = s.meals || []
+      s.meals = isNew ? [...list, next] : list.map(x => x?.id === meal.id ? next : x)
+    })
+    close(); ui().toast(isNew ? t('Meal saved as "{0}"', next.name) : t('Meal updated'))
+  }
+  return <>
+    <h3>{isNew ? t('Save as meal') : t('Edit meal')}</h3>
+    <label className="small muted" htmlFor="meal-name">{t('Name')}</label>
+    <TextField id="meal-name" value={name} maxLength={60} onChange={e => setName(e.target.value)} style={{ marginTop: 6 }} />
+    <div className="body-list" style={{ marginTop: 12 }}>{items.map((it, i) => <div key={i} className="body-row meal-edit-row">
+      <CommitNumberField className="body-num" value={it.g ?? null} decimal={false} aria-label={t('Grams')}
+        disabled={!(Number(it.g) > 0)}
+        onCommit={v => setItems(xs => xs.map((x, j) => j === i ? rescaleItem(x, Math.round(v || 0)) : x))} />
+      <span className="br-m"><span style={{ color: 'var(--label)' }}>{it.name}</span><br />{fmtNum(it.kcal || 0)} kcal · {fmtNum(it.p || 0)} g {t('protein')}</span>
+      <button className="linkbtn" aria-label={t('Remove')} onClick={() => setItems(xs => xs.filter((_, j) => j !== i))}><Icon name="xmark" /></button>
+    </div>)}</div>
+    {!items.length && <p className="small muted">{t('A meal needs at least one food.')}</p>}
+    <p className="small" style={{ margin: '10px 2px' }}><b>{fmtNum(kcal)}</b> kcal</p>
+    <Button variant="primary" disabled={!ok} onClick={save}>{t('Save')}</Button>
+    <div style={{ height: 8 }} />
+    <Button variant="ghost" onClick={close}>{t('Cancel')}</Button>
+  </>
+}
+export const mealEditSheet = (meal, isNew = false) => ui().openSheet(close => <MealEdit meal={meal} isNew={isNew} close={close} />)
 
 export const addFoodSheet = (meal, d) => ui().openSheet(close => <AddFood meal={meal} d={d} close={close} />)

@@ -6,6 +6,7 @@ import { fmtNum, fmtDate, todayISO, isoOf, weekKey, weekStartOf, weekDayOffset, 
 import { t, dateLocale } from '../lib/i18n.js'
 import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, weighInsSheet } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
+import { fieldNav } from '../lib/field-nav.js'
 import Icon from '../components/Icon.jsx'
 import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
@@ -234,7 +235,7 @@ function WeightSummary({ S, big = false }) {
       {toGoal != null ? ' · ' + (Math.abs(toGoal) < 0.05 ? t('Goal reached!') : t(toGoal > 0 ? '{0} to gain' : '{0} to lose', fmtNum(Math.abs(Math.round(toGoal * 10) / 10)) + ' ' + S.unit)) : ''}</div>
     {rate.rate != null && <div className="dfield-rate">{(rate.rate > 0 ? '+' : rate.rate < 0 ? '−' : '±') + fmtNum(Math.abs(Math.round(rate.rate * 100) / 100))} % {t('per week')}{band ? ' · ' + t(BAND_SHORT[band]) : ''}</div>}
     {points.length > 1 && <div className="dfield-chart"><LineChart points={points} h={big ? 110 : 96} unit={S.unit} goal={S.targetW} color="var(--on-field)" goalColor="var(--on-field)" ink="var(--on-field)" /></div>}
-    <button className="dfield-open" onClick={() => nav('/body')}>{t('Body: trend, measurements and body fat')}<Icon name="chevronRight" /></button>
+    <button className="dfield-open" onClick={ev => fieldNav(nav, ev, '/body')}>{t('Body: trend, measurements and body fat')}<Icon name="chevronRight" /></button>
   </>
 }
 
@@ -244,7 +245,7 @@ function NutritionBand({ S }) {
   const today = todayISO()
   const T = targets(S, today)
   const day = dayTotals(S.foodLog, today)
-  return <button className="dband" onClick={() => nav('/nutrition')}>
+  return <button className="dband" onClick={ev => fieldNav(nav, ev, '/nutrition')}>
     <span className="dband-sq dband-food"><Icon name="food" /></span>
     <span className="dband-m">
       <span className="dband-t">{fmtNum(day.kcal)}{T.kcal != null ? ' / ' + fmtNum(T.kcal) : ''} kcal</span>

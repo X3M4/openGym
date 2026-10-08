@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-06T00:00:00Z",
+  "generatedAt": "2026-10-08T00:00:00Z",
   "title": "Design System: SuperOpenGym",
   "extensions": {
     "colorMeta": {
@@ -19,7 +19,7 @@
           "#e1f1ff"
         ],
         "darkThemeValue": "#4eaaee",
-        "cssVar": "--d-train (also --acc by default)"
+        "cssVar": "--d-train (also --acc, fixed: no accent picker)"
       },
       "sky-deep": {
         "role": "primary",
@@ -70,7 +70,8 @@
           "#ffead8"
         ],
         "darkThemeValue": "#f6a64b",
-        "cssVar": "--d-food"
+        "cssVar": "--d-food",
+        "note": "Nutrition only. No longer marks a session in progress (that stays training sky)."
       },
       "activity-yellow": {
         "role": "secondary",
@@ -87,7 +88,8 @@
           "#ffeebd"
         ],
         "darkThemeValue": "#f7d04c",
-        "cssVar": "--d-move"
+        "cssVar": "--d-move",
+        "note": "Activity band on Home; also the solid PR badge field (the one standing borrow)."
       },
       "strength-violet": {
         "role": "secondary",
@@ -160,19 +162,10 @@
       "orange-text": {
         "role": "tertiary",
         "displayName": "Orange Text",
-        "canonical": "oklch(58.0% 0.142 55.1)",
-        "tonalRamp": [
-          "#170600",
-          "#3b1a00",
-          "#673200",
-          "#964d04",
-          "#c56b1d",
-          "#ee904a",
-          "#febe92",
-          "#feeadd"
-        ],
+        "canonical": "#a85400",
         "darkThemeValue": "#f8ae5c",
-        "cssVar": "--orange"
+        "cssVar": "--orange",
+        "note": "Darkened from #b85f05 to #a85400 in Phase 9 for AA on white."
       },
       "signal-red": {
         "role": "tertiary",
@@ -286,7 +279,9 @@
         "role": "neutral",
         "displayName": "Tertiary Label",
         "darkThemeValue": "rgba(238,242,247,.54)",
-        "cssVar": "--label-3"
+        "cssVar": "--label-3",
+        "canonical": "rgba(19,35,63,.66)",
+        "note": "Raised from .52 to .66 in Phase 9 for AA on white."
       },
       "rule": {
         "role": "neutral",
@@ -353,6 +348,13 @@
           "#caced3",
           "#ebeff4"
         ]
+      },
+      "scrim": {
+        "role": "neutral",
+        "displayName": "Scrim",
+        "canonical": "rgba(13,22,38,.5)",
+        "cssVar": "(.scrim background)",
+        "note": "Flat modal scrim, no blur."
       }
     },
     "typographyMeta": {
@@ -394,7 +396,19 @@
       },
       "label-day": {
         "displayName": "Label Day",
-        "purpose": "Weekday initials in the week strip, uppercase."
+        "purpose": "Weekday initials in the week strip, uppercase. Plan day squares use two letters at 17px/700 wide."
+      },
+      "numeral-tile": {
+        "displayName": "Numeral Tile",
+        "purpose": "Stats tile values, condensed tabular."
+      },
+      "exercise-name": {
+        "displayName": "Exercise Name",
+        "purpose": "Exercise heading in the running workout; 17px in compact/dense."
+      },
+      "label-section": {
+        "displayName": "Label Section",
+        "purpose": "h4.sec section labels over grouped lists, uppercase, label-secondary; also Stats tile labels at .05em."
       }
     },
     "shadows": [
@@ -407,6 +421,26 @@
         "name": "focus-stroke",
         "value": "inset 0 0 0 2px var(--acc-text)",
         "purpose": "Focused text field."
+      },
+      {
+        "name": "check-open-stroke",
+        "value": "inset 0 0 0 2px var(--label-2)",
+        "purpose": "Open set tick box. A stroke, not elevation."
+      },
+      {
+        "name": "media-frame",
+        "value": "inset 0 0 0 1px var(--sep)",
+        "purpose": "Hairline frame around exercise media."
+      },
+      {
+        "name": "tile-stripe",
+        "value": "inset 0 4px 0 var(--tile-f, var(--d-train))",
+        "purpose": "4px domain stripe across a Stats tile's top."
+      },
+      {
+        "name": "start-running-bar",
+        "value": "inset 0 3px 0 var(--ink)",
+        "purpose": "Ink bar on top of the tab bar's Start square while a session runs. Replaces the old orange fill and ping."
       }
     ],
     "motion": [
@@ -428,7 +462,12 @@
       {
         "name": "field-transition",
         "value": "240ms",
-        "purpose": "View Transition of the dfield (view-transition-name: dfield); full sweep interaction scheduled for Phase 9."
+        "purpose": "View Transition of the dfield (view-transition-name: dfield)."
+      },
+      {
+        "name": "field-nav",
+        "value": "240ms var(--ease)",
+        "purpose": "Signature transition `field` (lib/field-nav.js): a Home band's square or the body field grows into the destination's top field (.dfield-dest on Body and Nutrition), anchored top left; root cross-fade 200ms. Plain navigation under reduced motion or without View Transitions."
       }
     ],
     "breakpoints": [
@@ -456,9 +495,24 @@
         "type scale",
         "base components",
         "tab bar and desktop rail",
-        "Home"
+        "Home",
+        "Body and Nutrition top fields (Phases 5–8)",
+        "pictogram set (Phase 9)",
+        "section labels",
+        "Workout: Start chooser, running workout header, progress, set rows, nav",
+        "Plan day rows, routine rows, Coach entry",
+        "RoutineEdit header",
+        "Stats tiles and PR badge",
+        "field view transition"
       ],
-      "tokenInheritedOnly": "all other screens, redesign scheduled for Phase 9"
+      "tokenInheritedOnly": "Library, History (rows excepted), Settings, Admin, Login, Check-in, Muscles, Coach chat",
+      "removed": [
+        "accent picker (accent fixed to sky)"
+      ]
+    },
+    "iconography": {
+      "interface": "Single-weight strokes at 0/45/90°, square caps, miter joins (.icn), live area 3–21 on a 24 grid.",
+      "pictograms": "fig(): solid round head (r≈2.1) plus limb polylines at stroke 2.9 with round caps and round joins on the 45° grid; equipment as solid blocks. currentColor throughout."
     }
   },
   "components": [
@@ -508,7 +562,7 @@
       "refersTo": "input-field",
       "description": "Borderless silver field; focus is a 2px inset sky-text stroke.",
       "html": "<input class=\"ds-field\" placeholder=\"Body weight (kg)\">",
-      "css": ".ds-field{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);width:100%;background:var(--surface,#eef2f6);color:var(--label,#13233f);border:none;border-radius:var(--r,4px);padding:13px 15px;font-size:17px;outline:none;transition:box-shadow 140ms}.ds-field::placeholder{color:var(--label-3,rgba(19,35,63,.52))}.ds-field:focus,.ds-field:focus-visible{box-shadow:inset 0 0 0 2px var(--acc-text,#1468ad)}"
+      "css": ".ds-field{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);width:100%;background:var(--surface,#eef2f6);color:var(--label,#13233f);border:none;border-radius:var(--r,4px);padding:13px 15px;font-size:17px;outline:none;transition:box-shadow 140ms}.ds-field::placeholder{color:var(--label-3,rgba(19,35,63,.66))}.ds-field:focus,.ds-field:focus-visible{box-shadow:inset 0 0 0 2px var(--acc-text,#1468ad)}"
     },
     {
       "name": "Chips",
@@ -530,9 +584,9 @@
       "name": "Tab Bar",
       "kind": "nav",
       "refersTo": "tab-start",
-      "description": "Solid bottom bar with hairline top; active tab gets a 3px sky bar; Start is a raised 54px sky square.",
-      "html": "<nav class=\"ds-tabbar\"><button class=\"ds-tab ds-on\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M3 11l9-7 9 7v10H3z\"/></svg>Home</button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg>Plan</button><button class=\"ds-tab ds-start\"><span class=\"ds-cir\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6\"/></svg></span><span>Start</span></button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M5 20V12M10 20V6M15 20v-9M20 20V9\"/></svg>Progress</button></nav>",
-      "css": ".ds-tabbar{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;justify-content:space-around;align-items:flex-end;padding:7px 6px 6px;background:var(--bg-el,#fff);border-top:1px solid var(--sep,rgba(19,35,63,.16))}.ds-tab{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:5px;position:relative;border:none;background:none;color:var(--label-2,rgba(19,35,63,.7));font-size:11px;font-weight:500;cursor:pointer;transition:color 140ms}.ds-tab:hover{color:var(--label,#13233f)}.ds-tab:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}.ds-tab.ds-on{color:var(--label,#13233f);font-weight:650}.ds-tab.ds-on::before{content:'';position:absolute;top:-7px;width:28px;height:3px;background:var(--acc,#3a9fe4)}.ds-start{margin-top:-24px;color:var(--label,#13233f);font-weight:650}.ds-cir{width:54px;height:54px;border-radius:var(--r,4px);background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f);display:flex;align-items:center;justify-content:center;transition:transform 140ms cubic-bezier(.22,1,.36,1)}.ds-start:active .ds-cir{transform:scale(.93)}"
+      "description": "Solid bottom bar with hairline top; active tab gets a 3px sky bar; Start is a raised 54px sky square, and while a session runs it stays sky with a 3px inset ink bar on top (no ping).",
+      "html": "<nav class=\"ds-tabbar\"><button class=\"ds-tab ds-on\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M3 11l9-7 9 7v10H3z\"/></svg>Home</button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg>Plan</button><button class=\"ds-tab ds-start ds-rec\"><span class=\"ds-cir\"><svg width=\"26\" height=\"26\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M6 8v8M9 6v12M15 6v12M18 8v8M9 12h6\"/></svg></span><span>Start</span></button><button class=\"ds-tab\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"><path d=\"M5 20V12M10 20V6M15 20v-9M20 20V9\"/></svg>Progress</button></nav>",
+      "css": ".ds-tabbar{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;justify-content:space-around;align-items:flex-end;padding:7px 6px 6px;background:var(--bg-el,#fff);border-top:1px solid var(--sep,rgba(19,35,63,.16))}.ds-tab{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:5px;position:relative;border:none;background:none;color:var(--label-2,rgba(19,35,63,.7));font-size:11px;font-weight:500;cursor:pointer;transition:color 140ms}.ds-tab:hover{color:var(--label,#13233f)}.ds-tab:focus-visible{outline:2.5px solid var(--acc-text,#1468ad);outline-offset:2px}.ds-tab.ds-on{color:var(--label,#13233f);font-weight:650}.ds-tab.ds-on::before{content:'';position:absolute;top:-7px;width:28px;height:3px;background:var(--acc,#3a9fe4)}.ds-start{margin-top:-24px;color:var(--label,#13233f);font-weight:650}.ds-cir{width:54px;height:54px;border-radius:var(--r,4px);background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f);display:flex;align-items:center;justify-content:center;transition:transform 140ms cubic-bezier(.22,1,.36,1)}.ds-start:active .ds-cir{transform:scale(.93)}.ds-start.ds-rec .ds-cir{box-shadow:inset 0 3px 0 var(--ink,#13233f)}"
     },
     {
       "name": "Toast",
@@ -541,6 +595,38 @@
       "description": "Solid navy ink bar with a 4px corner; never a pill.",
       "html": "<div class=\"ds-toast\">Weight saved</div>",
       "css": ".ds-toast{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-block;background:var(--ink,#13233f);color:var(--bg,#fff);border-radius:var(--r,4px);padding:11px 18px;font-size:15px;font-weight:500;max-width:88vw}"
+    },
+    {
+      "name": "Plan Day Rows",
+      "kind": "custom",
+      "refersTo": "plan-day-square",
+      "description": "Weekday rows led by a 56px square with the two-letter weekday: sky for training days, rest silver for rest days.",
+      "html": "<div class=\"ds-plist\"><div class=\"ds-pday ds-on\"><span class=\"ds-psq\">Mo</span><span class=\"ds-pt\">Monday</span></div><div class=\"ds-pday\"><span class=\"ds-psq\">Tu</span><span class=\"ds-pt\">Tuesday</span><span class=\"ds-tag\">Rest</span></div></div>",
+      "css": ".ds-plist{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;flex-direction:column;gap:1px;background:var(--sep,rgba(19,35,63,.16));border-radius:var(--r,4px);overflow:hidden;color:var(--label,#13233f)}.ds-pday{display:flex;align-items:stretch;gap:14px;min-height:56px;background:var(--surface,#eef2f6);padding-inline-end:12px}.ds-psq{width:56px;flex:none;display:grid;place-items:center;font-size:17px;font-weight:700;font-stretch:112%;text-transform:uppercase;letter-spacing:.04em;background:var(--d-rest,#c4ccd5);color:var(--on-field,#13233f)}.ds-pday.ds-on .ds-psq{background:var(--d-train,#3a9fe4)}.ds-pt{align-self:center;flex:1;font-size:17px;font-weight:650}.ds-pday:not(.ds-on) .ds-pt{color:var(--label-2,rgba(19,35,63,.7))}.ds-tag{align-self:center;background:var(--surface-2,#e2e8ef);color:var(--label-2,rgba(19,35,63,.7));border-radius:3px;padding:3px 7px;font-size:12px;font-weight:500}"
+    },
+    {
+      "name": "Coach Entry",
+      "kind": "custom",
+      "refersTo": "coach-band-square",
+      "description": "Silver band led by a full-height 64px ink square.",
+      "html": "<button class=\"ds-coach\"><span class=\"ds-coach-sq\">AI</span><span class=\"ds-coach-t\"><b>Coach</b><span>Build a plan with the coach</span></span></button>",
+      "css": ".ds-coach{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;align-items:stretch;width:100%;text-align:start;padding:0;border:none;border-radius:var(--r,4px);overflow:hidden;background:var(--surface,#eef2f6);color:var(--label,#13233f);cursor:pointer;transition:background 140ms}.ds-coach:active,.ds-coach:hover{background:var(--surface-2,#e2e8ef)}.ds-coach-sq{width:64px;flex:none;display:grid;place-items:center;background:var(--ink,#13233f);color:var(--bg,#fff);font-weight:700}.ds-coach-t{display:flex;flex-direction:column;gap:2px;padding:13px 14px}.ds-coach-t b{font-size:17px;font-weight:700;font-stretch:112%}.ds-coach-t span{font-size:13px;color:var(--label-2,rgba(19,35,63,.7))}"
+    },
+    {
+      "name": "Stats Tile and PR Badge",
+      "kind": "card",
+      "refersTo": "stat-tile",
+      "description": "Silver tile with a 4px domain stripe, wide uppercase label and 36px condensed numeral; PR badge as a solid yellow field with navy ink.",
+      "html": "<div class=\"ds-tiles\"><div class=\"ds-tile\"><div class=\"ds-tl\">Workouts</div><div class=\"ds-tv\">128</div></div><div class=\"ds-tile ds-body\"><div class=\"ds-tl\">Weight 30d</div><div class=\"ds-tv\">−1.4 kg</div></div></div><span class=\"ds-pr\">PR</span>",
+      "css": ".ds-tiles{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;color:var(--label,#13233f)}.ds-tile{background:var(--surface,#eef2f6);border-radius:var(--r,4px);padding:16px 14px 14px;box-shadow:inset 0 4px 0 var(--tile-f,var(--d-train,#3a9fe4))}.ds-tile.ds-body{--tile-f:var(--d-body,#34b06a)}.ds-tl{font-size:12px;font-weight:700;font-stretch:112%;letter-spacing:.05em;text-transform:uppercase;color:var(--label-2,rgba(19,35,63,.7))}.ds-tv{font-size:36px;font-weight:700;font-stretch:78%;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:6px;line-height:1}.ds-pr{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:inline-flex;background:var(--d-move,#f5c932);color:var(--on-field,#13233f);border-radius:3px;padding:3px 8px;font-size:12px;font-weight:700}"
+    },
+    {
+      "name": "Set Rows",
+      "kind": "custom",
+      "refersTo": "set-number-next",
+      "description": "Set-number squares: silver by default, sky for the next set, green when done; condensed tabular values.",
+      "html": "<div class=\"ds-sets\"><div class=\"ds-set\"><span class=\"ds-n ds-done\">1</span><span class=\"ds-v\">80 kg × 8</span><span class=\"ds-ck ds-on\">✓</span></div><div class=\"ds-set\"><span class=\"ds-n ds-next\">2</span><span class=\"ds-v\">80 kg × 8</span><span class=\"ds-ck\"></span></div><div class=\"ds-set\"><span class=\"ds-n\">3</span><span class=\"ds-v\">80 kg × 8</span><span class=\"ds-ck\"></span></div></div>",
+      "css": ".ds-sets{font-family:var(--font,'Archivo Variable','Archivo',system-ui,sans-serif);display:flex;flex-direction:column;gap:8px;color:var(--label,#13233f)}.ds-set{display:flex;align-items:center;gap:12px}.ds-n{width:26px;height:26px;border-radius:3px;background:var(--surface-2,#e2e8ef);display:grid;place-items:center;font-size:13px;font-weight:700;font-stretch:78%}.ds-n.ds-next{background:var(--d-train,#3a9fe4);color:var(--on-field,#13233f)}.ds-n.ds-done{background:var(--d-body,#34b06a);color:var(--on-field,#13233f)}.ds-v{flex:1;font-size:17px;font-stretch:78%;font-variant-numeric:tabular-nums}.ds-ck{width:30px;height:30px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--label-2,rgba(19,35,63,.7));display:grid;place-items:center;font-size:16px;font-weight:700}.ds-ck.ds-on{background:var(--d-body,#34b06a);box-shadow:none;color:var(--on-field,#13233f)}"
     }
   ],
   "narrative": {
@@ -551,7 +637,7 @@
       "Navy ink in both themes. Ink on any coloured field is always navy.",
       "One family, Archivo Variable, with its width axis as the type grid (wide 112, condensed 78).",
       "One 4px corner (3px on small marks). No pills, no circles on containers.",
-      "Flat. No cast shadows, gradients or glass on redesigned surfaces.",
+      "Flat. No cast shadows, gradients or glass, including the scrim and the pinned bars.",
       "The primary action is a full-width ink bar."
     ],
     "rules": [
@@ -566,8 +652,8 @@
         "section": "colors"
       },
       {
-        "name": "The Reserved Colour Rule",
-        "body": "Activity Yellow and Strength Violet are reserved for their domains. Do not borrow them for decoration while those domains have no surface.",
+        "name": "The Own Domain Rule",
+        "body": "Each domain colour belongs to its domain. Orange is nutrition only; a session in progress is training and stays sky. The one standing borrow is the PR badge, a solid Activity Yellow field with navy ink. Do not take a domain colour for decoration elsewhere.",
         "section": "colors"
       },
       {
@@ -592,7 +678,7 @@
       },
       {
         "name": "The One Corner Rule",
-        "body": "Use 4px, or 3px on small marks. Nothing in the redesigned system is a pill or a circle. The Start action is a square, not a disc.",
+        "body": "Use 4px, or 3px on small marks. No container or action is a pill or a circle. The Start action is a square, not a disc. Round forms belong only to the objects themselves: a pictogram's head, a plate, a wheel.",
         "section": "shapes"
       }
     ],
@@ -603,17 +689,19 @@
       "**Do** keep every corner at 4px, or 3px on small marks.",
       "**Do** separate surfaces with silver tone steps and 1px hairlines in the rule colour.",
       "**Do** use the text-safe tone (sky-text, green-text, orange-text, signal-red) for words and thin strokes on the ground.",
-      "**Do** keep motion straight and ease-out (cubic-bezier(.22,1,.36,1)): 140ms for press feedback, 230–240ms for fields and controls. Honour reduced motion by removing it."
+      "**Do** keep motion straight and ease-out (cubic-bezier(.22,1,.36,1)): 140ms for press feedback, 230–240ms for fields and controls. Honour reduced motion by removing it. The one travelling move is the `field` transition from a Home band into its screen's top field."
     ],
     "donts": [
       "**Don't** use #000 or any pure black for ink, text or the go bar.",
       "**Don't** add cast shadows, glows, gradients or backdrop blur to a surface. Lift it by tone or a rule instead.",
       "**Don't** make containers or actions into pills or circles. Use the square Start action and the square today marker.",
       "**Don't** set body text in a domain field colour on the white ground.",
-      "**Don't** use Activity Yellow or Strength Violet decoratively before their domains ship.",
+      "**Don't** use Nutrition Orange outside nutrition. A session in progress is sky, marked by the ink bar on the Start square.",
+      "**Don't** borrow a domain colour for decoration. The PR badge's yellow field is the one standing exception.",
+      "**Don't** draw sport pictograms with square caps or interface icons with round ones. Figures are round-capped bars with a solid head; interface icons are square-capped strokes.",
       "**Don't** add a second typeface or fake widths with letter-spacing. Use the `wdth` axis.",
       "**Don't** animate numerals (no count-ups, no bounces).",
-      "**Don't** add uppercase labels above headings. The only uppercase is a routine's name in a field and the weekday initials in the week strip."
+      "**Don't** add uppercase labels above headings. Uppercase is limited to a routine's name in a field, section labels over grouped lists, Stats tile labels, Plan's day squares and the weekday initials in the week strip."
     ]
   }
 }

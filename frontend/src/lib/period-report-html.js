@@ -407,6 +407,6 @@ export function periodReportHTML(rep, S, owner) {
   <h2>${esc(t('Every session in detail'))}</h2>
   ${workoutsHTML(rep, speedUnit)}
 
-  <footer><span>${esc(t('Made with SuperOpenGym, based on openGym'))}</span><span>${esc(new Date().toLocaleDateString(dateLocale()))}</span></footer>
+  <footer><span>${esc(t('Made with SuperOpenGym, based on {0}', 'openGym'))}</span><span>${esc(new Date().toLocaleDateString(dateLocale()))}</span></footer>
 </div></body></html>`
 }

@@ -39,7 +39,7 @@ describe('the tab bar across a store write', () => {
   it('keeps the very same buttons instead of rebuilding them every tick', () => {
     act(() => { root.render(<TabBar onStart={() => {}} />) })
     const before = tabs()
-    expect(before).toHaveLength(5)
+    expect(before).toHaveLength(6)
 
     // What a rest does once a second: S is replaced, so everything reading it re-renders.
     act(() => { useStore.getState().update(s => { s.restSec = 91 }, false) })

@@ -395,13 +395,13 @@ export default function RoutineEdit() {
   const missingCount = profile ? r.ex.filter(e => !exAvailable(S, exOr(e.id))).length : 0
 
   return <div className="narrow">
-    <div className="hdr">
+    <div className="hdr redit-hdr">
       <button className="iconbtn" onClick={() => nav('/plan')} aria-label={t('Plan')}><Icon name="chevronLeft" /></button>
       <div style={{ flex: 1, margin: '0 12px' }}>
-        <input className="input" defaultValue={r.name} style={{ fontWeight: 600, fontSize: 20, letterSpacing: '-.021em' }}
+        <input className="input redit-name" defaultValue={r.name}
           onChange={e => update(s => { s.routines.find(x => x.id === id).name = e.target.value.trim() || t('Routine') })} />
       </div>
-      <button className="iconbtn" aria-label={t('Pick an icon')} onClick={() => glyphPicker(r.emoji, g => update(s => { s.routines.find(x => x.id === id).emoji = g }))}><Icon name={glyphOf(r.emoji)} /></button>
+      <button className="iconbtn redit-glyph" aria-label={t('Pick an icon')} onClick={() => glyphPicker(r.emoji, g => update(s => { s.routines.find(x => x.id === id).emoji = g }))}><Icon name={glyphOf(r.emoji)} /></button>
     </div>
 
     <div className="sect-b" style={{ marginBottom: 16 }}>
@@ -413,7 +413,7 @@ export default function RoutineEdit() {
           This switch decides whether the routine's workouts count at all: a deload routine's
           sessions open at its own numbers and are never the baseline the next regular session
           progresses from (session-start.js, history.js entryExcluded). */}
-      <Row icon="pause" iconTint="var(--orange)" title={t('Deload routine')}
+      <Row icon="pause" iconTint="var(--grey)" title={t('Deload routine')}
         subtitle={t('Its workouts do not count toward progression. They still show in history and statistics.')}>
         <Switch checked={r.excludeFromProgression === true} onChange={v => update(s => {
           const routine = s.routines.find(x => x.id === id)
@@ -428,9 +428,9 @@ export default function RoutineEdit() {
         : t(POLICY_DESC[r.prog || 'linear'] || POLICY_DESC.linear) + ' ' + t('Applies to every exercise in this routine that does not set its own rule.')}
     </div>
 
-    {missingCount > 0 && <div className="card" style={{ marginBottom: 16, borderColor: 'var(--orange)' }}>
+    {missingCount > 0 && <div className="card callout-warn" style={{ marginBottom: 16 }}>
       <div className="row" style={{ gap: 8, alignItems: 'center' }}>
-        <Icon name="warning" style={{ color: 'var(--orange)' }} />
+        <Icon name="warning" />
         <div className="small">{t('{0} of {1} exercises need equipment outside "{2}"', missingCount, r.ex.length, profile.name)}</div>
       </div>
     </div>}

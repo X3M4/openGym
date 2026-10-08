@@ -68,8 +68,13 @@ export const dateLocale = () => DATE_LOCALES[lang] || 'en-GB'
 export const getVersion = () => version
 
 // Translate a source string; {0},{1}… are replaced with args (also on the English fallback).
+// SuperOpenGym's name in every string inherited from openGym: the catalogue and its 16 translations
+// keep their keys, and "openGym" in any of them reads "SuperOpenGym" on screen. Applied before the
+// arguments go in, so a credit passed as an argument (t('… based on {0}', 'openGym')) stays as is.
+export const brand = v => v.replace(/(?<!Super)openGym/g, 'SuperOpenGym')
+
 export function t(s, ...args) {
-  let v = dict[s] || s
+  let v = brand(dict[s] || s)
   for (let i = 0; i < args.length; i++) v = v.replaceAll('{' + i + '}', args[i])
   return v
 }

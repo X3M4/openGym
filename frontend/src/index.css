@@ -33,7 +33,7 @@
   --ink:       #13233f;
   --label:     #13233f;
   --label-2:   rgba(19,35,63,.70);
-  --label-3:   rgba(19,35,63,.52);
+  --label-3:   rgba(19,35,63,.66);
   --label-4:   rgba(19,35,63,.20);
 
   /* lines */
@@ -51,7 +51,7 @@
   --on-field:   #13233f;
 
   /* text-safe tones of the same hues, for words and thin strokes on the ground */
-  --blue:#1468ad; --green:#17834a; --red:#c03a17; --orange:#b85f05;
+  --blue:#1468ad; --green:#17834a; --red:#c03a17; --orange:#a85400;
   --yellow:#8a6a00; --teal:#0f7389; --indigo:#4b47b8; --pink:#b8285a;
   --purple:#6a55c4; --mint:#0d7f78; --brown:#87613a; --grey:#66727f;
 
@@ -221,8 +221,7 @@ body.resting #app{padding-bottom:calc(206px + var(--sab))}
 .conn-bar{
   position:fixed;inset-inline-start:0;inset-inline-end:0;top:0;z-index:45;
   padding:var(--sat) var(--pad) 0;
-  background:color-mix(in srgb,var(--bg) 94%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(10px);backdrop-filter:saturate(180%) blur(10px);
+  background:var(--bg);
 }
 .conn-row{max-width:560px;margin:0 auto;padding:6px 0}
 .conn{
@@ -283,9 +282,10 @@ button.conn:active{filter:brightness(1.12)}
 .iconbtn.on-ss{background:var(--acc-soft);color:var(--acc-text)}
 .iconbtn:disabled{opacity:.32}
 
+/* Section labels in the Munich manner: small, bold, wide capitals — a signpost, not a heading. */
 h4.sec{
-  font-size:13px;font-weight:400;letter-spacing:-.004em;color:var(--label-2);
-  text-transform:none;margin:22px 0 8px;padding:0 4px;
+  font-size:12px;font-weight:700;font-stretch:var(--w-wide);letter-spacing:.06em;color:var(--label-2);
+  text-transform:uppercase;margin:24px 0 9px;padding:0 4px;
 }
 .card h2{
   font-size:17px;font-weight:650;font-stretch:var(--w-wide);color:var(--label);
@@ -397,7 +397,7 @@ h4.sec{
 .btn.primary:active,.btn.primary:hover{background:color-mix(in srgb,var(--ink) 86%,var(--d-train))}
 .btn.field{background:var(--acc);color:var(--on-acc)}
 .btn.field:active,.btn.field:hover{background:var(--acc-2)}
-.btn.tinted{background:var(--acc-soft);color:var(--acc-text)}
+.btn.tinted{background:var(--surface-2);color:var(--acc-text)}
 .btn.danger{background:color-mix(in srgb,var(--red) 15%,transparent);color:var(--red)}
 .btn.ghost,.btn.plain{background:none;color:var(--acc-text);font-weight:400}
 .btn.ghost:active,.btn.plain:active{background:var(--surface-2)}
@@ -446,17 +446,11 @@ h4.sec{
 #tabbar button.start .cir .icn{font-size:26px;--icon-stroke:2;color:inherit;opacity:1}
 #tabbar button.start span{color:var(--label);font-weight:650}
 /* `.cir` is itself a <span>, so the label rules above and below reach it too and
-   outrank the `.cir` block — which is how the running state ended up painting an
-   orange play glyph onto an orange disc. Both states restate their own colour.
-   The disc is orange in either theme, so its glyph is black, not `--on-acc`. */
+   outrank the `.cir` block. Both states restate their own colour: the square is sky in
+   either theme (a running session adds an ink top bar), so its glyph is navy --on-field. */
 #tabbar button.start .cir{color:var(--on-field)}
-#tabbar button.start.rec .cir{background:var(--d-food);color:var(--on-field)}
-#tabbar button.start.rec span{color:var(--orange)}
-#tabbar button.start.rec .cir::after{
-  content:'';position:absolute;inset:0;border-radius:var(--r);
-  border:2px solid var(--d-food);animation:ping 1.9s var(--ease) infinite;
-}
-@keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.3);opacity:0}}
+#tabbar button.start.rec .cir{background:var(--d-train);color:var(--on-field);box-shadow:inset 0 3px 0 var(--ink)}
+#tabbar button.start.rec span{color:var(--label)}
 
 /* NOTE on every backdrop-filter pair in this file: the -webkit- line comes first and the
    standard property last, which is the order a prefixed/standard pair wants — whichever is
@@ -473,8 +467,8 @@ h4.sec{
 }
 
 /* --------------------------------------------------------- domain field -- */
-/* Home's first block: one full-width field in the colour of what today asks for. Training is
-   sky blue, a session in progress orange, the body green. Ink on it is always --on-field. The
+/* Home's first block: one full-width field in the colour of what today asks for. Training — and a
+   session in progress — is sky blue, the body green, food orange. Ink on it is always --on-field. The
    go bar is an ink bar across the field's foot — the one action the field exists for. */
 .dfield{
   --f:var(--d-train);
@@ -490,7 +484,7 @@ h4.sec{
 .dfield-band .dfield-pict{font-size:30px}
 .dfield-band .dfield-head{padding-inline-end:44px;min-height:0}
 .dfield-body{--f:var(--d-body)}
-.dfield-active{--f:var(--d-food)}
+.dfield-active{--f:var(--d-train)}
 .dfield-head{position:relative;padding-inline-end:68px}
 .dfield-head+.dfield-note{padding-inline-end:68px;margin-top:-8px}
 /* the corner pictogram sits outside the heading's flow, so the note under the heading stays on it */
@@ -552,7 +546,13 @@ h4.sec{
 .dfield-ghost:active,.dfield-ghost:hover{background:color-mix(in srgb,var(--on-field) 20%,transparent)}
 @media (prefers-reduced-motion:no-preference){
   ::view-transition-old(dfield),::view-transition-new(dfield){animation-duration:240ms;animation-timing-function:var(--ease)}
+  /* the signature move (lib/field-nav.js): a Home band's square grows into its screen's top field */
+  ::view-transition-group(field){animation-duration:240ms;animation-timing-function:var(--ease)}
+  ::view-transition-old(field),::view-transition-new(field){height:100%;width:100%;object-fit:none;object-position:top left}
+  ::view-transition-old(field){animation:none;opacity:0}
+  ::view-transition-old(root),::view-transition-new(root){animation-duration:200ms}
 }
+.dfield-dest{view-transition-name:field}
 
 /* ------------------------------------------------------------- body view -- */
 .body-chart{display:block;width:100%;height:auto;margin:4px 0 8px}
@@ -566,6 +566,8 @@ h4.sec{
 .body-list{display:flex;flex-direction:column;margin-top:12px;border-top:var(--hair) solid var(--sep)}
 .body-row{display:grid;grid-template-columns:68px minmax(0,1fr) auto 30px;gap:10px;align-items:center;padding:8px 0;font-size:14px;border-bottom:var(--hair) solid var(--sep)}
 .br-d{font-weight:600}
+.body-row.meal-row{grid-template-columns:68px minmax(0,1fr) 30px 30px}
+.body-row.meal-edit-row{grid-template-columns:84px minmax(0,1fr) 30px}
 .br-m{color:var(--label-2);min-width:0}
 .br-v{display:flex;flex-direction:column;align-items:flex-end;line-height:1.15}
 .br-v small{font-size:12px;color:var(--label-2)}
@@ -597,6 +599,7 @@ input.body-num::placeholder{color:var(--label-3);font-weight:400}
 .ntargets .num-m small{font-size:13px;font-weight:600;font-stretch:100%}
 @media (max-width:420px){.ntargets{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .callout-s{background:color-mix(in srgb,var(--d-food) 18%,var(--bg));border-radius:var(--r-sm);padding:10px 12px;font-size:14px;margin-bottom:10px}
+.callout-s.callout-quiet{background:var(--surface)}
 
 /* ----------------------------------------------------------- deficit alerts -- */
 .dband-alert{background:color-mix(in srgb,var(--d-strength) 16%,var(--surface))}
@@ -676,7 +679,22 @@ input.body-num::placeholder{color:var(--label-3);font-weight:400}
   color:var(--label-2);border-radius:var(--r-sm);padding:3px 7px;font-size:12px;
   font-weight:500;text-transform:capitalize;
 }
-.tag.acc{background:var(--acc-soft);color:var(--acc-text)}
+.tag.acc{background:var(--surface-2);color:var(--acc-text)}
+/* Plan: a training day carries the training field down its leading edge; a rest day stays quiet. */
+.plan-day{min-height:56px;padding:0;align-items:stretch;overflow:hidden;gap:14px;padding-inline-end:12px}
+.plan-day>.grow,.plan-day>.tag,.plan-day>.chev{align-self:center}
+.plan-sq{width:56px;flex:none;display:grid;place-items:center;font-size:17px;font-weight:700;font-stretch:var(--w-wide);text-transform:uppercase;letter-spacing:.04em;background:var(--d-rest);color:var(--on-field)}
+.plan-day.on{padding-inline-end:0}
+.plan-day.on .plan-sq{background:var(--d-train)}
+.plan-day .tt{font-weight:650}
+.plan-day:not(.on) .tt{color:var(--label-2)}
+.redit-hdr{align-items:center}
+.redit-name.input{font-size:22px;font-weight:700;font-stretch:var(--w-wide);background:transparent;padding-inline:4px;border-bottom:2px solid var(--ink);border-radius:0}
+.redit-name.input:focus{background:var(--surface)}
+.redit-glyph.iconbtn{width:46px;height:46px;font-size:24px;background:var(--d-train);color:var(--on-field);--icon-stroke:2.2}
+.callout-warn{background:var(--surface);color:var(--label)}
+.callout-warn .icn{color:var(--red)}
+.lrow-i.on-train{background:var(--d-train);color:var(--on-field);--icon-stroke:2.2}
 /* favourite marker (issue #6): a small yellow star glued to the exercise name — distinct from
    the accent "chosen" tag at the row's end, which means "already in a routine or the log" */
 .fav-star{color:var(--yellow);font-size:12px;display:inline-block;margin-inline-end:5px;vertical-align:-1px}
@@ -828,7 +846,7 @@ body.chips-dragging *{cursor:inherit}
 
 /* native time input, restyled to sit in a row like a value label */
 .timef{
-  background:var(--surface-2);border:none;border-radius:8px;padding:6px 10px;
+  background:var(--surface-2);border:none;border-radius:var(--r-sm);padding:6px 10px;
   font-size:16px;color:var(--label);outline:none;font-variant-numeric:tabular-nums;
 }
 /* A date or time field is as wide as the browser draws it and will not give way, and neither will
@@ -889,21 +907,21 @@ body.chips-dragging *{cursor:inherit}
 .chk,.ck{
   width:30px;height:30px;border-radius:var(--r-sm);flex:none;position:relative;
   display:flex;align-items:center;justify-content:center;
-  background:none;box-shadow:inset 0 0 0 1.8px var(--label-4);color:transparent;
+  background:none;box-shadow:inset 0 0 0 2px var(--label-2);color:transparent;
   transition:background var(--fast),box-shadow var(--fast),color var(--fast),transform var(--fast);
 }
 .chk .icn{font-size:16px;--icon-stroke:2.6}
 /* 30px is the right look next to a stepper but a poor target: extend the tap area to 44px
    without painting it; the left side stays shorter so the stepper's + button keeps its edge */
 .chk::before,.ck::before{content:'';position:absolute;inset:-7px -7px -7px -4px}
-.chk.on{background:var(--acc);box-shadow:none;color:var(--on-acc)}
+.chk.on{background:var(--d-body);box-shadow:none;color:var(--on-field)}
 .chk:active,.ck:active{transform:scale(.9)}
 .ck svg{
   width:16px;height:16px;stroke:transparent;fill:none;stroke-width:2.6;
   stroke-linecap:round;stroke-linejoin:round;transition:stroke var(--fast);
 }
-.ck.on{background:var(--acc);box-shadow:none}
-.ck.on svg{stroke:var(--on-acc)}
+.ck.on{background:var(--d-body);box-shadow:none}
+.ck.on svg{stroke:var(--on-field)}
 
 /* ------------------------------------------------------------- workout --- */
 /* Workout header. In list mode it is pinned: pulled up over #app's top padding so it sits flush
@@ -914,23 +932,21 @@ body.chips-dragging *{cursor:inherit}
   position:sticky;top:0;z-index:20;
   margin:calc(-1 * (var(--sat) + var(--conn) + 8px)) calc(-1 * var(--pad)) 6px;
   padding:calc(var(--sat) + var(--conn) + 8px) var(--pad) 0;
-  background:color-mix(in srgb,var(--bg) 94%,transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(10px);backdrop-filter:saturate(180%) blur(10px);
+  background:var(--bg);
 }
 .whdr.stick .hdr{margin-bottom:12px}
 .whdr.stick .wprog{margin-bottom:10px}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .whdr.stick{background:var(--bg)}
 }
-.wprog{height:4px;background:var(--surface-2);border-radius:var(--r-sm);overflow:hidden;margin-bottom:16px}
-.wprog i{display:block;height:100%;background:var(--acc);border-radius:var(--r-sm);transition:width var(--med) var(--ease)}
-.exmedia{position:relative;border-radius:var(--r-lg);overflow:hidden;background:#fff;margin-bottom:12px}
+.wprog{height:6px;background:var(--surface-2);border-radius:0;overflow:hidden;margin-bottom:16px}
+.wprog i{display:block;height:100%;background:var(--d-train);border-radius:0;transition:width var(--med) var(--ease)}
+.exmedia{position:relative;border-radius:var(--r);overflow:hidden;background:#fff;margin-bottom:12px;box-shadow:inset 0 0 0 1px var(--sep)}
 .exmedia img{width:100%;height:320px;object-fit:contain;display:block}
 .exmedia .gifhint,.exmedia .giftoggle{
   position:absolute;bottom:9px;display:inline-flex;align-items:center;gap:4px;
-  background:rgba(0,0,0,.45);color:#fff;border-radius:var(--r-sm);padding:5px 11px;
-  font-size:12px;font-weight:500;
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  background:var(--ink);color:var(--bg);border-radius:var(--r-sm);padding:5px 11px;
+  font-size:12px;font-weight:600;
 }
 .exmedia .gifhint{inset-inline-end:9px}
 .exmedia .giftoggle{inset-inline-start:9px}
@@ -980,7 +996,7 @@ body.chips-dragging *{cursor:inherit}
 }
 .exlink-arr{color:var(--label-3);font-size:14px;flex:none}
 .exlink-card.mini{padding:6px 12px;gap:10px}
-.exlink-card.mini .exlink-icon{width:28px;height:28px;font-size:15px;border-radius:7px}
+.exlink-card.mini .exlink-icon{width:28px;height:28px;font-size:15px;border-radius:var(--r-sm)}
 .exlink-card.mini .exlink-title{font-size:13px}
 
 /* the editor's field (components/CustomMediaField.jsx): the row, a 36px thumb of the draft, the
@@ -988,7 +1004,7 @@ body.chips-dragging *{cursor:inherit}
 .cmf{margin-top:8px}
 .cmf .lrow{padding-inline:4px}
 .cmf-act{display:flex;align-items:center;gap:6px;flex:none}
-.cmf-thumb .thumb{width:36px;height:36px;border-radius:8px}
+.cmf-thumb .thumb{width:36px;height:36px;border-radius:var(--r-sm)}
 .cmf-thumb .thumb-x{font-size:16px}
 .cmf-sub{display:inline-flex;align-items:center;gap:4px}
 .cmf-sub .icn{font-size:13px}
@@ -1039,7 +1055,7 @@ body.chips-dragging *{cursor:inherit}
   display:flex;align-items:center;gap:8px;padding:0 0 6px;
   font-size:11px;color:var(--label-3);font-weight:500;text-transform:uppercase;letter-spacing:.045em;
 }
-.sethead .n-sp{width:24px;flex:none}
+.sethead .n-sp{width:26px;flex:none}
 .sethead .w-sp{flex:1.4;text-align:center}
 .sethead .r-sp{flex:1;text-align:center}
 .sethead .eff-sp{text-align:center}
@@ -1053,8 +1069,8 @@ body.chips-dragging *{cursor:inherit}
 .setsep{height:1px;background:var(--sep);margin:9px 0}
 /* the per-side wrapper carries its own .n (the set number in front of the L/R rows) */
 .setrow .n,.setrow-side>.n{
-  width:24px;height:24px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--label-2);
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex:none;
+  width:26px;height:26px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--label);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-stretch:var(--w-cond);flex:none;
   position:relative;padding:0;border:0;font-family:inherit;cursor:pointer;
   transition:background var(--fast),color var(--fast);
 }
@@ -1080,6 +1096,7 @@ body.chips-dragging *{cursor:inherit}
    carries the same `plain` so its columns freeze where the cells do. */
 .setrow .stp.plain,.sethead.plain .w-sp,.sethead.plain .r-sp{--btn-floor:0px}
 .setrow .stp.w .val,.setrow .stp.r .val{min-width:var(--num)}
+.setrow .stp .val{font-stretch:var(--w-cond);font-variant-numeric:tabular-nums}
 /* A timed hold logs the seconds in the first column and the load in the second, so the two
    columns swap roles: the load carries "227.5" and needs the wider reserve and the bigger share,
    the seconds column "120". Without the swap the load input was 35 px for a 41.7 px "102.5" at
@@ -1159,8 +1176,10 @@ body.chips-dragging *{cursor:inherit}
 .effpick .effpick-free .stp{flex:none;width:148px}
 .effpick .effpick-free .stp .num{font-size:17px;font-weight:600}
 .effpick .effpick-free .stp .num::placeholder{color:var(--label-3);font-weight:500}
-.setrow.done .n{background:var(--acc);color:var(--on-acc)}
-.setrow.done{opacity:.45}
+.setrow.done .n,.setrow-side.done>.n{background:var(--d-body);color:var(--on-field)}
+/* the next set to do comes forward: a training wash across the row, its number an ink square */
+
+.setrow.next .n,.setrow-side.next>.n{background:var(--d-train);color:var(--on-field)}
 
 /* one-sided (unilateral) sets (issue #60): the set number sits beside a two-row L/R stack, each
    side its own weight/reps/effort + done tick. The two inner rows reuse .setrow so their columns
@@ -1175,7 +1194,7 @@ body.chips-dragging *{cursor:inherit}
 .setrow-side .setrow.side{padding:4px 0}
 .setrow-side .setrow.side+.setrow.side::before{display:none}
 .sidetag{
-  width:24px;height:24px;border-radius:8px;background:var(--surface-2);color:var(--label-3);
+  width:24px;height:24px;border-radius:var(--r-sm);background:var(--surface-2);color:var(--label-3);
   display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:none;
 }
 /* A one-sided row with an effort column is the tightest line in the app: set number, L/R badge,
@@ -1304,6 +1323,14 @@ body.chips-dragging *{cursor:inherit}
 .stp.plain{grid-template-columns:1fr}
 .stp.plain .val{width:100%}
 .stp.plain .num{width:100%;text-align:center}
+/* the exercise's name in the workout: the system's wide face, as a heading */
+.ex-name{font-size:22px;font-weight:700;font-stretch:var(--w-wide);letter-spacing:-.012em;line-height:1.15}
+.ex-name.is-small{font-size:17px}
+/* Prev / Next under the card: Next is the ink bar the thumb finds, Prev a quiet square */
+.wnav{gap:8px}
+.wnav .wnav-prev{flex:none;width:auto;padding-inline:14px;background:var(--surface);color:var(--label)}
+.wnav .wnav-next{flex:1;min-height:56px;font-size:18px}
+
 /* --- menu sheet (the workout's "more" menus) --- */
 .menu-list .menu-item{min-height:52px;padding:8px 12px}
 .menu-list .menu-item .lrow-i{width:32px;height:32px;font-size:16px;background:var(--surface-2);color:var(--label)}
@@ -1317,10 +1344,12 @@ body.chips-dragging *{cursor:inherit}
 .setextra .chip.add:disabled{opacity:.35}
 /* why the next target is what it is (issue #17) */
 .progline{
-  width:100%;display:flex;align-items:flex-start;gap:7px;margin:6px 0 2px;padding:0;
-  text-align: start;font-size:13px;line-height:1.38;color:var(--acc-text);
+  width:100%;display:flex;align-items:flex-start;gap:8px;margin:8px 0 4px;padding:9px 11px;
+  text-align: start;font-size:13px;line-height:1.38;color:var(--label);
+  background:var(--surface);border-radius:var(--r-sm);
 }
-.progline.warn{color:var(--yellow)}
+.progline strong{font-weight:700}
+.progline.warn{background:var(--surface)}
 .progline svg{flex:none;margin-top:2px}
 /* "Last time" / "Best set" under the plan line (#173): a button that switches between the two,
    looking like the plain line it replaced, with a small icon to say it can be tapped. */
@@ -1394,8 +1423,7 @@ body.chips-dragging *{cursor:inherit}
 #modal-root{position:fixed;inset:0;z-index:100;display:none}
 #modal-root.open{display:block}
 .mback{
-  position:absolute;inset:0;background:rgba(0,0,0,.4);
-  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  position:absolute;inset:0;background:rgba(13,22,38,.5);
   touch-action:none;overscroll-behavior:none;
 }
 .sheet{
@@ -1476,7 +1504,7 @@ body.chips-dragging *{cursor:inherit}
 /* --- glyph picker (replaces the emoji grid) --- */
 .glyph-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
 .glyph-cell{
-  aspect-ratio:1;border-radius:13px;background:var(--surface);
+  aspect-ratio:1;border-radius:var(--r);background:var(--surface);
   display:flex;align-items:center;justify-content:center;font-size:24px;
   color:var(--label);transition:background var(--fast),color var(--fast),transform var(--fast);
 }
@@ -1517,9 +1545,9 @@ body.chips-dragging *{cursor:inherit}
    pushed under the `.chart` clip at either edge — hence no offset here. */
 .ctip{
   position:absolute;left:0;top:0;background:var(--surface-2);
-  border-radius:8px;padding:4px 10px;font-size:12px;font-weight:500;white-space:nowrap;
+  border-radius:var(--r-sm);padding:4px 10px;font-size:12px;font-weight:500;white-space:nowrap;
   max-width:calc(100% - 8px);overflow:hidden;text-overflow:ellipsis;
-  pointer-events:none;box-shadow:0 6px 18px -4px rgba(0,0,0,.4);
+  pointer-events:none;
 }
 
 /* --- activity heatmap --- */
@@ -1595,20 +1623,21 @@ body.chips-dragging *{cursor:inherit}
 
 /* --- stat tiles --- */
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.tile{background:var(--surface);border-radius:var(--r-card);padding:14px}
+.tile{background:var(--surface);border-radius:var(--r-card);padding:16px 14px 14px;box-shadow:inset 0 4px 0 var(--tile-f,var(--d-train))}
+.tile-body{--tile-f:var(--d-body)}
 .tile .l{
-  color:var(--label-2);font-size:13px;font-weight:400;letter-spacing:-.004em;
-  text-transform:none;display:flex;align-items:center;gap:5px;
+  color:var(--label-2);font-size:12px;font-weight:700;font-stretch:var(--w-wide);letter-spacing:.05em;
+  text-transform:uppercase;display:flex;align-items:center;gap:6px;
 }
-.tile .l .icn{font-size:14px;color:var(--label)}
-.tile .v{font-size:26px;font-weight:600;letter-spacing:-.026em;margin-top:5px;line-height:1.1}
+.tile .l .icn{font-size:15px;color:var(--label);--icon-stroke:2.2}
+.tile .v{font-size:36px;font-weight:700;font-stretch:var(--w-cond);font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:6px;line-height:1}
 .tile.tappable:active{background:var(--surface-2)}
 
 /* --- PR badge --- */
 .pr{
   display:inline-flex;align-items:center;gap:4px;
-  background:color-mix(in srgb,var(--yellow) 18%,transparent);color:var(--yellow);
-  border-radius:6px;padding:3px 8px;font-size:12px;font-weight:500;
+  background:var(--d-move);color:var(--on-field);
+  border-radius:var(--r-sm);padding:3px 8px;font-size:12px;font-weight:700;
 }
 .pr .icn{font-size:13px}
 
@@ -1795,7 +1824,14 @@ body.chips-dragging *{cursor:inherit}
   .home-grid>.dfield{margin:0;min-height:380px}
   .home-grid>.dfield .dfield-hero .icn{font-size:clamp(120px,46cqi,280px)}
   .home-side>:last-child{margin-bottom:0}
-  .sheet{left:50%;right:auto;margin-left:-320px;width:640px;border-radius:var(--r-xl) var(--r-xl) 0 0}
+  /* On a computer a sheet is a dialog in the middle of the window, not a drawer glued to its
+     foot. `translate` (not `transform`) centres it, so the drag-to-close transform still composes. */
+  .sheet,.sheet:has(.picker-search){
+    left:50%;right:auto;margin-left:-320px;width:640px;border-radius:var(--r-xl);
+    top:50%;bottom:auto;translate:0 -50%;padding-bottom:24px;
+    max-height:min(86vh,calc(100dvh - 48px));
+    animation:pop-fade .2s var(--ease);
+  }
   .center{width:340px}
   #timer{left:50%;right:auto;margin-left:-260px;width:520px;bottom:112px}
   /* 520px fits the clock, the bar and all three controls on one line again */
@@ -1855,24 +1891,22 @@ body.chips-dragging *{cursor:inherit}
    square in the middle says "put the code here" — decoding reads the whole frame regardless. */
 .cam-wrap{position:relative;width:100%;aspect-ratio:3/4;max-height:58vh;border-radius:var(--r-lg);overflow:hidden;background:#000}
 .cam-wrap video{width:100%;height:100%;object-fit:cover;display:block}
-.cam-frame{position:absolute;inset:0;margin:auto;width:62%;aspect-ratio:1;border:2px dashed rgba(255,255,255,.75);border-radius:14px;pointer-events:none}
+.cam-frame{position:absolute;inset:0;margin:auto;width:62%;aspect-ratio:1;border:2px dashed rgba(255,255,255,.75);border-radius:var(--r);pointer-events:none}
 /* ------------------------------------------------- the Coach entry on Plan -- */
 .coach-cta{
-  display:flex;align-items:center;gap:13px;width:100%;text-align: start;
-  margin-bottom:12px;padding:14px 16px;border-radius:var(--r-card);
-  background:linear-gradient(135deg,var(--acc-soft),color-mix(in srgb,var(--acc) 6%,var(--surface)));
-  border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);
-  transition:transform var(--fast),filter var(--fast)
+  display:flex;align-items:stretch;gap:0;width:100%;text-align: start;
+  margin-bottom:12px;padding:0;border-radius:var(--r-card);overflow:hidden;
+  background:var(--surface);transition:background var(--fast)
 }
-.coach-cta:active{transform:scale(.985);filter:brightness(1.06)}
+.coach-cta:active{background:var(--surface-2)}
 .coach-cta-av{
-  width:42px;height:42px;border-radius:13px;flex:none;display:grid;place-items:center;font-size:21px;
-  background:var(--acc);color:var(--on-acc);
+  width:64px;flex:none;display:grid;place-items:center;font-size:26px;--icon-stroke:2.1;
+  background:var(--ink);color:var(--bg);
 }
-.coach-cta-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.coach-cta-t b{font-size:17px;font-weight:600;letter-spacing:-.015em;color:var(--label)}
+.coach-cta-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding:13px 14px}
+.coach-cta-t b{font-size:17px;font-weight:700;font-stretch:var(--w-wide);color:var(--label)}
 .coach-cta-t span{font-size:13px;color:var(--label-2);line-height:1.35}
-.coach-cta-chev{color:var(--acc-text);font-size:15px;flex:none}
+.coach-cta-chev{color:var(--label);font-size:15px;flex:none;align-self:center;margin-inline-end:14px;--icon-stroke:2.4}
 
 /* ----------------------------------------------------------- RTL (Arabic) -- */
 /* Directional icons flip: back chevrons point right, trailing chevrons point left. */

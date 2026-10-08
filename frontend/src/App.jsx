@@ -57,7 +57,9 @@ const resolveTheme = theme => theme === 'light' || theme === 'dark'
 function applyPrefs(theme, accent) {
   const de = document.documentElement
   de.dataset.theme = resolveTheme(theme)
-  de.dataset.accent = ACCENTS[accent] ? accent : 'sky'
+  // SuperOpenGym: the accent is the training field, fixed — every domain already has its colour
+  // (DESIGN.md). A profile's old accent choice is kept in its state but no longer applied.
+  de.dataset.accent = 'sky'
   const meta = document.querySelector('meta[name="theme-color"]')
   if (meta) meta.content = de.dataset.theme === 'light' ? '#ffffff' : '#0d1626'
   setSystemBars(de.dataset.theme === 'dark')
@@ -102,7 +104,9 @@ function Shell() {
   // A profile that never picked a language follows the instance default or the browser (#303) —
   // worked out here, on this device, and never written into the synced state (lib/default-lang.js).
   const config = useStore(s => s.config)
-  const lang = effectiveLang(S, config)
+  // The phone app in local mode has no server to give a config: without this it waited for one
+  // that never came and stayed in English on a Spanish phone. With no config, the system language.
+  const lang = effectiveLang(S, config ?? (MOBILE ? {} : null))
   useEffect(() => { setLang(lang, S.enParens?.[baseLang(lang)] ?? true, S.enOnly?.[baseLang(lang)] === true) }, [lang, S.enParens, S.enOnly])
   // Same shape as the language: a module-level display setting, pushed when it changes (#139).
   useEffect(() => { setWeightDecimals(S.wdec) }, [S.wdec])

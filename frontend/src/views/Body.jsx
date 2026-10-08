@@ -80,7 +80,7 @@ export default function Body() {
       <button className="iconbtn" onClick={() => nav(-1)} aria-label={t('Back')}><Icon name="chevronLeft" /></button>
     </div>
 
-    <section className="dfield dfield-body dfield-band" aria-label={t('Weight trend')}>
+    <section className="dfield dfield-body dfield-band dfield-dest" aria-label={t('Weight trend')}>
       <div className="dfield-head"><h2 className="dfield-lead">{t('Weight trend')}</h2><Icon name="scale" className="dfield-pict" /></div>
       {last ? <>
         <div className="dfield-weight"><span className="num-xl">{fmtNum(Math.round(last.trend * 10) / 10)}</span><span className="dfield-unit">{S.unit}</span></div>

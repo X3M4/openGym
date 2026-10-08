@@ -213,3 +213,12 @@ describe('English-name switches with every exercise-name pack', () => {
     _setLangState('en', {}, null, null)
   })
 })
+
+describe('SuperOpenGym brand layer', () => {
+  it('reads openGym as SuperOpenGym, leaves SuperOpenGym alone, and keeps a credit passed as an argument', async () => {
+    const { t, brand } = await import('./i18n-core.js')
+    expect(brand('How do you want to use openGym?')).toBe('How do you want to use SuperOpenGym?')
+    expect(brand('Made with SuperOpenGym')).toBe('Made with SuperOpenGym')
+    expect(t('Made with SuperOpenGym, based on {0}', 'openGym')).toBe('Made with SuperOpenGym, based on openGym')
+  })
+})

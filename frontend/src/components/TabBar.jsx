@@ -25,7 +25,7 @@ export default function TabBar({ onStart }) {
   const isGuest = useStore(s => s.isGuest())
   if (!user && !isGuest) return null
   const cur = loc.pathname.split('/')[1] || 'home'
-  const on = k => cur === k || (cur === 'history' && k === 'stats') || (cur === 'settings' && k === 'home') || (cur === 'body' && k === 'home') || (cur === 'nutrition' && k === 'home') || (cur === 'muscles' && k === 'library') || (cur === 'structural-balance' && k === 'stats')
+  const on = k => cur === k || (cur === 'history' && k === 'stats') || (cur === 'settings' && k === 'home') || (cur === 'body' && k === 'home') || (cur === 'muscles' && k === 'library') || (cur === 'structural-balance' && k === 'stats')
 
   const startWorkout = () => {
     if (!S.active) {
@@ -48,6 +48,7 @@ export default function TabBar({ onStart }) {
         <span>{S.active ? (cur === 'workout' ? t('Workout') : S.active.editingWorkoutId ? t('Edit workout') : t('Resume')) : t('Start')}</span>
       </button>
       <Tab active={on('stats')} icon="chart" label={t('Stats')} onClick={() => nav('/stats')} />
+      <Tab active={on('nutrition')} icon="food" label={t('Nutrition')} onClick={() => nav('/nutrition')} />
       <Tab active={on('library')} icon="list" label={t('Exercises')} onClick={() => nav('/library')} />
     </nav>
   )
