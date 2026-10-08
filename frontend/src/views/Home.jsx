@@ -14,6 +14,7 @@ import { fieldKind, typicalMinutes } from '../lib/home-field.js'
 import { trendSeries, weeklyRate, rateBand, isCutting } from '../lib/body-comp.js'
 import { targets, dayTotals } from '../lib/nutrition.js'
 import { stepsOn, exerciseOn, EXERCISE_TYPES, STRENGTH_TYPES } from '../lib/health-sync.js'
+import { AlertBand } from '../components/DeficitAlerts.jsx'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -122,6 +123,7 @@ export default function Home() {
     {S.showWeightCard !== false && fieldKind(S, todayRoutines, doneToday) !== 'body' &&
       <BodyBand S={S} bw={bw} delta={delta} bwPoints={bwPoints} />}
 
+    <AlertBand S={S} />
     <NutritionBand S={S} />
     <ActivityBand S={S} />
 

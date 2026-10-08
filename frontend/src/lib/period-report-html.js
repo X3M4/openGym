@@ -13,6 +13,7 @@ import { fmtSpeed, speedUnitOf } from './speed.js'
 import { isWarmupRow, dropsOf, clustersOf, isSideSet, setType } from './workout-model.js'
 import { MIN_WEEKS } from './correlation.js'
 import { FOOD_MIN_DAYS } from './period-report.js'
+import { STRENGTH_DROP } from './deficit-alerts.js'
 
 const INK = '#13233f', TRAIN = '#3a9fe4', BODY = '#34b06a', FOOD = '#f39a33', MOVE = '#f5c932', STRENGTH = '#8f80dc', SILVER = '#eef2f6', RULE = '#d3dbe4'
 
@@ -198,6 +199,17 @@ function relationsHTML(rep, routines) {
 
 const METHOD_LABEL = { scale: 'Smart scale (bioimpedance)', calipers: 'Skinfold calipers', dexa: 'DEXA scan', navy: 'US Navy estimate', other: 'Other' }
 const MEASURE_LABEL = { waist: 'Waist', neck: 'Neck', hip: 'Hip', chest: 'Chest', shoulders: 'Shoulders', arm: 'Arm', thigh: 'Thigh', calf: 'Calf' }
+
+function alertsHTML(rep) {
+  const A = rep.alerts || []
+  const note = `<p class="note">${esc(t('Volume: a third of the usual weekly volume kept the muscle gained in young adults (Bickel, Cross & Bamman, 2011), outside a calorie deficit. Strength: a {0}% drop of the estimated 1RM is SuperOpenGym\'s own threshold — no study sets one.', Math.round(STRENGTH_DROP * 100)))}</p>`
+  if (!A.length) return `<div class="callout">${esc(t('No alerts: your strength and training volume hold.'))}</div>` + note
+  return A.map(a => `<div class="finding"><span class="badge">${esc(a.kind === 'strength' ? t('Strength') : t('Volume'))}</span><p class="f-h">${esc(a.kind === 'strength'
+    ? t('{0}: estimated 1RM down {1}%', exName(a.id), fmtNum(a.drop))
+    : t('{0}: {1} work sets last week, usually {2}', (s => s.charAt(0).toUpperCase() + s.slice(1))(t(a.bp)), a.sets, fmtNum(a.usual)))}</p>${a.kind === 'strength'
+    ? `<p>${esc(t('Best of the last 3 weeks {0} {1} ({2}), against {3} {1} in the 6 weeks before ({4}).', fmtNum(a.recent.est), rep.unit, shortDate(a.recent.d), fmtNum(a.prior.est), shortDate(a.prior.d)))}</p>`
+    : `<p>${esc(t('Under a third of your usual weekly sets for this muscle (mean of the 8 weeks before).'))}</p>`}</div>`).join('') + note
+}
 
 function activityHTML(rep) {
   const A = rep.activity
@@ -385,6 +397,9 @@ export function periodReportHTML(rep, S, owner) {
   <h4 style="margin-top:14px">${esc(t('Weight trend'))} (${esc(rep.unit)})</h4>
   ${lineChart(rep.body.trend, BODY, rep.unit, { goal: S.targetW ?? null })}
   ${rep.lifts.length ? `<h4 style="margin-top:6px">${esc(t('Estimated 1RM of your most trained exercises'))} (${esc(rep.unit)})</h4><div class="lifts">${lifts}</div>` : ''}
+
+  <h2>${esc(t('Training in a deficit'))}</h2>
+  ${alertsHTML(rep)}
 
   <h2>${esc(t('Training and weight change'))}</h2>
   ${relationsHTML(rep, S.routines || [])}

@@ -86,6 +86,8 @@ export const DEF = {
   // Health Connect (lib/health.js): steps per day and other apps' exercise sessions land in
   // `activity` (merged like `measures`); `health` is the switch and where the last read got to.
   activity: [], health: { on: false, write: true, lastRead: null, lastSync: null },
+  // Deficit alerts (lib/deficit-alerts.js): the keys acknowledged, and the weekly notification switch.
+  alertsSeen: [], alertsNotify: false,
   nutrition: { mode: 'adaptive', protPerKgLean: 2.3, fatPct: 25, ratePct: 0.75, manualKcal: null, manualProtein: null },
   exWeights: {}, workouts: [], active: null, customEx: [], gifSize: 'full',
   // Stats activity heatmap metric. Profiles without this key continue to open on time.

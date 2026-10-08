@@ -408,6 +408,8 @@ export function mergeStates(a0, b0, { prefer } = {}) {
     if (list(n[f]).length || list(o[f]).length) out[f] = mergeLatestById(n[f], o[f]).map(clone)
   }
   if (list(n.favEx).length || list(o.favEx).length) out.favEx = [...new Set([...list(n.favEx), ...list(o.favEx)])]
+  // deficit alerts acknowledged on either device stay acknowledged (lib/deficit-alerts.js)
+  if (list(n.alertsSeen).length || list(o.alertsSeen).length) out.alertsSeen = [...new Set([...list(n.alertsSeen), ...list(o.alertsSeen)])].slice(-500)
   out.exWeights = clone(mergeExWeights(n.exWeights, o.exWeights))
   for (const [id, sources] of editedBy) {
     const kept = correctedExWeight(id, out.workouts, sources)

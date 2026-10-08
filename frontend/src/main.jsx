@@ -45,3 +45,6 @@ if (MOBILE) {
   useStore.subscribe(s => { if (s.ready) healthTick() })
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') healthTick() })
 }
+
+// Deficit alerts: the weekly notification is re-planned each time the app goes to the background.
+if (MOBILE) import('./lib/alert-notify.js').then(m => m.initAlertNotifications(useStore.getState)).catch(() => {})

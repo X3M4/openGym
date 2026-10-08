@@ -12,6 +12,7 @@ import { isoOf, weekKey } from './format.js'
 import { weeklyRelations } from './correlation.js'
 import { trendSeries, weeklyRate, bodyFatSeries, liveMeasures, measureChanges } from './body-comp.js'
 import { cardioMinutesByDay } from './health-sync.js'
+import { deficitAlerts } from './deficit-alerts.js'
 
 // A week's food enters the relations only with at least this many days logged (SuperOpenGym's rule).
 export const FOOD_MIN_DAYS = 4
@@ -239,6 +240,8 @@ export function buildPeriodReport(S, { from, to, today = isoOf(new Date()), week
     body: bodySection(S, from, to),
     food: foodSection(S, from, to),
     activity: activitySection(S, from, to),
+    // the deficit alerts as they stood at the end of the period (lib/deficit-alerts.js)
+    alerts: deficitAlerts(S, to, weekStart).all,
   }
 }
 
