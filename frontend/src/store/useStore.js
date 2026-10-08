@@ -83,6 +83,9 @@ export const DEF = {
   // daily log, each entry { id, t, … } and merged like `measures`; `nutrition` holds the targets'
   // settings — how calories are set, the protein factor, the fat share and the rate aimed for.
   foods: [], meals: [], foodLog: [],
+  // Health Connect (lib/health.js): steps per day and other apps' exercise sessions land in
+  // `activity` (merged like `measures`); `health` is the switch and where the last read got to.
+  activity: [], health: { on: false, write: true, lastRead: null, lastSync: null },
   nutrition: { mode: 'adaptive', protPerKgLean: 2.3, fatPct: 25, ratePct: 0.75, manualKcal: null, manualProtein: null },
   exWeights: {}, workouts: [], active: null, customEx: [], gifSize: 'full',
   // Stats activity heatmap metric. Profiles without this key continue to open on time.
@@ -876,7 +879,7 @@ export const useStore = create((set, get) => {
   // A copy's workouts, weigh-ins and custom exercises split by the names a sign-in recorded when it
   // began (`pre`, see setUser): `before` holds what was there then, `later` — null when nothing
   // is — what was logged since, with the custom exercises its workouts use, in this copy's unit.
-  const ADOPT_FIELDS = ['workouts', 'bodyweight', 'customEx', 'measures', 'bodyfat', 'foods', 'meals', 'foodLog']
+  const ADOPT_FIELDS = ['workouts', 'bodyweight', 'customEx', 'measures', 'bodyfat', 'foods', 'meals', 'foodLog', 'activity']
   const splitByPre = (S, pre) => {
     const before = { ...S }
     const later = { _ts: S._ts, unit: S.unit, ...(S.unitSet ? { unitSet: S.unitSet } : {}) }

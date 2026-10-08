@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="health_rationale_title">Datos de salud en SuperOpenGym</string>
+    <string name="health_rationale">SuperOpenGym lee de Health Connect, solo con tu permiso:\n\n• Los pasos de cada día, para mostrar tu actividad diaria y compararla con tu tendencia de peso.\n• Las sesiones de ejercicio que registran otras apps o tu reloj (correr, caminar, bici…), para contar tu cardio.\n• El peso y el % de grasa de una báscula inteligente, que se añaden como pesajes y lecturas de grasa.\n\nEscribe en Health Connect los entrenos que terminas en SuperOpenGym, como sesiones de entrenamiento de fuerza.\n\nLos datos se quedan en tu móvil y, si conectas la app a tu propio servidor, en ese servidor. Nunca se envían a nadie más, no se venden ni se usan para publicidad.\n\nPuedes retirar cualquier permiso cuando quieras en Ajustes → Health Connect.</string>
+</resources>

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     namespace "com.chemafernandez.superopengym"
@@ -16,6 +17,8 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Kotlin bytecode on the same level as the Java sources (capacitor.build.gradle: Java 21)
+    kotlinOptions { jvmTarget = '21' }
     buildTypes {
         release {
             minifyEnabled false
@@ -53,6 +56,9 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
+    // Health Connect (SuperOpenGym Phase 7): steps, exercise, weight and body fat in; workouts out
+    implementation "androidx.health.connect:connect-client:$healthConnectVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3"
 }
 
 apply from: 'capacitor.build.gradle'

@@ -2683,6 +2683,8 @@ function doFinishWorkout() {
     }
     s.active = null
   })
+  // Health Connect: the finished workout as a strength session there, when switched on (never blocks)
+  import('./lib/health.js').then(m => m.writeWorkoutToHealth(useStore.getState().S, shown)).catch(() => {})
   useStore.getState().autoBackupNow()
   useUI.getState().stopRest()
   beep(snd(), 880, 0.15); beep(snd(), 1100, 0.15, 0.18); beep(snd(), 1320, 0.3, 0.36)

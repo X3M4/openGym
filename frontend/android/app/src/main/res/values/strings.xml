@@ -8,4 +8,6 @@
     <string name="rest_channel_name">Rest timer</string>
     <string name="rest_quiet_channel_name">Rest timer, without vibration</string>
     <string name="rest_channel_desc">Rest between sets, in the notification shade. The lock screen shows it only when notifications are allowed there.</string>
+    <string name="health_rationale_title">Health data in SuperOpenGym</string>
+    <string name="health_rationale">SuperOpenGym reads from Health Connect, only with your permission:\n\n• Steps per day, to show your daily activity and compare it with your weight trend.\n• Exercise sessions recorded by other apps or your watch (running, walking, bike…), to count your cardio.\n• Weight and body fat from a smart scale, added as weigh-ins and body-fat readings.\n\nIt writes to Health Connect the workouts you finish in SuperOpenGym, as strength-training sessions.\n\nThe data stays on your phone and, if you connect the app to your own server, on that server. It is never sent to anyone else, never sold and not used for advertising.\n\nYou can withdraw any permission at any time in Settings → Health Connect.</string>
 </resources>

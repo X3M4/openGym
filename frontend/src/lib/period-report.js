@@ -11,6 +11,7 @@ import { bestSetOf } from './onerm.js'
 import { isoOf, weekKey } from './format.js'
 import { weeklyRelations } from './correlation.js'
 import { trendSeries, weeklyRate, bodyFatSeries, liveMeasures, measureChanges } from './body-comp.js'
+import { cardioMinutesByDay } from './health-sync.js'
 
 // A week's food enters the relations only with at least this many days logged (SuperOpenGym's rule).
 export const FOOD_MIN_DAYS = 4
@@ -137,6 +138,11 @@ export function weeklySeries(S, facts, from, to, ws) {
       mixedSessions: inWeek.filter(f => f.kind === 'mixed').length,
     }
     for (const id of routineIds) vars['routine:' + id] = inWeek.filter(f => f.routineIds.includes(id)).length
+    // Health Connect: mean daily steps of the week's days with a count, and other apps' cardio
+    const stepDays = (S.activity || []).filter(x => x && !x.deleted && x.kind === 'steps' && weekKey(x.d, ws) === key)
+    vars.steps = stepDays.length >= FOOD_MIN_DAYS ? mean(stepDays.map(x => x.steps)) : null
+    vars.extCardio = (S.activity || []).some(x => x && x.kind === 'exercise')
+      ? [...cardioMinutesByDay(S, key, addDays(key, 6)).values()].reduce((a, b) => a + b, 0) : null
     vars.kcal = logged.length >= FOOD_MIN_DAYS ? mean(logged.map(x => x.kcal)) : null
     vars.protein = logged.length >= FOOD_MIN_DAYS ? mean(logged.map(x => x.p)) : null
     const avg = mean(bwByWeek.get(key) || [])
@@ -188,7 +194,7 @@ export function topLiftSeries(S, facts, n = 4) {
 
 /** The relation keys the report tests, in reading order. */
 export function relationKeys(weeks) {
-  const base = ['sessions', 'sets', 'volume', 'cardioMin', 'strengthSessions', 'cardioSessions', 'mixedSessions', 'kcal', 'protein']
+  const base = ['sessions', 'sets', 'volume', 'cardioMin', 'strengthSessions', 'cardioSessions', 'mixedSessions', 'kcal', 'protein', 'steps', 'extCardio']
   const routines = Object.keys(weeks[0]?.vars || {}).filter(k => k.startsWith('routine:'))
   return [...base, ...routines]
 }
@@ -232,6 +238,7 @@ export function buildPeriodReport(S, { from, to, today = isoOf(new Date()), week
     fatRelations: { ...weeklyRelations(weeks.map(w => ({ vars: w.vars, change: w.fatChange })), relationKeys(weeks)), method: mainFatMethod(S, from, addDays(to, 7)) },
     body: bodySection(S, from, to),
     food: foodSection(S, from, to),
+    activity: activitySection(S, from, to),
   }
 }
 
@@ -281,4 +288,13 @@ export function foodSection(S, from, to) {
   const xs = [...days.values()]
   const avg = k => (xs.length ? Math.round(xs.reduce((n, x) => n + x[k], 0) / xs.length) : null)
   return { days: xs.length, totalDays: daysBetween(from, to).length, kcal: avg('kcal'), p: avg('p'), c: avg('c'), f: avg('f') }
+}
+
+/** Health Connect over [from, to]: mean steps of the days with a count, other apps' cardio. */
+export function activitySection(S, from, to) {
+  const steps = (S.activity || []).filter(x => x && !x.deleted && x.kind === 'steps' && x.d >= from && x.d <= to)
+  const cardio = [...cardioMinutesByDay(S, from, to).values()].reduce((a, b) => a + b, 0)
+  const sessions = (S.activity || []).filter(x => x && !x.deleted && x.kind === 'exercise' && x.d >= from && x.d <= to)
+  return { stepDays: steps.length, steps: steps.length ? Math.round(steps.reduce((n, x) => n + x.steps, 0) / steps.length) : null,
+    cardioMin: Math.round(cardio), sessions: sessions.length }
 }

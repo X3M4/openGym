@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EXDB } from './exercises.js'
-import { buildPeriodReport, workoutFacts, calendarDays, weeklySeries, daysBetween, presetRange, mainFatMethod, bodySection } from './period-report.js'
+import { buildPeriodReport, workoutFacts, calendarDays, weeklySeries, daysBetween, presetRange, mainFatMethod, bodySection, activitySection } from './period-report.js'
 
 const chest = EXDB.find(e => e.bp === 'chest').id
 const legs = EXDB.find(e => e.bp === 'upper legs').id
@@ -121,5 +121,18 @@ describe('body composition in the report', () => {
     expect(b.measures.waist.change).toBe(-2)
     expect(b.fat.map(x => x.method)).toEqual(['navy', 'scale', 'scale', 'calipers', 'navy'])
     expect(b.rate).toBeLessThan(0)
+  })
+})
+
+describe('activity from Health Connect in the report', () => {
+  it('means the steps of the days with a count and adds up other apps\' cardio, strength left out', () => {
+    const S = { activity: [
+      { id: 'steps:2026-09-01', kind: 'steps', d: '2026-09-01', steps: 8000 },
+      { id: 'steps:2026-09-02', kind: 'steps', d: '2026-09-02', steps: 12000 },
+      { id: 'hc:a', kind: 'exercise', d: '2026-09-02', start: 0, end: 40 * 60000, type: 56 },
+      { id: 'hc:b', kind: 'exercise', d: '2026-09-02', start: 0, end: 60 * 60000, type: 70 },
+      { id: 'x', deleted: true, t: 1 },
+    ] }
+    expect(activitySection(S, '2026-09-01', '2026-09-30')).toEqual({ stepDays: 2, steps: 10000, cardioMin: 40, sessions: 2 })
   })
 })

@@ -129,6 +129,8 @@ const VAR_NOUN = {
   cardioSessions: () => t('cardio-only sessions'),
   mixedSessions: () => t('mixed sessions'),
   kcal: () => t('calories eaten'),
+  steps: () => t('daily steps'),
+  extCardio: () => t('cardio from other apps'),
   protein: () => t('protein eaten'),
 }
 const routineName = (key, routines) => routines.find(x => x.id === key.slice(8))?.name || t('a routine')
@@ -148,6 +150,8 @@ function thresholdText(key, v, unit, routines) {
     cardioSessions: () => t('{0} or more cardio-only sessions', n),
     mixedSessions: () => t('{0} or more mixed sessions', n),
     kcal: () => t('{0} kcal a day or more', n),
+    steps: () => t('{0} steps a day or more', n),
+    extCardio: () => t('{0} or more minutes of cardio from other apps', n),
     protein: () => t('{0} g of protein a day or more', n),
   }[key] || (() => n))()
 }
@@ -194,6 +198,16 @@ function relationsHTML(rep, routines) {
 
 const METHOD_LABEL = { scale: 'Smart scale (bioimpedance)', calipers: 'Skinfold calipers', dexa: 'DEXA scan', navy: 'US Navy estimate', other: 'Other' }
 const MEASURE_LABEL = { waist: 'Waist', neck: 'Neck', hip: 'Hip', chest: 'Chest', shoulders: 'Shoulders', arm: 'Arm', thigh: 'Thigh', calf: 'Calf' }
+
+function activityHTML(rep) {
+  const A = rep.activity
+  if (!A.stepDays && !A.sessions) return `<p class="empty">${esc(t('Nothing from Health Connect in this period.'))}</p>`
+  const cell = (color, label, value, sub = '') => `<div class="stat" style="--f:${color}"><span class="stat-l">${esc(label)}</span><span class="stat-v">${value}</span>${sub ? `<span class="stat-s">${sub}</span>` : ''}</div>`
+  return `<div class="stats">
+    ${cell(MOVE, t('Steps'), A.steps != null ? esc(fmtNum(A.steps)) : '—', esc(t('a day, mean of {0} days with a count', A.stepDays)))}
+    ${cell(MOVE, t('Cardio from other apps'), `${esc(fmtNum(A.cardioMin))}<small> min</small>`, esc(t('{0} sessions', A.sessions)))}
+  </div>`
+}
 
 function foodHTML(rep) {
   const F = rep.food
@@ -353,6 +367,9 @@ export function periodReportHTML(rep, S, owner) {
 
   <h2>${esc(t('Nutrition'))}</h2>
   ${foodHTML(rep)}
+
+  <h2>${esc(t('Activity'))}</h2>
+  ${activityHTML(rep)}
 
   <h2>${esc(t('Plan and sessions, day by day'))}</h2>
   <div class="legend"><span><i style="background:${TRAIN}"></i>${esc(t('Trained'))}</span><span><i style="border:1.5px solid ${INK}"></i>${esc(t('Planned, not done'))}</span><span><i style="background:${SILVER}"></i>${esc(t('Planned, still to come'))}</span></div>

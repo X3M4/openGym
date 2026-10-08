@@ -13,6 +13,7 @@ import { glyphOf } from '../lib/glyphs.js'
 import { fieldKind, typicalMinutes } from '../lib/home-field.js'
 import { trendSeries, weeklyRate, rateBand, isCutting } from '../lib/body-comp.js'
 import { targets, dayTotals } from '../lib/nutrition.js'
+import { stepsOn, exerciseOn, EXERCISE_TYPES, STRENGTH_TYPES } from '../lib/health-sync.js'
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -122,6 +123,7 @@ export default function Home() {
       <BodyBand S={S} bw={bw} delta={delta} bwPoints={bwPoints} />}
 
     <NutritionBand S={S} />
+    <ActivityBand S={S} />
 
     <button className="dband" onClick={() => calendarSheet()}>
       <span className="dband-sq dband-train"><Icon name="flame" /></span>
@@ -245,6 +247,25 @@ function NutritionBand({ S }) {
     <span className="dband-m">
       <span className="dband-t">{fmtNum(day.kcal)}{T.kcal != null ? ' / ' + fmtNum(T.kcal) : ''} kcal</span>
       <span className="dband-s">{t('Protein')} {fmtNum(day.p)}{T.protein != null ? ' / ' + fmtNum(T.protein) : ''} g{!day.items.length ? ' · ' + t('nothing logged today') : ''}</span>
+    </span>
+    <Icon name="chevronRight" className="dband-c" />
+  </button>
+}
+
+// The activity band: today's steps and other apps' exercise, from Health Connect. Shown once
+// Health Connect is on or anything has arrived from it.
+function ActivityBand({ S }) {
+  const nav = useNavigate()
+  const today = todayISO()
+  if (!S.health?.on && !(S.activity || []).length) return null
+  const steps = stepsOn(S, today)
+  const sessions = exerciseOn(S, today)
+  const cardio = Math.round(sessions.filter(x => !STRENGTH_TYPES.has(x.type)).reduce((n, x) => n + (x.end - x.start) / 60000, 0))
+  return <button className="dband" onClick={() => nav('/settings')}>
+    <span className="dband-sq dband-move"><Icon name="figureRun" /></span>
+    <span className="dband-m">
+      <span className="dband-t">{steps != null ? t('{0} steps', fmtNum(steps)) : t('No steps yet today')}</span>
+      <span className="dband-s">{sessions.length ? sessions.map(x => t(EXERCISE_TYPES[x.type] || 'Workout')).join(' · ') + (cardio ? ' · ' + t('{0} min of cardio', cardio) : '') : t('From Health Connect')}</span>
     </span>
     <Icon name="chevronRight" className="dband-c" />
   </button>

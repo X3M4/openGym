@@ -30,3 +30,18 @@ if (!MOBILE && 'serviceWorker' in navigator && location.protocol === 'https:') {
   // It only fetches ahead while the page runs as the installed app; a tab keeps what it has shown.
   import('./lib/media-prefetch.js').then(m => m.startMediaPrefetch(useStore)).catch(() => {})
 }
+
+// Health Connect (Android app): what is new since the last read, once the profile is loaded and
+// whenever the app comes back to the front — at most every 15 minutes. Off until switched on.
+if (MOBILE) {
+  const HEALTH_EVERY_MS = 15 * 60000
+  let lastTry = 0
+  const healthTick = () => {
+    const st = useStore.getState()
+    if (!st.ready || !st.S?.health?.on || Date.now() - lastTry < HEALTH_EVERY_MS) return
+    lastTry = Date.now()
+    import('./lib/health.js').then(m => m.syncHealth(useStore)).catch(() => {})
+  }
+  useStore.subscribe(s => { if (s.ready) healthTick() })
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') healthTick() })
+}

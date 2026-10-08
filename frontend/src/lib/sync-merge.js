@@ -22,7 +22,7 @@
  *   - routines: union by id in the newer copy's order; of an id that both have, the version
  *     edited last by its own `_ts` (stampRoutines), the newer copy's on a tie
  *   - bodyweight: union by day, the later-edited (`t`) entry of a day that both have
- *   - measures, bodyfat, foods, meals, foodLog (SuperOpenGym): union by id, the later-edited (`t`) version of an id both
+ *   - measures, bodyfat, foods, meals, foodLog, activity (SuperOpenGym): union by id, the later-edited (`t`) version of an id both
  *     have. A deletion is a tombstone ({ id, deleted: true, t }) so it outlives the other copy's
  *     older version instead of being brought back by the union (mergeLatestById)
  *   - favEx: ordered set union, the newer copy first
@@ -230,10 +230,10 @@ const bodyweightKey = e => `${e?.d}|${e?.t ?? ''}`
 const RESET_LISTS = {
   workouts: workoutKey, routines: x => x?.id, customEx: x => x?.id, bodyweight: bodyweightKey,
   gymCards: x => x?.id, equipProfiles: x => x?.id, favEx: x => x,
-  measures: x => x?.id, bodyfat: x => x?.id, foods: x => x?.id, meals: x => x?.id, foodLog: x => x?.id,
+  measures: x => x?.id, bodyfat: x => x?.id, foods: x => x?.id, meals: x => x?.id, foodLog: x => x?.id, activity: x => x?.id,
 }
 /** The SuperOpenGym lists merged entry by entry (mergeLatestById), deletions as tombstones. */
-export const LATEST_BY_ID = ['measures', 'bodyfat', 'foods', 'meals', 'foodLog']
+export const LATEST_BY_ID = ['measures', 'bodyfat', 'foods', 'meals', 'foodLog', 'activity']
 const RESET_MAPS = ['exNotes', 'barWeights', 'balanceOverrides', 'loadKind', 'plates']
 /** An entry's name in resetIds: a workout's id (or day and start), a weigh-in's day and time, … */
 export const entryKey = (field, x) => String(RESET_LISTS[field](x))
