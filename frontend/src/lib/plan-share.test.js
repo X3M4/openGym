@@ -291,3 +291,25 @@ describe('plan-share links and media (#246)', () => {
     expect(mine.customEx[0].url).toBeUndefined()
   })
 })
+
+describe('slot alternatives in a shared plan', () => {
+  it('travel with the exercise, tidied', () => {
+    expect(roundTrip({ alt: ['0748', '0025', '0748', '0577'] }).alt).toEqual(['0748', '0577'])
+  })
+  it('are left out when there are none', () => {
+    expect(roundTrip({ alt: [] })).not.toHaveProperty('alt')
+  })
+  it('drop an id the file cannot resolve', () => {
+    const raw = { opengym_plan: 1, routines: [{ id: 'r', name: 'R', ex: [{ id: '0025', sets: 3, reps: 5, alt: ['nope', '0748'] }] }], customEx: [] }
+    expect(parsePlan(raw).routines[0].ex[0].alt).toEqual(['0748'])
+  })
+  it('bring a custom alternative along and point at its new id after import', () => {
+    const custom = { id: 'c9', n: 'Gym pec deck', bp: 'chest', custom: true }
+    const source = { routines: [{ id: 'r', name: 'R', ex: [{ id: '0308', sets: 3, reps: 12, alt: ['c9'] }] }], week: {}, customEx: [custom] }
+    const bundle = buildPlanBundle(source, 'Plan')
+    expect(bundle.customEx.map(c => c.id)).toEqual(['c9'])
+    const target = { routines: [], week: {}, customEx: [] }
+    mergePlan(target, parsePlan(JSON.stringify(bundle)))
+    expect(target.routines[0].ex[0].alt).toEqual([target.customEx[0].id])
+  })
+})

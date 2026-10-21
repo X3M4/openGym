@@ -135,3 +135,45 @@ describe('swap wording', () => {
     expect(configView.props.saveLabel).toBe('Use in this workout')
   })
 })
+
+// A routine slot's alternatives (lib/routines.js): offered at the top of the swap picker, and a
+// tap swaps with the slot's own sets, reps and rest — not the library default of 3 × 10.
+describe('swapping to a slot alternative', () => {
+  const DB_FLY = '0308', PEC_DECK = '0596', CABLE_FLY = '0188'
+  const install = () => {
+    const S = clone(DEF)
+    S.routines = [{ id: 'chest', name: 'Chest + Arms', prog: 'double', ex: [
+      { id: DB_FLY, sets: 3, reps: 15, repsMin: 12, weight: 14, restSec: 60, alt: [PEC_DECK, CABLE_FLY] }
+    ] }]
+    S.active = {
+      id: 'swap-alt', d: '2026-10-21', start: Date.now(), routineIds: ['chest'], name: 'Chest + Arms', bw: null, cur: 0,
+      entries: [{ ...entry(DB_FLY), rid: 'chest' }],
+    }
+    useStore.setState({ S, user: null })
+  }
+  const openPicker = () => {
+    swapActiveWorkoutExercise(0)
+    const picker = useUI.getState().sheets.at(-1)
+    return picker.render(picker.close)
+  }
+
+  it('lists the alternatives first', () => {
+    install()
+    expect(openPicker().props.suggested.map(e => e.id)).toEqual([PEC_DECK, CABLE_FLY])
+  })
+
+  it('swaps with the slot prescription, and then offers the planned exercise back', () => {
+    install()
+    const view = openPicker()
+    act(() => view.props.onPick(view.props.suggested[0], true))
+    const [swapped] = useStore.getState().S.active.entries
+    expect(swapped).toMatchObject({ id: PEC_DECK, rid: 'chest' })
+    expect(swapped.target).toMatchObject({ sets: 3, reps: 15, repsMin: 12, restSec: 60 })
+    expect(useStore.getState().S.routines[0].ex[0].id).toBe(DB_FLY)
+    expect(openPicker().props.suggested.map(e => e.id)).toEqual([DB_FLY, CABLE_FLY])
+  })
+
+  it('offers nothing for a freestyle entry', () => {
+    expect(openPicker().props.suggested).toBeNull()
+  })
+})

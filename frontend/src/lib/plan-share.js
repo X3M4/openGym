@@ -9,6 +9,7 @@
 //     a page break — each exercise, and each routine that fits, stays in one place.
 
 import { EXIDX, isBodyweightEq } from './exercises.js'
+import { cleanAlternatives } from './routines.js'
 import { cleanUrl } from './media-refs.js'
 import { modeOf, exLine, MAX_PLANNED_WARMUPS } from './history.js'
 import { deriveSessionName } from './session-merge.js'
@@ -99,6 +100,10 @@ function cleanEx(e) {
   if (e.warmupRestSec > 0) o.warmupRestSec = e.warmupRestSec   // the ramp's own rest travels with the work rest
   if (e.sg) o.sg = e.sg
   if (e.note) o.note = e.note
+  // The slot's alternatives are part of the plan: a shared routine without them is one bad
+  // gym-floor day from a search through the whole library.
+  const alt = cleanAlternatives(e.alt, e.id)
+  if (alt.length) o.alt = alt
   const warm = cleanWarmupSets(e.warmupSets)
   if (warm) o.warmupSets = warm
   // Drop-sets and rest-pause are part of how the exercise is prescribed, not a logging detail.
@@ -177,7 +182,7 @@ export function buildPlanBundle(S, name) {
     ...(r.excludeFromProgression === true ? { excludeFromProgression: true } : {}),
     ex: (r.ex || []).map(cleanEx)
   }))
-  const usedIds = new Set(routines.flatMap(r => r.ex.map(e => e.id)))
+  const usedIds = new Set(routines.flatMap(r => r.ex.flatMap(e => [e.id, ...(e.alt || [])])))
   const customEx = (S.customEx || [])
     .filter(c => usedIds.has(c.id))
     .map(cleanCustom)
@@ -221,8 +226,11 @@ export function parsePlan(raw, destinationUnit = 'kg') {
       const intens = cleanIntensifier(e.intensifier)
       const rest = cleanRestSec(e.restSec)
       const warmRest = cleanRestSec(e.warmupRestSec)
-      const { warmupSets, intensifier, restSec, warmupRestSec, ...passthrough } = e
-      return convertedExercise({ ...passthrough, ...(warm ? { warmupSets: warm } : {}), ...(intens ? { intensifier: intens } : {}), ...(rest ? { restSec: rest } : {}), ...(warmRest ? { warmupRestSec: warmRest } : {}) }, sourceUnit || destination, destination)
+      // Alternatives that name an exercise this file cannot resolve are dropped, not kept as ids
+      // that would show up as a blank row in the swap list.
+      const alt = cleanAlternatives(e.alt, e.id, id => known.has(id) || !!EXIDX[id])
+      const { warmupSets, intensifier, restSec, warmupRestSec, alt: _alt, ...passthrough } = e
+      return convertedExercise({ ...passthrough, ...(warm ? { warmupSets: warm } : {}), ...(intens ? { intensifier: intens } : {}), ...(rest ? { restSec: rest } : {}), ...(warmRest ? { warmupRestSec: warmRest } : {}), ...(alt.length ? { alt } : {}) }, sourceUnit || destination, destination)
     })
   }))
   return {
@@ -275,7 +283,7 @@ export function mergePlan(s, bundle, { schedule } = {}) {
       emoji: r.emoji,
       ...(r.prog ? { prog: r.prog } : {}),
       ...(r.excludeFromProgression === true ? { excludeFromProgression: true } : {}),
-      ex: (r.ex || []).map(e => ({ ...e, id: exIdMap[e.id] || e.id }))
+      ex: (r.ex || []).map(e => ({ ...e, id: exIdMap[e.id] || e.id, ...(e.alt ? { alt: e.alt.map(a => exIdMap[a] || a) } : {}) }))
     })
   })
   if (schedule) {

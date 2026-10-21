@@ -78,11 +78,12 @@ export function replaceSlotExercise(slot, id, S, rid) {
   const old = slot || {}
   if (old.id === id) return { ...old }
   if ((modeOf(old) === 'cardio') !== isCardio(id)) {
-    const kept = ['sg', 'note', 'restSec'].filter(key => old[key] != null)
-    return { id, ...defaultConfig(id), ...Object.fromEntries(kept.map(key => [key, old[key]])) }
+    const kept = ['sg', 'note', 'restSec', 'alt'].filter(key => old[key] != null)
+    return setSlotAlternatives({ id, ...defaultConfig(id), ...Object.fromEntries(kept.map(key => [key, old[key]])) }, old.alt)
   }
   const { id: _replaced, bodyweight: _flag, assisted: _assisted, side: _side, ...carried } = old
-  const out = { id, ...carried }
+  // Alternatives belong to the slot, so they stay — minus the exercise that now fills it.
+  const out = setSlotAlternatives({ id, ...carried }, old.alt)
   if (isCardio(id)) return out
   if (isBw(old) !== isBodyweightEq(id)) {
     out.weight = 0
@@ -98,4 +99,49 @@ export function replaceSlotExercise(slot, id, S, rid) {
   const last = S ? sessionsFor(S, id, out, rid).filter(s => s.mode === mode).at(-1) : null
   if (last) out.weight = last.planned?.weight ?? last.weight ?? 0
   return out
+}
+
+// How many alternatives one slot keeps. A handful covers "the machine is taken" and "I fancy
+// the other one today"; past that it is a second routine.
+export const MAX_ALTERNATIVES = 6
+
+/**
+ * A slot's alternatives, tidied: ids only, each once, never the slot's own exercise, only the
+ * ones `known` accepts (an exercise deleted or not shipped any more), at most MAX_ALTERNATIVES.
+ * Returns [] for anything that is not a list, so callers can drop the field when it is empty.
+ */
+export function cleanAlternatives(list, slotId, known = () => true) {
+  if (!Array.isArray(list)) return []
+  const out = []
+  for (const id of list) {
+    if (typeof id !== 'string' || !id || id === slotId || out.includes(id) || !known(id)) continue
+    out.push(id)
+    if (out.length === MAX_ALTERNATIVES) break
+  }
+  return out
+}
+
+/** Set a slot's alternatives in place: written only when there are any, so a plan keeps its shape. */
+export function setSlotAlternatives(slot, list, known) {
+  const alt = cleanAlternatives(list, slot.id, known)
+  if (alt.length) slot.alt = alt
+  else delete slot.alt
+  return slot
+}
+
+/**
+ * What a workout entry can be swapped to from its routine's plan: the slot's planned exercise
+ * and its alternatives, minus the exercise the entry holds now. The slot is found by the entry's
+ * exercise being either the slot's own or one of its alternatives — so after a swap the original
+ * is offered back. Returns { index, ids } (index of the slot in the routine), or null when the
+ * routine has no slot for it or nothing to offer.
+ */
+export function slotAlternatives(routine, exId) {
+  const ex = Array.isArray(routine?.ex) ? routine.ex : []
+  let index = ex.findIndex(s => s?.id === exId)
+  if (index < 0) index = ex.findIndex(s => Array.isArray(s?.alt) && s.alt.includes(exId))
+  if (index < 0) return null
+  const slot = ex[index]
+  const ids = [slot.id, ...cleanAlternatives(slot.alt, slot.id)].filter(id => id !== exId)
+  return ids.length ? { index, ids } : null
 }

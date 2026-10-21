@@ -31,10 +31,11 @@ const APPROVED = {
 const shape = r => r.ex.map(e => [e.id, e.sets, e.reps])
 
 describe('starter plan catalog', () => {
-  it('offers exactly the four plans, with the day count read off the schedule', () => {
+  it('offers exactly the five plans, with the day count read off the schedule', () => {
     expect(starterPlanOptions()).toEqual([
       { id: 'ppl', days: 3 }, { id: 'upper-lower', days: 4 },
       { id: 'full-body', days: 3 }, { id: '5x5', days: 3 },
+      { id: 'paired-split', days: 3 },
     ])
     for (const { id, days } of starterPlanOptions()) expect(starterPlanDays(id)).toHaveLength(days)
   })
@@ -100,5 +101,76 @@ describe('starterRoutines (the demo build entry point)', () => {
     const first = starterRoutines().map(r => r.id)
     const second = starterRoutines().map(r => r.id)
     expect(new Set([...first, ...second]).size).toBe(6)
+  })
+})
+
+// The paired split carries more than [id, sets, reps]: rep ranges under double progression,
+// rests, supersets, cardio warm-ups/finishers and per-slot alternatives.
+describe('paired-split', () => {
+  // [weekday, name, [[id, sets, repsMin, reps]]] — lifting slots only, cardio checked apart.
+  const APPROVED_SPLIT = [
+    [1, 'Chest + Back', [['0025', 4, 6, 8], ['2616', 4, 8, 10], ['1299', 3, 8, 10], ['0292', 3, 8, 10], ['0227', 3, 12, 15], ['1323', 3, 10, 12], ['0581', 3, 10, 12], ['0203', 3, 12, 15], ['0375', 2, 10, 12]]],
+    [3, 'Legs + Back', [['0043', 4, 6, 8], ['2330', 4, 8, 10], ['0739', 3, 10, 12], ['1350', 3, 8, 10], ['1409', 3, 10, 12], ['0586', 3, 10, 12], ['0585', 3, 12, 15], ['0237', 3, 12, 15], ['0738', 3, 12, 15]]],
+    [5, 'Chest + Arms', [['0314', 4, 8, 10], ['0577', 3, 8, 10], ['0751', 3, 8, 10], ['0308', 3, 12, 15], ['0031', 3, 8, 10], ['0060', 3, 8, 10], ['0070', 3, 10, 12], ['0200', 3, 12, 15], ['0313', 3, 10, 12], ['0194', 3, 10, 12]]],
+  ]
+  const lifts = r => r.ex.filter(e => !EXIDX[e.id] || EXIDX[e.id].bp !== 'cardio')
+
+  it('schedules chest + back, legs + back, chest + arms on Mon/Wed/Fri with the approved lifts', () => {
+    const { routines, schedule } = buildStarterPlan('paired-split')
+    const byId = Object.fromEntries(routines.map(r => [r.id, r]))
+    const got = schedule.map(({ day, routineId }) => {
+      const r = byId[routineId]
+      return [day, r.name, lifts(r).map(e => [e.id, e.sets, e.repsMin, e.reps])]
+    })
+    expect(got).toEqual(APPROVED_SPLIT)
+  })
+
+  it('runs every routine on double progression', () => {
+    for (const r of buildStarterPlan('paired-split').routines) expect(r.prog).toBe('double')
+  })
+
+  it('opens with a cardio warm-up and ends with a cardio finisher', () => {
+    for (const r of buildStarterPlan('paired-split').routines) {
+      for (const e of [r.ex[0], r.ex.at(-1)]) {
+        expect(EXIDX[e.id].bp).toBe('cardio')
+        expect(e).toMatchObject({ sets: 1 })
+        expect(e.min).toBeGreaterThan(0)
+        expect(e).not.toHaveProperty('reps')
+      }
+    }
+  })
+
+  it('never plans a pull-up, not even as an alternative', () => {
+    for (const r of buildStarterPlan('paired-split').routines) {
+      for (const e of r.ex) expect([e.id, ...(e.alt || [])]).not.toContain('0652')
+    }
+  })
+
+  it('offers real alternatives, never the slot itself, and the dumbbell fly can go to the pec deck', () => {
+    const { routines } = buildStarterPlan('paired-split')
+    for (const r of routines) for (const e of r.ex) {
+      expect(EXIDX[e.id], e.id).toBeTruthy()
+      expect(e.weight ?? 0).toBe(0)
+      for (const a of e.alt || []) expect(EXIDX[a], a).toBeTruthy()
+      expect(e.alt || []).not.toContain(e.id)
+    }
+    const fly = routines.find(r => r.name === 'Chest + Arms').ex.find(e => e.id === '0308')
+    expect(fly.alt).toContain('0596')
+  })
+
+  it('pairs supersets as adjacent slots', () => {
+    for (const r of buildStarterPlan('paired-split').routines) {
+      const groups = {}
+      r.ex.forEach((e, i) => { if (e.sg) (groups[e.sg] ||= []).push(i) })
+      for (const idx of Object.values(groups)) {
+        expect(idx).toHaveLength(2)
+        expect(idx[1] - idx[0]).toBe(1)
+      }
+    }
+  })
+
+  it('takes translated routine names by key and keeps English for the rest', () => {
+    const { routines } = buildStarterPlan('paired-split', { 'legs-back': 'Pierna + Espalda' })
+    expect(routines.map(r => r.name)).toEqual(['Legs + Back', 'Chest + Back', 'Chest + Arms'].map(n => n === 'Legs + Back' ? 'Pierna + Espalda' : n))
   })
 })

@@ -37,6 +37,7 @@ import { speedUnitOf, toSpeed, fromSpeed } from './lib/speed.js'
 import { buildCompletedWorkout } from './lib/finish-workout.js'
 import { isWarmupRow, hasCompletedWork } from './lib/workout-model.js'
 import { saveSessionAsRoutine } from './lib/session-routines.js'
+import { replaceSlotExercise, setSlotAlternatives, slotAlternatives, MAX_ALTERNATIVES } from './lib/routines.js'
 import { nextUnfinishedUnit } from './lib/supersetFlow.js'
 import { swapActiveExercise } from './lib/active-exercise-swap.js'
 import { useSheetKeyboard, useRevealActiveChip, tappable } from './lib/use-sheet-keyboard.js'
@@ -134,7 +135,12 @@ const PLAN_COPY = {
   ppl: () => ({ name: t('Push / Pull / Legs'), about: t('Push, pull and legs each get their own day.') }),
   'upper-lower': () => ({ name: t('Upper / Lower'), about: t('Upper body twice, lower body twice.') }),
   'full-body': () => ({ name: t('Full Body'), about: t('Three sessions, the whole body each time.') }),
-  '5x5': () => ({ name: t('5×5'), about: t('Five sets of five on the main barbell lifts.') })
+  '5x5': () => ({ name: t('5×5'), about: t('Five sets of five on the main barbell lifts.') }),
+  'paired-split': () => ({
+    name: t('Paired split'),
+    about: t('Chest + back, legs + back and chest + arms, with alternatives for every exercise.'),
+    routines: { 'legs-back': t('Legs + Back'), 'chest-back': t('Chest + Back'), 'chest-arms': t('Chest + Arms') }
+  })
 }
 
 // Adds the plan's routines and puts them on its weekdays. Existing routines are never touched
@@ -142,7 +148,7 @@ const PLAN_COPY = {
 // nothing at all. planId is deliberately required — a default invites `onClick={loadStarterPlan}`,
 // which hands the click event in as the plan and silently loads nothing.
 export function loadStarterPlan(planId) {
-  const plan = buildStarterPlan(planId)
+  const plan = buildStarterPlan(planId, PLAN_COPY[planId]?.().routines)
   if (!plan) return false
   update(st => {
     st.routines.push(...plan.routines)
@@ -1082,7 +1088,7 @@ function usageMap(st) {
   st.workouts.forEach(w => w.entries.forEach(e => { u[e.id] = (u[e.id] || 0) + 1 }))
   return u
 }
-function ExercisePicker({ onPick, title, close }) {
+function ExercisePicker({ onPick, title, suggested, close }) {
   const st = useStore(s => s.S)
   const usage = usageMap(st)
   const [q, setQ] = useState('')
@@ -1128,6 +1134,17 @@ function ExercisePicker({ onPick, title, close }) {
     <div className="picker-search"><div className={'search' + (narrowed ? ' has-count' : '')}><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
       <input ref={searchRef} className="input" placeholder={t('Search {0} exercises…', all.length)} value={q} onFocus={onSearchFocus} onChange={e => { setQ(e.target.value); setShown(50) }} />
       {narrowed && <span className="search-count" role="status" aria-label={exCount(f.length)}>{fmtNum(f.length)}</span>}</div></div>
+    {/* A routine slot's alternatives (lib/routines.js slotAlternatives): the one-tap answer to
+        "the machine is taken", above the search so it is there before you type anything. */}
+    {suggested?.length > 0 && !q.trim() && <>
+      <div className="small dim" style={{ margin: '12px 2px 6px' }}>{t('Alternatives')}</div>
+      <div className="list">
+        {suggested.map(e => <div key={e.id} className="item" {...tappable(() => onPick(e, true))}>
+          <Thumb ex={e} /><div className="grow"><div className={`tt ${exerciseNameClass(e)}`}>{exerciseNameFor(e)}</div><div className="ss capitalize">{t(MUSCLE_NAME[e.tg] || e.tg || e.bp)} · {t(e.eq)}</div></div>
+          <Icon name="shuffle" className="chev" />
+        </div>)}
+      </div>
+    </>}
     {profile && <div className="small dim row" style={{ margin: '8px 0 2px', gap: 6, alignItems: 'center' }}>
       <Icon name="dumbbell" style={{ fontSize: 13 }} />
       {showAll ? t('Showing all equipment') : t('Showing what you have in "{0}"', profile.name)}
@@ -1173,7 +1190,7 @@ function ExercisePicker({ onPick, title, close }) {
   </>
 }
 // `title` names what the pick is for when it is not an add — the routine editor's Replace (#110).
-export const exercisePicker = (onPick, { title } = {}) => ui().openSheet(close => <ExercisePicker onPick={onPick} title={title} close={close} />)
+export const exercisePicker = (onPick, { title, suggested } = {}) => ui().openSheet(close => <ExercisePicker onPick={onPick} title={title} suggested={suggested} close={close} />)
 
 /** Start a safe swap for one exact active-workout occurrence. */
 export function swapActiveWorkoutExercise(index) {
@@ -1183,7 +1200,24 @@ export function swapActiveWorkoutExercise(index) {
   // The "+" on a picker row commits with the default config, exactly as it does in the add
   // flows; tapping the row still opens the config sheet first.
   // Worded for the session, not the routine: a swap changes today's workout only.
-  const picker = exercisePicker((ex, quick) => quick ? swapTo(ex, defaultConfig(ex.id)) : exConfigSheet(ex, null, cfg => swapTo(ex, cfg), null, null, null, null, t('Use in this workout')), { title: t('Swap exercise') })
+  // The slot's alternatives from its routine (lib/routines.js slotAlternatives) come first, and
+  // one of them takes the slot's own sets, reps and rest — what the routine asks of that slot —
+  // with its own weight, the same way the routine editor's Replace builds it.
+  const planned = active.entries[index].rid ? S().routines.find(r => r.id === active.entries[index].rid) : null
+  const alts = slotAlternatives(planned, active.entries[index].id)
+  const altCfg = ex => {
+    const st = S()
+    const routine = st.routines.find(r => r.id === planned?.id)
+    const slot = routine?.ex[alts.index]
+    if (!slot) return defaultConfig(ex.id)
+    const { id: _id, sg: _sg, alt: _alt, ...cfg } = replaceSlotExercise(slot, ex.id, st, routine.id)
+    return cfg
+  }
+  const isAlt = ex => !!alts && alts.ids.includes(ex.id)
+  const picker = exercisePicker((ex, quick) => quick
+    ? swapTo(ex, isAlt(ex) ? altCfg(ex) : defaultConfig(ex.id))
+    : exConfigSheet(ex, null, cfg => swapTo(ex, cfg), null, null, isAlt(ex) ? altCfg(ex) : null, null, t('Use in this workout')),
+  { title: t('Swap exercise'), suggested: alts ? alts.ids.map(id => exOr(id)) : null })
   function swapTo(ex, cfg) {
     // The picker is a chooser here, not a stack you keep adding from: one swap, then back to
     // the workout. (The add flow deliberately leaves it open.)
@@ -1365,7 +1399,7 @@ const intensifierToSave = x => (x.type === 'dropset'
     ? { ...x, totalReps: Math.max(1, Math.round(x.totalReps) || 0), restSec: Math.max(5, Number(x.restSec) || 0) }
     : x)
 
-function ExConfig({ ex, existing, onSave, onDelete, onReplace, close, routine, initial, saveLabel }) {
+function ExConfig({ ex, existing, onSave, onDelete, onReplace, onAlternatives, close, routine, initial, saveLabel }) {
   const st = useStore(s => s.S)
   const cardio = isCardio(ex.id)
   const speedUnit = speedUnitOf(st)
@@ -1621,10 +1655,54 @@ function ExConfig({ ex, existing, onSave, onDelete, onReplace, close, routine, i
         slot, with the slot's sets, reps, weight, rule and note kept (lib/routines.js). What was
         changed on this sheet and not saved is left behind, as closing it would. */}
     {onReplace && <><div style={{ height: 8 }} /><Button icon="shuffle" onClick={() => { close(); onReplace() }}>{t('Replace exercise')}</Button></>}
+    {onAlternatives && <><div style={{ height: 8 }} /><Button icon="list" onClick={() => { close(); onAlternatives() }}>
+      {existing?.alt?.length ? t('Alternatives ({0})', existing.alt.length) : t('Alternatives')}</Button></>}
     {onDelete && <><div style={{ height: 8 }} /><Button variant="danger" onClick={() => { close(); onDelete() }}>{t('Remove from routine')}</Button></>}
   </>
 }
-export const exConfigSheet = (ex, existing, onSave, onDelete, routine, initial, onReplace, saveLabel) => ui().openSheet(close => <ExConfig ex={ex} existing={existing} initial={initial} onSave={onSave} onDelete={onDelete} onReplace={onReplace} routine={routine} saveLabel={saveLabel} close={close} />)
+export const exConfigSheet = (ex, existing, onSave, onDelete, routine, initial, onReplace, saveLabel, onAlternatives) => ui().openSheet(close => <ExConfig ex={ex} existing={existing} initial={initial} onSave={onSave} onDelete={onDelete} onReplace={onReplace} onAlternatives={onAlternatives} routine={routine} saveLabel={saveLabel} close={close} />)
+
+/* ============================ slot alternatives ============================ */
+// The exercises one routine slot can be swapped to mid-workout (the machine is taken, or you
+// fancy the other one today). Swapping in a workout changes that session only; the routine
+// keeps its exercise. Edits persist at once, like everything else in the routine editor. The
+// sheet holds the slot by routine id + index + the exercise it was opened on, and does nothing
+// if the slot has since become something else.
+function SlotAlternatives({ routineId, index, openedOn, close }) {
+  const st = useStore(s => s.S)
+  const slot = st.routines.find(r => r.id === routineId)?.ex[index]
+  const valid = slot && slot.id === openedOn
+  const alt = valid ? (slot.alt || []) : []
+  const known = id => !!EXIDX[id] || (st.customEx || []).some(c => c.id === id)
+  const write = next => update(s => {
+    const x = s.routines.find(r => r.id === routineId)?.ex[index]
+    if (x && x.id === openedOn) setSlotAlternatives(x, next, known)
+  })
+  const add = () => {
+    const picker = exercisePicker(ex => { picker.close(); write([...alt, ex.id]) }, { title: t('Add alternative') })
+  }
+  if (!valid) return <><h3>{t('Alternatives')}</h3><div className="empty">{t('This exercise is no longer in the routine.')}</div></>
+  const main = exOr(slot.id)
+  return <>
+    <h3>{t('Alternatives')}</h3>
+    <div className="small dim" style={{ marginBottom: 12 }}>
+      {t('Offered first when you swap “{0}” during a workout. The swap keeps the sets, reps and rest of this routine and only changes that workout.', exerciseNameFor(main))}
+    </div>
+    {alt.length > 0 && <div className="list">
+      {alt.map(id => { const e = exOr(id); return <div key={id} className="item">
+        <Thumb ex={e} /><div className="grow"><div className={`tt ${exerciseNameClass(e)}`}>{exerciseNameFor(e)}</div><div className="ss capitalize">{t(MUSCLE_NAME[e.tg] || e.tg || e.bp)} · {t(e.eq)}</div></div>
+        <button className="iconbtn chev" aria-label={t('Remove “{0}”', exerciseNameFor(e))} style={{ padding: 8, margin: -8 }}
+          onClick={() => write(alt.filter(x => x !== id))}><Icon name="xmark" /></button>
+      </div> })}
+    </div>}
+    {alt.length === 0 && <div className="empty">{t('No alternatives yet.')}</div>}
+    <div style={{ height: 12 }} />
+    {alt.length < MAX_ALTERNATIVES && <Button variant="primary" icon="plus" onClick={add}>{t('Add alternative')}</Button>}
+    <div style={{ height: 8 }} />
+    <Button variant="ghost" onClick={close}>{t('Done')}</Button>
+  </>
+}
+export const slotAlternativesSheet = (routineId, index, openedOn) => ui().openSheet(close => <SlotAlternatives routineId={routineId} index={index} openedOn={openedOn} close={close} />)
 
 /* ============================ glyph picker ============================ */
 // Grouped by what the glyph means for a training day, so picking one is a scan
