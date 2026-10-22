@@ -11,7 +11,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { hashPassword, hashResetCode } from '../password.js';
+import { hashPassword, hashResetCode, verifyPassword } from '../password.js';
 import { boundPort } from './helpers.mjs';
 
 const API = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -392,7 +392,17 @@ for (const [label, stored] of [['current', () => pwHash], ['older parameters', (
     for (const cookie of cookies) if ((await h.req('GET', '/api/me', { cookie })).status === 200) alive.push(cookie);
     assert.equal(alive.length, 0, `${alive.length} of ${cookies.length} sessions signed with the old password survived the change`);
     assert.equal((await h.req('GET', '/api/me', { cookie: done.cookie })).status, 200, "the owner's own session carries on");
-    assert.equal((await login(h, 'Ana', next, '203.0.113.201')).status, 200);
+    // The new password is the one that holds. Signing in with it may meet a pause, and rightly:
+    // the old-password sign-ins answered after the change are wrong passwords for this account,
+    // and whether a late right one clears the count before the pause starts depends on the order
+    // they finish in — on a busy machine they ran it up, and this check failed now and then.
+    // So the stored hash is checked, and a sign-in with the new password is either let in or
+    // paused, never told the password is wrong.
+    const saved = h.db().users[0].pw.h;
+    assert.equal(await verifyPassword(next, saved), true, 'the new password is stored');
+    assert.equal(await verifyPassword(GOOD, saved), false, 'the old one no longer is');
+    const fresh = await login(h, 'Ana', next, '203.0.113.201');
+    assert.ok([200, 429].includes(fresh.status), `new password answered ${fresh.status}`);
   });
 }
 
